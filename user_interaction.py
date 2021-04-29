@@ -144,14 +144,16 @@ class tmednet(tk.Frame):
 			subplot: plot object
 		Version: 01/2021, EGL: Documentation
 		"""
-        w = evt.widget
+
+        w = evt.widget # Que es EVT???
         index = int(w.curselection()[0])
-        value = w.get(index)
-        print(index, value)
+        self.value = w.get(index)
+        print(index, self.value)
 
         # dibuixem un cop seleccionat
         self.plot_ts(index)
-        fm.loaddata(self)
+
+        # fm.loaddata(self)  Que fa això aquí???? Investigar
 
     def onOpen(self):
         """
@@ -208,7 +210,7 @@ class tmednet(tk.Frame):
         Method: plot_ts(self)
         Purpose: Plot a time series
         Require:
-            canvas: refrence to canvas widget
+            canvas: reference to canvas widget
             subplot: plot object
         Version:
         01/2021, EGL: Documentation
@@ -256,7 +258,7 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-        pass
+        self.fig.savefig(self.value[:-4]+".png")
 
     def donothing(self):
         """
