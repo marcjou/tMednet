@@ -147,7 +147,7 @@ class tmednet(tk.Frame):
 		Version: 01/2021, EGL: Documentation
 		"""
 
-        w = evt.widget # Que es EVT???
+        w = evt.widget  # Que es EVT???
         index = int(w.curselection()[0])
         if index in self.index:
             pass
@@ -249,12 +249,20 @@ class tmednet(tk.Frame):
     def onSave(self):
         """
         Method: onSave(self)
-        Purpose:
+        Purpose: Saves the file with a purposed name and lets the user choose one of their liking.
         Require:
         Version:
         01/2021, EGL: Documentation
         """
-        self.fig.savefig(self.value[:-4]+".png")
+        try:    # If there is no plot, it shows an error message
+            file = asksaveasfilename(filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
+                                     defaultextension='.png', initialfile=self.value[:-4], title="Save as")
+            if file:
+                self.fig.savefig(file)
+        except AttributeError:
+            messagebox.showerror("Error", "Plot a file first")
+
+
 
     def donothing(self):
         """
