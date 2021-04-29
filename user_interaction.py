@@ -166,21 +166,9 @@ class tmednet(tk.Frame):
         self.path = "./"
         files = askopenfilenames(initialdir=self.path, title="Open files",
                                  filetypes=[("All files", "*.*")])
-
-        nf = len(files)
-        if nf > 0:
-            self.path = "/".join(files[0].split("/")[:-1]) + "/"
-            for ifile in files:
-                self.files.append(ifile.split("/")[-1])
-            print(self.path, "files: ", self.files)
-
-            # Escric els fitxers a la pantalla principal
-            self.textBox.insert(END, 'Hem carregat: ' + str(nf) + ' files \n')
-            self.textBox.insert(END, '\n'.join(self.files))
-            for i in range(len(self.files)):
-                self.list.insert(i, self.files[i])
-
-            fm.loaddata(self)  # Llegim els fitxers
+        filesname, self.path = fm.openfile(self, files, END)
+        self.files.append(filesname)    # !!!!!!!!!!!CORREGIR ESTO, ES UNA LISTA DE LISTAS, DEBERIA SER SOLO UNA LISTA
+        fm.loaddata(self)  # Llegim els fitxers
 
         return
 
