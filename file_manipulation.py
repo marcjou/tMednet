@@ -10,7 +10,7 @@ def loaddata(args):
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    for ifile in args.files:
+    for ifile in args.files[len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
         filein = args.path + ifile
         print("file", filein)
         # Extraemos campos del nombre del fichero
@@ -61,6 +61,40 @@ def report(args, textbox, end):
         textbox.insert("end", cadena)
 
     textbox.insert("end", "=========\n")
+
+
+def openfile(args, files, end):
+    """
+    Method: onOpen(self)
+    Purpose: Launches the askopen widget to set data filenames
+    Require:
+    Version: 01/2021, EGL: Documentation
+    """
+    filesname = []
+    args.newfiles = 0
+    nf = len(files)
+    if nf > 0:
+        path = "/".join(files[0].split("/")[:-1]) + "/"
+        for ifile in files:
+            filesname.append(ifile.split("/")[-1])
+        print(path, "files: ", filesname)
+
+        # Escric els fitxers a la pantalla principal
+        args.textBox.insert(end, 'Hem carregat: ' + str(nf) + ' files \n')
+        args.textBox.insert(end, '\n'.join(filesname))
+        if args.list.size() != 0:   # Checks if the list is empty. If it isn't puts the item at the end of the list
+            n = args.list.size()
+            for i in range(len(filesname)):
+                args.list.insert(i + n, filesname[i])
+                args.newfiles = args.newfiles + 1
+        else:
+            for i in range(len(filesname)):
+                args.list.insert(i, filesname[i])
+                args.newfiles = args.newfiles + 1
+
+
+
+    return filesname, path
 
 
 def to_utc(args):
