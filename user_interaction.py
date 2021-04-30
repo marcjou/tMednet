@@ -46,6 +46,7 @@ class tmednet(tk.Frame):
         self.mdata = []
         self.index = []
         self.newfiles = 0
+        self.counter = []
 
         # We build the GUI
         self.init_window()
@@ -147,7 +148,7 @@ class tmednet(tk.Frame):
 		Version: 01/2021, EGL: Documentation
 		"""
 
-        w = evt.widget # Que es EVT???
+        w = evt.widget  # Que es EVT???
         index = int(w.curselection()[0])
         if index in self.index:
             pass
@@ -155,6 +156,7 @@ class tmednet(tk.Frame):
             self.value = w.get(index)
             print(index, self.value)
             self.index.append(index)
+            self.counter.append(index) # Keeps track of how many plots there are and the index of the plotted files
             # dibuixem un cop seleccionat
             self.plot_ts(index)
 
@@ -243,18 +245,39 @@ class tmednet(tk.Frame):
         01/2021, EGL: Documentation
         """
         self.index = []
+        self.counter = []
         self.plot.clear()
         self.canvas.draw()
 
     def onSave(self):
         """
         Method: onSave(self)
-        Purpose:
+        Purpose: Saves the file with a purposed name and lets the user choose one of their liking.
         Require:
         Version:
         01/2021, EGL: Documentation
         """
-        self.fig.savefig(self.value[:-4]+".png")
+
+        try:    # If there is no plot, it shows an error message
+
+            if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
+                filename = self.value[:-4]
+            if len(self.counter) > 1:
+                filename = ""
+                for n in self.counter:
+                    filename = filename + "_" + self.files[n][-6:-4]
+                filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
+                           + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename
+
+            file = asksaveasfilename(filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
+                                     defaultextension='.png', initialfile= filename, title="Save as")
+            if file:
+                self.fig.savefig(file)
+        except (AttributeError, UnboundLocalError, IndexError):
+            messagebox.showerror("Error", "Plot a file first")
+
+
+
 
     def donothing(self):
         """
