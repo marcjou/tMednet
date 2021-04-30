@@ -44,6 +44,8 @@ class tmednet(tk.Frame):
         self.path = ""
         self.files = []
         self.mdata = []
+        self.index = []
+        self.newfiles = 0
 
         # We build the GUI
         self.init_window()
@@ -147,13 +149,16 @@ class tmednet(tk.Frame):
 
         w = evt.widget # Que es EVT???
         index = int(w.curselection()[0])
-        self.value = w.get(index)
-        print(index, self.value)
+        if index in self.index:
+            pass
+        else:
+            self.value = w.get(index)
+            print(index, self.value)
+            self.index.append(index)
+            # dibuixem un cop seleccionat
+            self.plot_ts(index)
 
-        # dibuixem un cop seleccionat
-        self.plot_ts(index)
-
-        # fm.loaddata(self)  Que fa això aquí???? Investigar
+        # fm.loaddata(self)  Que fa això aquí???? Investigar [[DEPRECATED??]]
 
     def onOpen(self):
         """
@@ -167,7 +172,9 @@ class tmednet(tk.Frame):
         files = askopenfilenames(initialdir=self.path, title="Open files",
                                  filetypes=[("All files", "*.*")])
         filesname, self.path = fm.openfile(self, files, END)
-        self.files.append(filesname)    # !!!!!!!!!!!CORREGIR ESTO, ES UNA LISTA DE LISTAS, DEBERIA SER SOLO UNA LISTA
+
+        for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
+            self.files.append(file)
         fm.loaddata(self)  # Llegim els fitxers
 
         return
@@ -235,6 +242,7 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
+        self.index = []
         self.plot.clear()
         self.canvas.draw()
 

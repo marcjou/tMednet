@@ -10,7 +10,7 @@ def loaddata(args):
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    for ifile in args.files:
+    for ifile in args.files[len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
         filein = args.path + ifile
         print("file", filein)
         # Extraemos campos del nombre del fichero
@@ -71,6 +71,7 @@ def openfile(args, files, end):
     Version: 01/2021, EGL: Documentation
     """
     filesname = []
+    args.newfiles = 0
     nf = len(files)
     if nf > 0:
         path = "/".join(files[0].split("/")[:-1]) + "/"
@@ -85,9 +86,11 @@ def openfile(args, files, end):
             n = args.list.size()
             for i in range(len(filesname)):
                 args.list.insert(i + n, filesname[i])
+                args.newfiles = args.newfiles + 1
         else:
             for i in range(len(filesname)):
                 args.list.insert(i, filesname[i])
+                args.newfiles = args.newfiles + 1
 
 
 
