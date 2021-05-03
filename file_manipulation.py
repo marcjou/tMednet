@@ -3,7 +3,7 @@ import re
 import user_interaction as ui
 
 
-def loaddata(args):
+def loaddata(args, consolescreen):
     """
     Method: loaddata(args)
     Purpose: read tmednet *.txt data files
@@ -13,6 +13,8 @@ def loaddata(args):
     for ifile in args.files[len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
         filein = args.path + ifile
         print("file", filein)
+        consolescreen.insert("end", "file ")
+        consolescreen.insert("end", filein + "\n =============\n")
         # Extraemos campos del nombre del fichero
         datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
                  "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
@@ -39,7 +41,7 @@ def loaddata(args):
         args.mdata.append(datos)
 
 
-def report(args, textbox, end):
+def report(args, textbox):
     """
     Method: report(args)
     Purpose: List main file characteristics
@@ -47,7 +49,7 @@ def report(args, textbox, end):
         textBox: text object
     Version: 01/2021, EGL: Documentation
     """
-    textbox.delete(1.0, end)
+    textbox.delete(1.0, "end")
     for item in args.mdata:
         daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
         cadena = "=========\n"
@@ -63,7 +65,7 @@ def report(args, textbox, end):
     textbox.insert("end", "=========\n")
 
 
-def openfile(args, files, end):
+def openfile(args, files, consolescreen):
     """
     Method: onOpen(self)
     Purpose: Launches the askopen widget to set data filenames
@@ -77,11 +79,13 @@ def openfile(args, files, end):
         path = "/".join(files[0].split("/")[:-1]) + "/"
         for ifile in files:
             filesname.append(ifile.split("/")[-1])
+            # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant
         print(path, "files: ", filesname)
 
+
         # Escric els fitxers a la pantalla principal
-        args.textBox.insert(end, 'Hem carregat: ' + str(nf) + ' files \n')
-        args.textBox.insert(end, '\n'.join(filesname))
+        args.textBox.insert("end", 'Hem carregat: ' + str(nf) + ' files \n')
+        args.textBox.insert("end", '\n'.join(filesname))
         if args.list.size() != 0:   # Checks if the list is empty. If it isn't puts the item at the end of the list
             n = args.list.size()
             for i in range(len(filesname)):

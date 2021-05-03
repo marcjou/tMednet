@@ -139,6 +139,11 @@ class tmednet(tk.Frame):
         self.textBox.grid(row=0, column=0, sticky="nswe")
         cscrollb.config(command=self.textBox.yview)
 
+        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white')
+        self.consolescreen.grid(row=1, column=0, sticky='nsew')
+        self.consolescreen.bind("<Key>", lambda e: "break") # Makes the console uneditable
+
+
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
@@ -159,6 +164,8 @@ class tmednet(tk.Frame):
         else:
             self.value = w.get(index)
             print(index, self.value)
+            self.consolescreen.insert("end", "Plotting: " + self.value + "\n =============\n")
+
             self.index.append(index)
             self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
             # dibuixem un cop seleccionat
@@ -177,11 +184,11 @@ class tmednet(tk.Frame):
         self.path = "./"
         files = askopenfilenames(initialdir=self.path, title="Open files",
                                  filetypes=[("All files", "*.*")])
-        filesname, self.path = fm.openfile(self, files, END)
+        filesname, self.path = fm.openfile(self, files, self.consolescreen)
 
         for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
             self.files.append(file)
-        fm.loaddata(self)  # Llegim els fitxers
+        fm.loaddata(self, self.consolescreen)  # Llegim els fitxers
 
         return
 
@@ -194,7 +201,7 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
 
-        fm.report(self, self.textBox, END)
+        fm.report(self, self.textBox)
 
     def to_utc(self):
         """
@@ -248,6 +255,7 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
+        self.consolescreen.insert("end", "Clearing Plots \n =============\n")
         self.index = []
         self.counter = []
         self.plot.clear()
@@ -279,6 +287,7 @@ class tmednet(tk.Frame):
                 self.fig.savefig(file)
         except (AttributeError, UnboundLocalError, IndexError):
             messagebox.showerror("Error", "Plot a file first")
+            self.consolescreen.insert("end", "Error, couldn't find a plot to save\n =============\n")
 
     def help(self):
         """
