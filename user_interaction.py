@@ -5,6 +5,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename, asksaveasfilename, askdirectory
 from tkinter import messagebox, Button
 from tkinter import scrolledtext
+from PIL import Image, ImageTk
 
 import file_manipulation as fm
 import matplotlib
@@ -294,7 +295,18 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-        messagebox.showinfo('About', 'Version: ' + version + '\nAuthor: Marc Jou \nBuild: ' + build)
+
+        top = Toplevel()
+        top.title("About...")
+
+        img = Image.open("./TMEDNET_White.png").resize((250, 78))
+        photo = ImageTk.PhotoImage(img)
+        label = Label(top, image=photo)
+        label.image = photo  # keep a reference!
+        text = Label(top, text='Version: ' + version + '\nAuthor: Marc Jou \nBuild: ' + build)
+        label.pack()
+        text.pack()
+        # messagebox.showinfo('About', 'Version: ' + version + '\nAuthor: Marc Jou \nBuild: ' + build)
         pass
 
 
