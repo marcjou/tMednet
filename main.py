@@ -2,11 +2,11 @@
 # coding: utf-8
 
 # T-Mednet GUI improvement
-# Version: 0.1
+# Version: 0.5.dev1
 # Author: Marc Jou
 # Date: 28/04/2021
 
-__version__ = "0.1"
+__version__ = "0.5"
 __author__ = "Marc Jou"
 __date__ = "April 2018"
 

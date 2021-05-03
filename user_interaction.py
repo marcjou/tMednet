@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
+version = "0.5"
+build = "April 2021"
+
 
 class tmednet(tk.Frame):
 
@@ -71,10 +74,10 @@ class tmednet(tk.Frame):
 
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="To UTC", command=self.to_utc)
-        editmenu.add_command(label="Plot1", command=self.donothing)
+        editmenu.add_command(label="Plot1", command=self.help)
         menubar.add_cascade(label="Edit", menu=editmenu)
         helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About...", command=self.donothing)
+        helpmenu.add_command(label="About...", command=self.help)
         menubar.add_cascade(label="Help", menu=helpmenu)
         self.master.config(menu=menubar)
 
@@ -106,6 +109,7 @@ class tmednet(tk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
         toolbar = NavigationToolbar2Tk(self.canvas, f2)
+        toolbar.children['!button5'].pack_forget()
         tk.Button(toolbar, text="Clear Plot", command=self.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
         toolbar.pack(side=tk.TOP, fill=tk.BOTH, expand=0)
         self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
@@ -135,18 +139,23 @@ class tmednet(tk.Frame):
         self.textBox.grid(row=0, column=0, sticky="nswe")
         cscrollb.config(command=self.textBox.yview)
 
+        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white')
+        self.consolescreen.grid(row=1, column=0, sticky='nsew')
+        self.consolescreen.bind("<Key>", lambda e: "break") # Makes the console uneditable
+
+
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
     def selectlist(self, evt):
         """
-		Method: clear_plots(self)
-		Purpose: Clear plot
-		Require:
-			canvas: refrence to canvas widget
-			subplot: plot object
-		Version: 01/2021, EGL: Documentation
-		"""
+        Method: clear_plots(self)
+        Purpose: Clear plot
+        Require:
+            canvas: refrence to canvas widget
+            subplot: plot object
+        Version: 01/2021, EGL: Documentation
+        """
 
         w = evt.widget  # Que es EVT???
         index = int(w.curselection()[0])
@@ -155,8 +164,10 @@ class tmednet(tk.Frame):
         else:
             self.value = w.get(index)
             print(index, self.value)
+            self.consolescreen.insert("end", "Plotting: " + self.value + "\n =============\n")
+
             self.index.append(index)
-            self.counter.append(index) # Keeps track of how many plots there are and the index of the plotted files
+            self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
             # dibuixem un cop seleccionat
             self.plot_ts(index)
 
@@ -173,24 +184,24 @@ class tmednet(tk.Frame):
         self.path = "./"
         files = askopenfilenames(initialdir=self.path, title="Open files",
                                  filetypes=[("All files", "*.*")])
-        filesname, self.path = fm.openfile(self, files, END)
+        filesname, self.path = fm.openfile(self, files, self.consolescreen)
 
         for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
             self.files.append(file)
-        fm.loaddata(self)  # Llegim els fitxers
+        fm.loaddata(self, self.consolescreen)  # Llegim els fitxers
 
         return
 
     def report(self):
         """
-		Method: report(self)
-		Purpose: List main file characteristics
-		Require:
-			textBox: text object
-		Version: 01/2021, EGL: Documentation
-		"""
+        Method: report(self)
+        Purpose: List main file characteristics
+        Require:
+            textBox: text object
+        Version: 01/2021, EGL: Documentation
+        """
 
-        fm.report(self, self.textBox, END)
+        fm.report(self, self.textBox)
 
     def to_utc(self):
         """
@@ -244,6 +255,7 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
+        self.consolescreen.insert("end", "Clearing Plots \n =============\n")
         self.index = []
         self.counter = []
         self.plot.clear()
@@ -252,13 +264,13 @@ class tmednet(tk.Frame):
     def onSave(self):
         """
         Method: onSave(self)
-        Purpose: Saves the file with a purposed name and lets the user choose one of their liking.
+        Purpose: Saves the file with a proposed name and lets the user choose one of their liking.
         Require:
         Version:
         01/2021, EGL: Documentation
         """
 
-        try:    # If there is no plot, it shows an error message
+        try:  # If there is no plot, it shows an error message
 
             if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
                 filename = self.value[:-4]
@@ -270,20 +282,19 @@ class tmednet(tk.Frame):
                            + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename
 
             file = asksaveasfilename(filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
-                                     defaultextension='.png', initialfile= filename, title="Save as")
+                                     defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)
         except (AttributeError, UnboundLocalError, IndexError):
             messagebox.showerror("Error", "Plot a file first")
+            self.consolescreen.insert("end", "Error, couldn't find a plot to save\n =============\n")
 
-
-
-
-    def donothing(self):
+    def help(self):
         """
         Version:
         01/2021, EGL: Documentation
         """
+        messagebox.showinfo('About', 'Version: ' + version + '\nAuthor: Marc Jou \nBuild: ' + build)
         pass
 
 
