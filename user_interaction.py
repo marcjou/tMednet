@@ -211,8 +211,10 @@ class tmednet(tk.Frame):
         Require:
         Version: 01/2021, EGL: Documentation
         """
-
-        fm.to_utc(self)
+        try:
+            fm.to_utc(self)
+        except IndexError:
+            messagebox.showerror('Error', 'Load a file before converting to UTC')
 
     def plot_ts(self, index):
         """

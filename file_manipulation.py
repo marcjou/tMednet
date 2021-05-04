@@ -10,7 +10,8 @@ def loaddata(args, consolescreen):
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    for ifile in args.files[len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
+    for ifile in args.files[
+                 len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
         filein = args.path + ifile
         print("file", filein)
         consolescreen.insert("end", "file ")
@@ -82,11 +83,10 @@ def openfile(args, files, consolescreen):
             # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant
         print(path, "files: ", filesname)
 
-
         # Escric els fitxers a la pantalla principal
         args.textBox.insert("end", 'Hem carregat: ' + str(nf) + ' files \n')
         args.textBox.insert("end", '\n'.join(filesname))
-        if args.list.size() != 0:   # Checks if the list is empty. If it isn't puts the item at the end of the list
+        if args.list.size() != 0:  # Checks if the list is empty. If it isn't puts the item at the end of the list
             n = args.list.size()
             for i in range(len(filesname)):
                 args.list.insert(i + n, filesname[i])
@@ -95,8 +95,6 @@ def openfile(args, files, consolescreen):
             for i in range(len(filesname)):
                 args.list.insert(i, filesname[i])
                 args.newfiles = args.newfiles + 1
-
-
 
     return filesname, path
 
@@ -108,8 +106,8 @@ def to_utc(args):
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    gmthshift = int(args.mdata[0]["GMT"][1:])
-    # Mirar timedelta
-    args.mdata[0]["time"] = [args.mdata[0]["timegmt"][i] - timedelta(hours=gmthshift) for i in
-                             range(len(args.mdata[0]["timegmt"]))];
-    print(args.mdata[0]["time"][10], args.mdata[0]["timegmt"][10])
+    for i in range(len(args.mdata)):
+        gmthshift = int(args.mdata[i]["GMT"][1:])
+        # Mirar timedelta
+        args.mdata[i]["time"] = [args.mdata[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in range(len(args.mdata[i]["timegmt"]))]
+        print(args.mdata[i]["time"][10], args.mdata[i]["timegmt"][10])
