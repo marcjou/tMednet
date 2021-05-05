@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import re
 import user_interaction as ui
+import pandas as pd
+from geojson import Point, Feature, dump
 
 
 def loaddata(args, consolescreen):
@@ -76,27 +78,30 @@ def openfile(args, files, consolescreen):
     filesname = []
     args.newfiles = 0
     nf = len(files)
-    if nf > 0:
-        path = "/".join(files[0].split("/")[:-1]) + "/"
-        for ifile in files:
-            filesname.append(ifile.split("/")[-1])
-            # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant
-        print(path, "files: ", filesname)
+    try:
+        if nf > 0:
+            path = "/".join(files[0].split("/")[:-1]) + "/"
+            for ifile in files:
+                filesname.append(ifile.split("/")[-1])
+                # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant
+            print(path, "files: ", filesname)
 
-        # Escric els fitxers a la pantalla principal
-        args.textBox.insert("end", 'Hem carregat: ' + str(nf) + ' files \n')
-        args.textBox.insert("end", '\n'.join(filesname))
-        if args.list.size() != 0:  # Checks if the list is empty. If it isn't puts the item at the end of the list
-            n = args.list.size()
-            for i in range(len(filesname)):
-                args.list.insert(i + n, filesname[i])
-                args.newfiles = args.newfiles + 1
-        else:
-            for i in range(len(filesname)):
-                args.list.insert(i, filesname[i])
-                args.newfiles = args.newfiles + 1
+            # Escric els fitxers a la pantalla principal
+            args.textBox.insert("end", 'Hem carregat: ' + str(nf) + ' files \n')
+            args.textBox.insert("end", '\n'.join(filesname))
+            if args.list.size() != 0:  # Checks if the list is empty. If it isn't puts the item at the end of the list
+                n = args.list.size()
+                for i in range(len(filesname)):
+                    args.list.insert(i + n, filesname[i])
+                    args.newfiles = args.newfiles + 1
+            else:
+                for i in range(len(filesname)):
+                    args.list.insert(i, filesname[i])
+                    args.newfiles = args.newfiles + 1
 
-    return filesname, path
+        return filesname, path
+    except:
+        ui.messagebox.showerror('Error', 'Path not found')
 
 
 def to_utc(args):
@@ -109,5 +114,61 @@ def to_utc(args):
     for i in range(len(args.mdata)):
         gmthshift = int(args.mdata[i]["GMT"][1:])
         # Mirar timedelta
-        args.mdata[i]["time"] = [args.mdata[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in range(len(args.mdata[i]["timegmt"]))]
+        args.mdata[i]["time"] = [args.mdata[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in
+                                 range(len(args.mdata[i]["timegmt"]))]
         print(args.mdata[i]["time"][10], args.mdata[i]["timegmt"][10])
+
+
+def merge(args):
+    """
+            Method: merge(self)
+            Purpose: Merges all of the loaded files into a single one
+            Require:
+            Version:
+            01/2021, EGL: Documentation
+    """
+    print('merging files')
+    # TODO Make sure the times are the same for each depth
+    df = pd.DataFrame(args.mdata[0]['time'], index=None, columns=['time'])
+    depths = []
+    SN = []
+    for data in args.mdata:
+        df[str(data['depth']) + 'm temp'] = data['temp']
+        depths.append(data['depth'])
+        SN.append(data['S/N'])
+
+    return df, depths, SN
+
+
+
+
+def df_to_txt(df):
+    print('writing txt')
+    with open('out.txt', 'w') as f:
+        df.to_string(f, col_space=10)
+    print('txt written')
+
+
+def df_to_geojson(df, properties, SN, lat,
+                  lon):  # Iterates through the DF in order to create the properties for the Geojson file
+    print('writing geojson')
+    props = {'depth': [],
+             'SN': SN,
+             'time': [],
+             'temp': []}
+    for _, row in df.iterrows():
+        props['time'].append(str(row['time']))
+    for prop in properties:
+        props['depth'].append(prop)
+        temp = []
+        for _, row in df.iterrows():
+            temp.append(row[str(prop) + 'm temp'])
+        props['temp'].append(temp)
+
+    point = Point((lat, lon))
+    feature = Feature(geometry=point, properties=props)
+
+    output_filename = 'dataset.geojson'
+    with open(output_filename, 'w') as output_file:  # Crashes when opened with text editor
+        dump(feature, output_file)
+    print('geojson written')

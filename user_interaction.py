@@ -6,6 +6,7 @@ from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilen
 from tkinter import messagebox, Button
 from tkinter import scrolledtext
 from PIL import Image, ImageTk
+import pandas as pd
 
 import file_manipulation as fm
 import matplotlib
@@ -76,7 +77,9 @@ class tmednet(tk.Frame):
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="To UTC", command=self.to_utc)
         editmenu.add_command(label="Plot1", command=self.help)
+        editmenu.add_command(label="Merge Files", command=self.merge)
         menubar.add_cascade(label="Edit", menu=editmenu)
+
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="About...", command=self.help)
         menubar.add_cascade(label="Help", menu=helpmenu)
@@ -292,6 +295,24 @@ class tmednet(tk.Frame):
             messagebox.showerror("Error", "Plot a file first")
             self.consolescreen.insert("end", "Error, couldn't find a plot to save\n =============\n")
 
+    def merge(self):
+        """
+        Method: merge(self)
+        Purpose: Merges all of the loaded files into a single one
+        Require:
+        Version:
+        01/2021, EGL: Documentation
+        """
+        # TODO make this window cleaner!!!!!!!
+        df, depths, SN = fm.merge(self)
+        top = tk.Toplevel()
+        top.title('Merge files')
+        text = Label(top, text='Which format do you want to output your merged files?')
+        text.pack()
+        txt = Button(top, text='*txt file', command=lambda: fm.df_to_txt(df))
+        txt.pack()
+        gjson = Button(top, text='geojson file', command=lambda: fm.df_to_geojson(df, depths, SN, 7, 14))
+        gjson.pack()
     def help(self):
         """
         Version:
