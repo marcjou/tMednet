@@ -295,6 +295,9 @@ class tmednet(tk.Frame):
             messagebox.showerror("Error", "Plot a file first")
             self.consolescreen.insert("end", "Error, couldn't find a plot to save\n =============\n")
 
+    def print_on_console(self, type):
+        self.consolescreen.insert("end", type + "\n =============\n")
+
     def merge(self):
         """
         Method: merge(self)
@@ -304,7 +307,11 @@ class tmednet(tk.Frame):
         01/2021, EGL: Documentation
         """
         # TODO make this window cleaner!!!!!!!
-        df, depths, SN = fm.merge(self)
+        type = ""
+        df, depths, SN, merging = fm.merge(self)
+        if merging is False:
+            self.consolescreen.insert("end", "Load more than a file for merging, creating an output of only a file "
+                                             "instead\n =============\n")
         top = tk.Toplevel()
         top.title('Merge files')
         text = Label(top, text='Which format do you want to output your merged files?')
@@ -313,6 +320,7 @@ class tmednet(tk.Frame):
         txt.pack()
         gjson = Button(top, text='geojson file', command=lambda: fm.df_to_geojson(df, depths, SN, 7, 14))
         gjson.pack()
+
     def help(self):
         """
         Version:

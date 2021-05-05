@@ -3,7 +3,7 @@ import re
 import user_interaction as ui
 import pandas as pd
 from geojson import Point, Feature, dump
-
+import time
 
 def loaddata(args, consolescreen):
     """
@@ -127,23 +127,26 @@ def merge(args):
             Version:
             01/2021, EGL: Documentation
     """
+
     print('merging files')
-    # TODO Make sure the times are the same for each depth
-    df = pd.DataFrame(args.mdata[0]['time'], index=None, columns=['time'])
-    depths = []
-    SN = []
-    for data in args.mdata:
-        df[str(data['depth']) + 'm temp'] = data['temp']
+    # Merges all the available files while making sure that the times match
+    df1 = pd.DataFrame(args.mdata[0]['temp'], index=args.mdata[0]['time'], columns=[str(args.mdata[0]['depth']) + 'm temp'])
+    depths = [args.mdata[0]['depth']]
+    SN = [args.mdata[0]['S/N']]
+    for data in args.mdata[1:]:
+        dfi = pd.DataFrame(data['temp'], index=data['time'], columns=[str(data['depth']) + 'm temp'])
         depths.append(data['depth'])
         SN.append(data['S/N'])
-
-    return df, depths, SN
-
-
+        df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)    # Merges by index which is the date
+    if len(args.mdata) < 2:
+        merging = False
+    else:
+        merging = True
+    return df1, depths, SN, merging
 
 
 def df_to_txt(df):
-    print('writing txt')
+    print('writing txt')    # TODO Create progress bar
     with open('out.txt', 'w') as f:
         df.to_string(f, col_space=10)
     print('txt written')
@@ -151,13 +154,10 @@ def df_to_txt(df):
 
 def df_to_geojson(df, properties, SN, lat,
                   lon):  # Iterates through the DF in order to create the properties for the Geojson file
+    start_time = time.time()
+
     print('writing geojson')
-    props = {'depth': [],
-             'SN': SN,
-             'time': [],
-             'temp': []}
-    for _, row in df.iterrows():
-        props['time'].append(str(row['time']))
+    props = {'depth': [], 'SN': SN, 'time': df.index.map(str).to_list(), 'temp': []}
     for prop in properties:
         props['depth'].append(prop)
         temp = []
@@ -172,3 +172,6 @@ def df_to_geojson(df, properties, SN, lat,
     with open(output_filename, 'w') as output_file:  # Crashes when opened with text editor
         dump(feature, output_file)
     print('geojson written')
+
+    ui.tmednet().print_on_console("--- %s seconds ---" % (time.time() - start_time))
+    print("--- %s seconds ---" % (time.time() - start_time))
