@@ -4,44 +4,52 @@ import user_interaction as ui
 import pandas as pd
 from geojson import Point, Feature, dump
 import time
+import os
 
-def loaddata(args, consolescreen):
+
+def load_data(args, consolescreen):
     """
-    Method: loaddata(args)
+    Method: load_data(args)
     Purpose: read tmednet *.txt data files
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    for ifile in args.files[
-                 len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
-        filein = args.path + ifile
-        print("file", filein)
-        consolescreen.insert("end", "file ")
-        consolescreen.insert("end", filein + "\n =============\n")
-        # Extraemos campos del nombre del fichero
-        datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
-                 "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
-                 "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
-                 "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H')}
+    try:
+        for ifile in args.files[
+                     len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
+            filein = args.path + ifile
 
-        f = open(filein, "r")
-        a = f.readlines()
-        f.close()
-        # We clean and separate values that contain "Enregistré"
-        a[:] = map(lambda item: re.sub('\t+', ' ', item.strip()).split(' '), a)
-        bad = []
-        for i in range(len(a)):
-            if a[i][-1] == "Enregistré":
-                bad.append(i)
-        nl = len(a) - len(bad) + 1
-        datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
-                            range(1, nl)]
-        datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
-        igm = '_'.join(a[0]).find("GMT")
-        gmtout = '_'.join(a[0])[igm + 3:igm + 6]
-        datos['GMT'] = gmtout
-        datos['S/N'] = a[0][a[0].index('S/N:') + 1]
-        args.mdata.append(datos)
+            # Extraemos campos del nombre del fichero
+            datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
+                     "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
+                     "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
+                     "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H')}
+
+            print("file", filein)
+            consolescreen.insert("end", "file ")
+            consolescreen.insert("end", filein + "\n =============\n")
+
+            f = open(filein, "r")
+            a = f.readlines()
+            f.close()
+            # We clean and separate values that contain "Enregistré"
+            a[:] = map(lambda item: re.sub('\t+', ' ', item.strip()).split(' '), a)
+            bad = []
+            for i in range(len(a)):
+                if a[i][-1] == "Enregistré":
+                    bad.append(i)
+            nl = len(a) - len(bad) + 1
+            datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
+                                range(1, nl)]
+            datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
+            igm = '_'.join(a[0]).find("GMT")
+            gmtout = '_'.join(a[0])[igm + 3:igm + 6]
+            datos['GMT'] = gmtout
+            datos['S/N'] = a[0][a[0].index('S/N:') + 1]
+            args.mdata.append(datos)
+    except ValueError:
+        consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
+        consolescreen.insert("end", "=============\n")
 
 
 def report(args, textbox):
@@ -75,6 +83,7 @@ def openfile(args, files, consolescreen):
     Require:
     Version: 01/2021, EGL: Documentation
     """
+
     filesname = []
     args.newfiles = 0
     nf = len(files)
@@ -82,6 +91,9 @@ def openfile(args, files, consolescreen):
         if nf > 0:
             path = "/".join(files[0].split("/")[:-1]) + "/"
             for ifile in files:
+                _, file_extension = os.path.splitext(ifile)
+                if file_extension != '.txt':
+                    raise ValueError('Error, file not loadable')
                 filesname.append(ifile.split("/")[-1])
                 # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant
             print(path, "files: ", filesname)
@@ -100,8 +112,9 @@ def openfile(args, files, consolescreen):
                     args.newfiles = args.newfiles + 1
 
         return filesname, path
-    except:
-        ui.messagebox.showerror('Error', 'Path not found')
+    except (ValueError, TypeError) as err:
+        consolescreen.insert("end", repr(err) + "\n", 'warning')
+        consolescreen.insert("end", "=============\n")
 
 
 def to_utc(args):
@@ -130,14 +143,15 @@ def merge(args):
 
     print('merging files')
     # Merges all the available files while making sure that the times match
-    df1 = pd.DataFrame(args.mdata[0]['temp'], index=args.mdata[0]['time'], columns=[str(args.mdata[0]['depth']) + 'm temp'])
+    df1 = pd.DataFrame(args.mdata[0]['temp'], index=args.mdata[0]['time'], columns=[str(args.mdata[0]['depth']) +
+                                                                                    'm temp'])
     depths = [args.mdata[0]['depth']]
     SN = [args.mdata[0]['S/N']]
     for data in args.mdata[1:]:
         dfi = pd.DataFrame(data['temp'], index=data['time'], columns=[str(data['depth']) + 'm temp'])
         depths.append(data['depth'])
         SN.append(data['S/N'])
-        df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)    # Merges by index which is the date
+        df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)  # Merges by index which is the date
     if len(args.mdata) < 2:
         merging = False
     else:
@@ -146,7 +160,7 @@ def merge(args):
 
 
 def df_to_txt(df):
-    print('writing txt')    # TODO Create progress bar
+    print('writing txt')  # TODO Create progress bar
     with open('out.txt', 'w') as f:
         df.to_string(f, col_space=10)
     print('txt written')
@@ -173,5 +187,4 @@ def df_to_geojson(df, properties, SN, lat,
         dump(feature, output_file)
     print('geojson written')
 
-    ui.tmednet().print_on_console("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s seconds ---" % (time.time() - start_time))

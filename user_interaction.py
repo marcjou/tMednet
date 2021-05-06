@@ -7,6 +7,7 @@ from tkinter import messagebox, Button
 from tkinter import scrolledtext
 from PIL import Image, ImageTk
 import pandas as pd
+import time
 
 import file_manipulation as fm
 import matplotlib
@@ -67,11 +68,11 @@ class tmednet(tk.Frame):
 
         menubar = tk.Menu(self.master)
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open", command=self.onOpen)
-        filemenu.add_command(label="Save", command=self.onSave)
+        filemenu.add_command(label="Open", command=self.on_open)
+        filemenu.add_command(label="Save", command=self.on_save)
         filemenu.add_command(label="Report", command=self.report)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=lambda: cerrar(self))
+        filemenu.add_command(label="Exit", command=lambda: close(self))
         menubar.add_cascade(label="File", menu=filemenu)
 
         editmenu = Menu(menubar, tearoff=0)
@@ -135,7 +136,7 @@ class tmednet(tk.Frame):
 
         self.list = tk.Listbox(frame1)
         self.list.grid(row=0, column=0, sticky="ewns")
-        self.list.bind("<<ListboxSelect>>", self.selectlist)
+        self.list.bind("<<ListboxSelect>>", self.select_list)
 
         cscrollb = tk.Scrollbar(frame2, width=20)
         cscrollb.grid(row=0, column=1, sticky="ns")
@@ -143,15 +144,16 @@ class tmednet(tk.Frame):
         self.textBox.grid(row=0, column=0, sticky="nswe")
         cscrollb.config(command=self.textBox.yview)
 
-        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white')
+        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white', font='Courier 12')
         self.consolescreen.grid(row=1, column=0, sticky='nsew')
-        self.consolescreen.bind("<Key>", lambda e: "break") # Makes the console uneditable
-
+        self.consolescreen.bind("<Key>", lambda e: "break")  # Makes the console uneditable
+        self.consolescreen.tag_config('warning', foreground="firebrick3")
+        self.consolescreen.tag_config('action', foreground="steelblue4", font='Courier 12 bold')
 
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
-    def selectlist(self, evt):
+    def select_list(self, evt):
         """
         Method: clear_plots(self)
         Purpose: Clear plot
@@ -160,26 +162,28 @@ class tmednet(tk.Frame):
             subplot: plot object
         Version: 01/2021, EGL: Documentation
         """
+        try:
+            w = evt.widget  # Que es EVT???
+            index = int(w.curselection()[0])
+            if index in self.index:
+                pass
+            else:
+                self.value = w.get(index)
+                print(index, self.value)
+                self.consolescreen.insert("end", "Plotting: ", 'action')
+                self.consolescreen.insert("end", self.value + "\n =============\n")
+                self.index.append(index)
+                self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
+                # dibuixem un cop seleccionat
+                self.plot_ts(index)
+        except IndexError:
+            pass  # Not knowing why this error raises when Saving the file but doesn't affect the code. Should check.
 
-        w = evt.widget  # Que es EVT???
-        index = int(w.curselection()[0])
-        if index in self.index:
-            pass
-        else:
-            self.value = w.get(index)
-            print(index, self.value)
-            self.consolescreen.insert("end", "Plotting: " + self.value + "\n =============\n")
+        # fm.load_data(self)  Que fa això aquí???? Investigar [[DEPRECATED??]]
 
-            self.index.append(index)
-            self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
-            # dibuixem un cop seleccionat
-            self.plot_ts(index)
-
-        # fm.loaddata(self)  Que fa això aquí???? Investigar [[DEPRECATED??]]
-
-    def onOpen(self):
+    def on_open(self):
         """
-        Method: onOpen(self)
+        Method: on_open(self)
         Purpose: Launches the askopen widget to set data filenames
         Require:
         Version: 01/2021, EGL: Documentation
@@ -188,11 +192,14 @@ class tmednet(tk.Frame):
         self.path = "./"
         files = askopenfilenames(initialdir=self.path, title="Open files",
                                  filetypes=[("All files", "*.*")])
-        filesname, self.path = fm.openfile(self, files, self.consolescreen)
-
-        for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
-            self.files.append(file)
-        fm.loaddata(self, self.consolescreen)  # Llegim els fitxers
+        try:
+            filesname, self.path = fm.openfile(self, files, self.consolescreen)
+            for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
+                self.files.append(file)
+            fm.load_data(self, self.consolescreen)  # Llegim els fitxers
+        except TypeError:
+            self.consolescreen.insert("end", "Unable to read file\n", 'warning')
+            self.consolescreen.insert("end", "=============\n")
 
         return
 
@@ -214,10 +221,14 @@ class tmednet(tk.Frame):
         Require:
         Version: 01/2021, EGL: Documentation
         """
-        try:
-            fm.to_utc(self)
-        except IndexError:
-            messagebox.showerror('Error', 'Load a file before converting to UTC')
+        if not self.mdata:
+            self.consolescreen.insert("end", "Please, load a file before converting to UTC\n", 'warning')
+            self.consolescreen.insert("end", "=============\n")
+        else:
+            try:
+                fm.to_utc(self)
+            except IndexError:
+                self.consolescreen.insert("end", "Please, load a file before converting to UTC\n =============\n")
 
     def plot_ts(self, index):
         """
@@ -267,9 +278,9 @@ class tmednet(tk.Frame):
         self.plot.clear()
         self.canvas.draw()
 
-    def onSave(self):
+    def on_save(self):
         """
-        Method: onSave(self)
+        Method: on_save(self)
         Purpose: Saves the file with a proposed name and lets the user choose one of their liking.
         Require:
         Version:
@@ -291,37 +302,43 @@ class tmednet(tk.Frame):
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)
+                self.consolescreen.insert("end", "Saving plot in: ", 'action')
+                self.consolescreen.insert("end", file + " \n=============\n")
         except (AttributeError, UnboundLocalError, IndexError):
-            messagebox.showerror("Error", "Plot a file first")
-            self.consolescreen.insert("end", "Error, couldn't find a plot to save\n =============\n")
-
-    def print_on_console(self, type):
-        self.consolescreen.insert("end", type + "\n =============\n")
+            self.consolescreen.insert("end", "Error, couldn't find a plot to save\n", 'warning')
+            self.consolescreen.insert("end", " =============\n")
 
     def merge(self):
         """
         Method: merge(self)
-        Purpose: Merges all of the loaded files into a single one
+        Purpose: Merges all of the loaded files into a single geojson one
         Require:
         Version:
         01/2021, EGL: Documentation
         """
-        # TODO make this window cleaner!!!!!!!
-        type = ""
-        df, depths, SN, merging = fm.merge(self)
-        if merging is False:
-            self.consolescreen.insert("end", "Load more than a file for merging, creating an output of only a file "
-                                             "instead\n =============\n")
-        top = tk.Toplevel()
-        top.title('Merge files')
-        text = Label(top, text='Which format do you want to output your merged files?')
-        text.pack()
-        txt = Button(top, text='*txt file', command=lambda: fm.df_to_txt(df))
-        txt.pack()
-        gjson = Button(top, text='geojson file', command=lambda: fm.df_to_geojson(df, depths, SN, 7, 14))
-        gjson.pack()
+        # TODO give the option to save into txt, right now only saves into json. Extract the coordinates and use them
+        try:
+            if not self.mdata[0]['time']:
+                self.consolescreen.insert("end", "First select 'To UTC' option\n", 'warning')
+                self.consolescreen.insert("end", " =============\n")
+            else:
+                self.consolescreen.insert("end", "Creating Geojson\n =============\n")
+                df, depths, SN, merging = fm.merge(self)
+                if merging is False:
+                    self.consolescreen.insert("end", "Load more than a file for merging, creating an output of only a "
+                                                     "file instead", 'warning')
+                    self.consolescreen.insert("end", " \n =============\n")
+                start_time = time.time()
+                fm.df_to_geojson(df, depths, SN, 7, 14)
 
-    def help(self):
+                self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
+                        time.time() - start_time) + "\n =============\n")
+        except IndexError:
+            self.consolescreen.insert("end", "Please, load a file first\n", 'warning')
+            self.consolescreen.insert("end", " =============\n")
+
+    @staticmethod
+    def help():
         """
         Version:
         01/2021, EGL: Documentation
@@ -341,9 +358,9 @@ class tmednet(tk.Frame):
         pass
 
 
-def cerrar(root):
+def close(root):
     """
-    Function: cerrar():
+    Function: close():
     Purpose: To quit and close the GUI
     Input:
         root (obsject): reference to toplevel tkinter widget
@@ -355,17 +372,3 @@ def cerrar(root):
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
         sys.exit()
-
-
-def main():
-    root = Tk()
-    # root.minsize(1000,500)
-    root.title("TMEDNET tool")
-
-    app = tmednet(root)
-    root.protocol("WM_DELETE_WINDOW", lambda: cerrar(root))
-    root.mainloop()
-
-
-if __name__ == '__main__':
-    main()
