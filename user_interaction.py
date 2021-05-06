@@ -112,6 +112,11 @@ class tmednet(tk.Frame):
         plt.rc('legend', fontsize='medium')
         self.fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
         self.plot = self.fig.add_subplot(111)
+        self.plot1 = self.fig.add_subplot(211)
+        self.plot2 = self.fig.add_subplot(212)
+        plt.Axes.remove(self.plot1)
+        plt.Axes.remove(self.plot2)
+        plt.Axes.remove(self.plot)
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
         toolbar = NavigationToolbar2Tk(self.canvas, f2)
@@ -256,7 +261,10 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        self.plot = self.fig.add_subplot(111)
         self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
                        '-', label=str(self.mdata[index]['depth']))
         self.plot.set(ylabel='Temperature (DEG C)',
@@ -280,12 +288,25 @@ class tmednet(tk.Frame):
         # w = evt.widget  # Que es EVT???
         index = int(self.list.curselection()[0])
         time_series, temperatures = fm.zoom_data(self.mdata[index])
-        self.plot.plot(time_series, temperatures,
+
+        self.plot1 = self.fig.add_subplot(211)
+        self.plot2 = self.fig.add_subplot(212)
+        plt.Axes.remove(self.plot)
+
+        self.plot1.plot(time_series[0], temperatures[0],
                        '-', label=str(self.mdata[index]['depth']))
-        self.plot.set(ylabel='Temperature (DEG C)',
+        self.plot1.set(ylabel='Temperature (DEG C)',
                       title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
                           self.mdata[index]['region']))
-        self.plot.legend()
+        self.plot1.legend()
+
+        self.plot2.plot(time_series[1], temperatures[1],
+                        '-', label=str(self.mdata[index]['depth']))
+        self.plot2.set(ylabel='Temperature (DEG C)',
+                       title=self.files[index] + "\n" + 'Depth:' + str(
+                           self.mdata[index]['depth']) + " - Region: " + str(
+                           self.mdata[index]['region']))
+        self.plot2.legend()
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
@@ -314,7 +335,11 @@ class tmednet(tk.Frame):
         self.consolescreen.insert("end", "Clearing Plots \n =============\n")
         self.index = []
         self.counter = []
-        self.plot.clear()
+        if self.plot.axes:
+            self.plot.clear()
+        if self.plot1.axes:
+            self.plot1.clear()
+            self.plot2.clear()
         self.canvas.draw()
 
     def on_save(self):

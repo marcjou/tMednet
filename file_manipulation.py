@@ -191,6 +191,6 @@ def df_to_geojson(df, properties, SN, lat,
 
 
 def zoom_data(data):
-    time_series = data['timegmt'][:24]
-    temperatures = data['temp'][:24]
+    time_series = [data['timegmt'][:24], data['timegmt'][-24:]]
+    temperatures = [data['temp'][:24], data['temp'][-24:]]
     return time_series, temperatures
