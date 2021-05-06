@@ -146,7 +146,7 @@ class tmednet(tk.Frame):
 
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
-        self.right_menu.add_command(label="Copy")
+        self.right_menu.add_command(label="Copy")   # Placeholders
         self.right_menu.add_command(label="Paste")
         self.right_menu.add_command(label="Reload")
         self.right_menu.add_separator()
@@ -159,7 +159,7 @@ class tmednet(tk.Frame):
         self.textBox.grid(row=0, column=0, sticky="nswe")
         cscrollb.config(command=self.textBox.yview)
 
-        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white', font='Courier 12')
+        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white', font='Courier 12', wrap='word')
         self.consolescreen.grid(row=1, column=0, sticky='nsew')
         self.consolescreen.bind("<Key>", lambda e: "break")  # Makes the console uneditable
         self.consolescreen.tag_config('warning', foreground="firebrick3")
