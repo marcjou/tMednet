@@ -188,3 +188,9 @@ def df_to_geojson(df, properties, SN, lat,
     print('geojson written')
 
     print("--- %s seconds ---" % (time.time() - start_time))
+
+
+def zoom_data(data):
+    time_series = data['timegmt'][:24]
+    temperatures = data['temp'][:24]
+    return time_series, temperatures

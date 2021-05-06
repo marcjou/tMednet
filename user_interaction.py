@@ -79,6 +79,7 @@ class tmednet(tk.Frame):
         editmenu.add_command(label="To UTC", command=self.to_utc)
         editmenu.add_command(label="Plot1", command=self.help)
         editmenu.add_command(label="Merge Files", command=self.merge)
+        editmenu.add_command(label="Zoom", command=self.plot_zoom)
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -138,6 +139,15 @@ class tmednet(tk.Frame):
         self.list.grid(row=0, column=0, sticky="ewns")
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
+        self.right_menu = Menu(frame1, tearoff=0)
+        self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
+        self.right_menu.add_command(label="Copy")
+        self.right_menu.add_command(label="Paste")
+        self.right_menu.add_command(label="Reload")
+        self.right_menu.add_separator()
+        self.right_menu.add_command(label="Rename")
+
+        self.list.bind("<Button-3>", self.do_popup)
         cscrollb = tk.Scrollbar(frame2, width=20)
         cscrollb.grid(row=0, column=1, sticky="ns")
         self.textBox = tk.Text(frame2, bg="black", fg="white", height=10, yscrollcommand=cscrollb.set)
@@ -153,6 +163,11 @@ class tmednet(tk.Frame):
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
+    def do_popup(self, event):
+        try:
+            self.right_menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.right_menu.grab_release()
     def select_list(self, evt):
         """
         Method: clear_plots(self)
@@ -163,6 +178,7 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
         try:
+
             w = evt.widget  # Que es EVT???
             index = int(w.curselection()[0])
             if index in self.index:
@@ -242,6 +258,29 @@ class tmednet(tk.Frame):
         """
 
         self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+                       '-', label=str(self.mdata[index]['depth']))
+        self.plot.set(ylabel='Temperature (DEG C)',
+                      title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
+                          self.mdata[index]['region']))
+        self.plot.legend()
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+        self.canvas.draw()
+
+    def plot_zoom(self):
+        """
+            Method: plot_ts(self)
+            Purpose: Plot a zoom of the begining and ending of the data
+            Require:
+                canvas: reference to canvas widget
+                subplot: plot object
+            Version:
+            01/2021, EGL: Documentation
+        """
+        self.clear_plots()
+        # w = evt.widget  # Que es EVT???
+        index = int(self.list.curselection()[0])
+        time_series, temperatures = fm.zoom_data(self.mdata[index])
+        self.plot.plot(time_series, temperatures,
                        '-', label=str(self.mdata[index]['depth']))
         self.plot.set(ylabel='Temperature (DEG C)',
                       title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
