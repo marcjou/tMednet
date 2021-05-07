@@ -140,13 +140,13 @@ class tmednet(tk.Frame):
         notebook.add(frame2, text="Report")
         notebook.grid(row=0, column=0, sticky="ewns")
 
-        self.list = tk.Listbox(frame1)
+        self.list = tk.Listbox(frame1, selectmode='extended')
         self.list.grid(row=0, column=0, sticky="ewns")
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
-        self.right_menu.add_command(label="Copy")   # Placeholders
+        self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)   # Placeholders
         self.right_menu.add_command(label="Paste")
         self.right_menu.add_command(label="Reload")
         self.right_menu.add_separator()
@@ -173,6 +173,8 @@ class tmednet(tk.Frame):
             self.right_menu.tk_popup(event.x_root, event.y_root)
         finally:
             self.right_menu.grab_release()
+
+
     def select_list(self, evt):
         """
         Method: clear_plots(self)
@@ -261,22 +263,32 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
+        # If there are subplots, deletes them before creating the plot anew
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
-        self.plot = self.fig.add_subplot(111)
-        self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
-                       '-', label=str(self.mdata[index]['depth']))
-        self.plot.set(ylabel='Temperature (DEG C)',
-                      title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
-                          self.mdata[index]['region']))
+
+        if self.plot.axes:
+            self.plot = self.fig.add_subplot(111)
+            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+                           '-', label=str(self.mdata[index]['depth']))
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Multiple depths at Region: ' + str(self.mdata[index]['region']))
+        else:
+            self.plot = self.fig.add_subplot(111)
+            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+                           '-', label=str(self.mdata[index]['depth']))
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
+                              self.mdata[index]['region']))
+
         self.plot.legend()
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
     def plot_zoom(self):
         """
-            Method: plot_ts(self)
+            Method: plot_zoom(self)
             Purpose: Plot a zoom of the begining and ending of the data
             Require:
                 canvas: reference to canvas widget
@@ -289,15 +301,18 @@ class tmednet(tk.Frame):
         index = int(self.list.curselection()[0])
         time_series, temperatures = fm.zoom_data(self.mdata[index])
 
-        self.plot1 = self.fig.add_subplot(211)
-        self.plot2 = self.fig.add_subplot(212)
-        plt.Axes.remove(self.plot)
+        # Creates the subplots and deletes the old plot
+        if not self.plot1.axes:
+            self.plot1 = self.fig.add_subplot(211)
+            self.plot2 = self.fig.add_subplot(212)
+            plt.Axes.remove(self.plot)
 
         self.plot1.plot(time_series[0], temperatures[0],
-                       '-', label=str(self.mdata[index]['depth']))
+                        '-', label=str(self.mdata[index]['depth']))
         self.plot1.set(ylabel='Temperature (DEG C)',
-                      title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
-                          self.mdata[index]['region']))
+                       title=self.files[index] + "\n" + 'Depth:' + str(
+                           self.mdata[index]['depth']) + " - Region: " + str(
+                           self.mdata[index]['region']))
         self.plot1.legend()
 
         self.plot2.plot(time_series[1], temperatures[1],
@@ -310,6 +325,53 @@ class tmednet(tk.Frame):
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
+
+
+
+
+
+    def plot_all_zoom(self):
+        """
+                    Method: plot_all_zoom(self)
+                    Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
+                    Require:
+                        canvas: reference to canvas widget
+                        subplot: plot object
+                    Version:
+                    01/2021, EGL: Documentation
+                """
+        self.clear_plots()
+        index = self.list.curselection()
+        depths = ""
+        # Creates the subplots and deletes the old plot
+        if not self.plot1.axes:
+            self.plot1 = self.fig.add_subplot(211)
+            self.plot2 = self.fig.add_subplot(212)
+            plt.Axes.remove(self.plot)
+
+        for i in index:
+            time_series, temperatures = fm.zoom_data(self.mdata[i])
+            depths = depths + " " + str(self.mdata[i]['depth'])
+            self.plot1.plot(time_series[0], temperatures[0],
+                            '-', label=str(self.mdata[i]['depth']))
+            self.plot1.set(ylabel='Temperature (DEG C)',
+                           title='Temperature at depths:' + depths + " - Region: " + str(
+                               self.mdata[i]['region']))
+            self.plot1.legend()
+
+            self.plot2.plot(time_series[1], temperatures[1],
+                            '-', label=str(self.mdata[i]['depth']))
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title='Temperature at depths:' + depths + " - Region: " + str(
+                               self.mdata[i]['region']))
+            self.plot2.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+        self.consolescreen.insert("end", "Plotting zoom of depths: ", 'action')
+        self.consolescreen.insert("end", depths + "\n =============\n")
+        self.consolescreen.insert("end", "at site" + self.mdata[0]['region'], 'action')
+        self.consolescreen.insert("end", "\n =============\n")
     def plot_dif(self):
         """
         Method: plot_dif(self)
@@ -337,6 +399,7 @@ class tmednet(tk.Frame):
         self.counter = []
         if self.plot.axes:
             self.plot.clear()
+            plt.Axes.remove(self.plot)
         if self.plot1.axes:
             self.plot1.clear()
             self.plot2.clear()
