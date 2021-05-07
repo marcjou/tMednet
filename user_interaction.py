@@ -299,29 +299,31 @@ class tmednet(tk.Frame):
         self.clear_plots()
         # w = evt.widget  # Que es EVT???
         index = int(self.list.curselection()[0])
-        time_series, temperatures = fm.zoom_data(self.mdata[index])
+        time_series, temperatures, indexes = fm.zoom_data(self.mdata[index])
 
         # Creates the subplots and deletes the old plot
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
-            plt.Axes.remove(self.plot)
 
         self.plot1.plot(time_series[0], temperatures[0],
-                        '-', label=str(self.mdata[index]['depth']))
+                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
         self.plot1.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
         self.plot1.legend()
-
-        self.plot2.plot(time_series[1], temperatures[1],
-                        '-', label=str(self.mdata[index]['depth']))
+        self.plot2.plot(time_series[1][:int(indexes[0])], temperatures[1][:int(indexes[0])],
+                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
+        self.plot2.legend()
+        # Plots in the same graph the last part which represents the errors in the data from removing the sensors
+        self.plot2.plot(time_series[1][int(indexes[0]) - 1:], temperatures[1][int(indexes[0]) - 1:],
+                        '-', color='red', label=str(self.mdata[index]['depth']))
         self.plot2.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
-        self.plot2.legend()
+
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
@@ -347,10 +349,9 @@ class tmednet(tk.Frame):
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
-            plt.Axes.remove(self.plot)
 
         for i in index:
-            time_series, temperatures = fm.zoom_data(self.mdata[i])
+            time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
             depths = depths + " " + str(self.mdata[i]['depth'])
             self.plot1.plot(time_series[0], temperatures[0],
                             '-', label=str(self.mdata[i]['depth']))

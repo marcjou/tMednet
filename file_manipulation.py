@@ -5,7 +5,8 @@ import pandas as pd
 from geojson import Point, Feature, dump
 import time
 import os
-
+from numpy import diff
+import numpy as np
 
 def load_data(args, consolescreen):
     """
@@ -193,4 +194,7 @@ def df_to_geojson(df, properties, SN, lat,
 def zoom_data(data):
     time_series = [data['timegmt'][:24], data['timegmt'][-24:]]
     temperatures = [data['temp'][:24], data['temp'][-24:]]
-    return time_series, temperatures
+    ftimestamp = [item.timestamp() for item in time_series[1]]
+    finaldydx = diff(temperatures[1])/diff(ftimestamp)
+    indexes = np.argwhere(finaldydx > 0.0001) + 1   # Gets the indexes in which the variation is too big (removing)
+    return time_series, temperatures, indexes
