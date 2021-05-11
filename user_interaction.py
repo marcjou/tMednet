@@ -148,7 +148,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
         self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)  # Placeholders
         self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
-        self.right_menu.add_command(label="Reload")
+        self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Rename")
 
@@ -385,26 +385,59 @@ class tmednet(tk.Frame):
         """
 
         self.clear_plots()
-        index = self.list.curselection()
         depths = ""
-        dfdelta = fm.temp_difference(self)
-        # Creates the subplots and deletes the old plot
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        self.plot = self.fig.add_subplot(111)
-        dfdelta.plot(ax=self.plot)
-        self.plot.set(ylabel='Temperature (DEG C)',
-                      title='Temp differences')
+        try:
+            dfdelta, _ = fm.temp_difference(self)
 
-        self.plot.legend()
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
 
-        # fig.set_size_inches(14.5, 10.5, forward=True)
-        self.canvas.draw()
-        self.consolescreen.insert("end", "Plotting temp differences: ", 'action')
-        self.consolescreen.insert("end", depths)
-        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
-        self.consolescreen.insert("end", "\n =============\n")
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.consolescreen.insert("end", "Plotting temp differences: ", 'action')
+            self.consolescreen.insert("end", depths)
+            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+            self.consolescreen.insert("end", "\n =============\n")
+        except UnboundLocalError:
+            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+
+    def plot_dif_filter1d(self):
+        self.clear_plots()
+        depths = ""
+        try:
+            dfdelta = fm.apply_uniform_filter(self)
+
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences filtered')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.consolescreen.insert("end", "Plotting temp differences filtered: ", 'action')
+            self.consolescreen.insert("end", depths)
+            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+            self.consolescreen.insert("end", "\n =============\n")
+        except UnboundLocalError:
+            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
 
     def clear_plots(self):
         """
