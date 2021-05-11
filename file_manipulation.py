@@ -48,9 +48,20 @@ def load_data(args, consolescreen):
             datos['GMT'] = gmtout
             datos['S/N'] = a[0][a[0].index('S/N:') + 1]
             args.mdata.append(datos)
+        check_hour_interval(args.mdata)
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
+
+
+def check_hour_interval(data):
+    for dat in data:
+        for i in range(len(dat['timegmt'])):
+            if i+1 == len(dat['timegmt']):
+                break
+            if (dat['timegmt'][i+1] - dat['timegmt'][i]).seconds > 3600:
+                print("Difference of an hour in depth " + str(dat['depth']) + " line" + str(i))
+        print("Finished depth" + str(dat['depth']))
 
 
 def report(args, textbox):
@@ -144,6 +155,16 @@ def merge(args):
 
     print('merging files')
     # Merges all the available files while making sure that the times match
+    df1, depths, SN = list_to_df(args)
+    time_difference(args)
+    if len(args.mdata) < 2:
+        merging = False
+    else:
+        merging = True
+    return df1, depths, SN, merging
+
+
+def list_to_df(args):
     df1 = pd.DataFrame(args.mdata[0]['temp'], index=args.mdata[0]['time'], columns=[str(args.mdata[0]['depth']) +
                                                                                     'm temp'])
     depths = [args.mdata[0]['depth']]
@@ -153,12 +174,8 @@ def merge(args):
         depths.append(data['depth'])
         SN.append(data['S/N'])
         df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)  # Merges by index which is the date
-    if len(args.mdata) < 2:
-        merging = False
-    else:
-        merging = True
-    return df1, depths, SN, merging
 
+    return df1, depths, SN
 
 def df_to_txt(df):
     print('writing txt')  # TODO Create progress bar
@@ -196,5 +213,20 @@ def zoom_data(data):
     temperatures = [data['temp'][:24], data['temp'][-24:]]
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1])/diff(ftimestamp)
-    indexes = np.argwhere(finaldydx > 0.0001) + 1   # Gets the indexes in which the variation is too big (removing)
+    indexes = np.argwhere(finaldydx > 0.0002) + 1   # Gets the indexes in which the variation is too big (removing)
     return time_series, temperatures, indexes
+
+
+def temp_difference(data):
+    to_utc(data)
+    df, depths, _ = list_to_df(data)
+    for depth in depths[:-1]:
+        series1 = df[str(depth) + 'm temp'] - df[str(depth + 5) + 'm temp'] # If fails, raises Key error (depth doesn't exist)
+        series1 = series1.rename(str(depth) + "-" + str(depth + 5))
+        if 'dfdelta' in locals():
+            dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
+        else:
+            dfdelta = pd.DataFrame(series1)
+    return dfdelta
+        # TODO solucionar esto, conseguir que funcione, la idea es buena, hay que restar las temperaturas tal y como establece, comprobar porque da error
+        # TODO No deja establecer un true en el if para las series, necesitamos checkear de otra manera que existen

@@ -146,8 +146,8 @@ class tmednet(tk.Frame):
 
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
-        self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)   # Placeholders
-        self.right_menu.add_command(label="Paste")
+        self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)  # Placeholders
+        self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
         self.right_menu.add_command(label="Reload")
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Rename")
@@ -173,7 +173,6 @@ class tmednet(tk.Frame):
             self.right_menu.tk_popup(event.x_root, event.y_root)
         finally:
             self.right_menu.grab_release()
-
 
     def select_list(self, evt):
         """
@@ -269,7 +268,7 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
 
         if self.plot.axes:
-            self.plot = self.fig.add_subplot(111)
+            # self.plot = self.fig.add_subplot(111)
             self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
@@ -279,7 +278,8 @@ class tmednet(tk.Frame):
             self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
-                          title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
+                          title=self.files[index] + "\n" + 'Depth:' + str(
+                              self.mdata[index]['depth']) + " - Region: " + str(
                               self.mdata[index]['region']))
 
         self.plot.legend()
@@ -326,11 +326,10 @@ class tmednet(tk.Frame):
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
-
-
-
-
-
+        self.consolescreen.insert("end", "Plotting zoom of depth: ", 'action')
+        self.consolescreen.insert("end", str(self.mdata[0]['depth']))
+        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+        self.consolescreen.insert("end", "\n =============\n")
 
     def plot_all_zoom(self):
         """
@@ -370,9 +369,10 @@ class tmednet(tk.Frame):
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
         self.consolescreen.insert("end", "Plotting zoom of depths: ", 'action')
-        self.consolescreen.insert("end", depths + "\n =============\n")
-        self.consolescreen.insert("end", "at site" + self.mdata[0]['region'], 'action')
+        self.consolescreen.insert("end", depths)
+        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
         self.consolescreen.insert("end", "\n =============\n")
+
     def plot_dif(self):
         """
         Method: plot_dif(self)
@@ -383,7 +383,28 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-        pass
+
+        self.clear_plots()
+        index = self.list.curselection()
+        depths = ""
+        dfdelta = fm.temp_difference(self)
+        # Creates the subplots and deletes the old plot
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        self.plot = self.fig.add_subplot(111)
+        dfdelta.plot(ax=self.plot)
+        self.plot.set(ylabel='Temperature (DEG C)',
+                      title='Temp differences')
+
+        self.plot.legend()
+
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+        self.canvas.draw()
+        self.consolescreen.insert("end", "Plotting temp differences: ", 'action')
+        self.consolescreen.insert("end", depths)
+        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+        self.consolescreen.insert("end", "\n =============\n")
 
     def clear_plots(self):
         """
