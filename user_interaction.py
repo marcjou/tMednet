@@ -11,6 +11,7 @@ import time
 
 import file_manipulation as fm
 import matplotlib
+import numpy as np
 
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
@@ -117,6 +118,9 @@ class tmednet(tk.Frame):
         plt.Axes.remove(self.plot1)
         plt.Axes.remove(self.plot2)
         plt.Axes.remove(self.plot)
+
+        self.cbexists = False   # Control for the colorbar of the Hovmoller
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
         toolbar = NavigationToolbar2Tk(self.canvas, f2)
@@ -150,7 +154,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
-        self.right_menu.add_command(label="Rename")
+        self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
 
         self.list.bind("<Button-3>", self.do_popup)
         cscrollb = tk.Scrollbar(frame2, width=20)
@@ -266,6 +270,11 @@ class tmednet(tk.Frame):
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
+        if self.cbexists:
+            self.clear_plots()
+
+        #if self.plotcb.axes:
+          #  plt.Axes.remove(self.plotcb)
 
         if self.plot.axes:
             # self.plot = self.fig.add_subplot(111)
@@ -305,6 +314,7 @@ class tmednet(tk.Frame):
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
+
 
         self.plot1.plot(time_series[0], temperatures[0],
                         '-', color='steelblue', label=str(self.mdata[index]['depth']))
@@ -348,6 +358,7 @@ class tmednet(tk.Frame):
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
+
 
         for i in index:
             time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
@@ -394,6 +405,7 @@ class tmednet(tk.Frame):
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
 
+
             self.plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.plot)
             self.plot.set(ylabel='Temperature (DEG C)',
@@ -422,6 +434,7 @@ class tmednet(tk.Frame):
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
 
+
             self.plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.plot)
             self.plot.set(ylabel='Temperature (DEG C)',
@@ -438,6 +451,28 @@ class tmednet(tk.Frame):
         except UnboundLocalError:
             self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
             self.consolescreen.insert("end", " \n =============\n")
+
+    def plot_hovmoller(self):
+        global cb
+        self.clear_plots()
+        df, depths, _ = fm.list_to_df(self)
+        depths = np.array(depths)
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        self.plot = self.fig.add_subplot(111)
+
+        levels = np.arange(np.floor(np.min(df.values)), np.ceil(np.max(df.values)), 1)
+        # df.resample(##) if we want to filter the results in a direct way
+        # Draws a contourn line. Right now looks messy
+        #ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+        cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+
+        cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
+        self.cbexists = True
+        self.plot.set(ylabel='Depth (m)',
+                      title='Hovmoller Diagram')
+        self.canvas.draw()
 
     def clear_plots(self):
         """
@@ -458,6 +493,14 @@ class tmednet(tk.Frame):
         if self.plot1.axes:
             self.plot1.clear()
             self.plot2.clear()
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        if self.cbexists:
+            cb.remove()
+            self.cbexists = False
+        #if self.plotcb.axes():
+          #  self.plotcb.clear()
+          #  plt.Axes.remove(self.plotcb)
         self.canvas.draw()
 
     def on_save(self):
