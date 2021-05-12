@@ -19,7 +19,7 @@ def main():
     # root.minsize(1000,500)
     root.title("TMEDNET tool")
     app = ui.tmednet(root)
-    root.protocol("WM_DELETE_WINDOW", lambda: ui.cerrar(root))
+    root.protocol("WM_DELETE_WINDOW", lambda: ui.close(root))
     root.mainloop()
 
 

@@ -11,6 +11,7 @@ import time
 
 import file_manipulation as fm
 import matplotlib
+import numpy as np
 
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
@@ -79,6 +80,7 @@ class tmednet(tk.Frame):
         editmenu.add_command(label="To UTC", command=self.to_utc)
         editmenu.add_command(label="Plot1", command=self.help)
         editmenu.add_command(label="Merge Files", command=self.merge)
+        editmenu.add_command(label="Zoom", command=self.plot_zoom)
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -111,6 +113,14 @@ class tmednet(tk.Frame):
         plt.rc('legend', fontsize='medium')
         self.fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
         self.plot = self.fig.add_subplot(111)
+        self.plot1 = self.fig.add_subplot(211)
+        self.plot2 = self.fig.add_subplot(212)
+        plt.Axes.remove(self.plot1)
+        plt.Axes.remove(self.plot2)
+        plt.Axes.remove(self.plot)
+
+        self.cbexists = False   # Control for the colorbar of the Hovmoller
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
         toolbar = NavigationToolbar2Tk(self.canvas, f2)
@@ -134,17 +144,26 @@ class tmednet(tk.Frame):
         notebook.add(frame2, text="Report")
         notebook.grid(row=0, column=0, sticky="ewns")
 
-        self.list = tk.Listbox(frame1)
+        self.list = tk.Listbox(frame1, selectmode='extended')
         self.list.grid(row=0, column=0, sticky="ewns")
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
+        self.right_menu = Menu(frame1, tearoff=0)
+        self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
+        self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)  # Placeholders
+        self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
+        self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
+        self.right_menu.add_separator()
+        self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
+
+        self.list.bind("<Button-3>", self.do_popup)
         cscrollb = tk.Scrollbar(frame2, width=20)
         cscrollb.grid(row=0, column=1, sticky="ns")
         self.textBox = tk.Text(frame2, bg="black", fg="white", height=10, yscrollcommand=cscrollb.set)
         self.textBox.grid(row=0, column=0, sticky="nswe")
         cscrollb.config(command=self.textBox.yview)
 
-        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white', font='Courier 12')
+        self.consolescreen = tk.Text(f1, bg='black', height=1, fg='white', font='Courier 12', wrap='word')
         self.consolescreen.grid(row=1, column=0, sticky='nsew')
         self.consolescreen.bind("<Key>", lambda e: "break")  # Makes the console uneditable
         self.consolescreen.tag_config('warning', foreground="firebrick3")
@@ -152,6 +171,12 @@ class tmednet(tk.Frame):
 
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
+
+    def do_popup(self, event):
+        try:
+            self.right_menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.right_menu.grab_release()
 
     def select_list(self, evt):
         """
@@ -163,6 +188,7 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
         try:
+
             w = evt.widget  # Que es EVT???
             index = int(w.curselection()[0])
             if index in self.index:
@@ -240,15 +266,123 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
+        # If there are subplots, deletes them before creating the plot anew
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        if self.cbexists:
+            self.clear_plots()
 
-        self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
-                       '-', label=str(self.mdata[index]['depth']))
-        self.plot.set(ylabel='Temperature (DEG C)',
-                      title=self.files[index] + "\n" + 'Depth:' + str(self.mdata[index]['depth']) + " - Region: " + str(
-                          self.mdata[index]['region']))
+        #if self.plotcb.axes:
+          #  plt.Axes.remove(self.plotcb)
+
+        if self.plot.axes:
+            # self.plot = self.fig.add_subplot(111)
+            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+                           '-', label=str(self.mdata[index]['depth']))
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Multiple depths at Region: ' + str(self.mdata[index]['region']))
+        else:
+            self.plot = self.fig.add_subplot(111)
+            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+                           '-', label=str(self.mdata[index]['depth']))
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title=self.files[index] + "\n" + 'Depth:' + str(
+                              self.mdata[index]['depth']) + " - Region: " + str(
+                              self.mdata[index]['region']))
+
         self.plot.legend()
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
+
+    def plot_zoom(self):
+        """
+            Method: plot_zoom(self)
+            Purpose: Plot a zoom of the begining and ending of the data
+            Require:
+                canvas: reference to canvas widget
+                subplot: plot object
+            Version:
+            01/2021, EGL: Documentation
+        """
+        self.clear_plots()
+        # w = evt.widget  # Que es EVT???
+        index = int(self.list.curselection()[0])
+        time_series, temperatures, indexes = fm.zoom_data(self.mdata[index])
+
+        # Creates the subplots and deletes the old plot
+        if not self.plot1.axes:
+            self.plot1 = self.fig.add_subplot(211)
+            self.plot2 = self.fig.add_subplot(212)
+
+
+        self.plot1.plot(time_series[0], temperatures[0],
+                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
+        self.plot1.set(ylabel='Temperature (DEG C)',
+                       title=self.files[index] + "\n" + 'Depth:' + str(
+                           self.mdata[index]['depth']) + " - Region: " + str(
+                           self.mdata[index]['region']))
+        self.plot1.legend()
+        self.plot2.plot(time_series[1][:int(indexes[0])], temperatures[1][:int(indexes[0])],
+                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
+        self.plot2.legend()
+        # Plots in the same graph the last part which represents the errors in the data from removing the sensors
+        self.plot2.plot(time_series[1][int(indexes[0]) - 1:], temperatures[1][int(indexes[0]) - 1:],
+                        '-', color='red', label=str(self.mdata[index]['depth']))
+        self.plot2.set(ylabel='Temperature (DEG C)',
+                       title=self.files[index] + "\n" + 'Depth:' + str(
+                           self.mdata[index]['depth']) + " - Region: " + str(
+                           self.mdata[index]['region']))
+
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+        self.canvas.draw()
+        self.consolescreen.insert("end", "Plotting zoom of depth: ", 'action')
+        self.consolescreen.insert("end", str(self.mdata[0]['depth']))
+        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+        self.consolescreen.insert("end", "\n =============\n")
+
+    def plot_all_zoom(self):
+        """
+                    Method: plot_all_zoom(self)
+                    Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
+                    Require:
+                        canvas: reference to canvas widget
+                        subplot: plot object
+                    Version:
+                    01/2021, EGL: Documentation
+                """
+        self.clear_plots()
+        index = self.list.curselection()
+        depths = ""
+        # Creates the subplots and deletes the old plot
+        if not self.plot1.axes:
+            self.plot1 = self.fig.add_subplot(211)
+            self.plot2 = self.fig.add_subplot(212)
+
+
+        for i in index:
+            time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
+            depths = depths + " " + str(self.mdata[i]['depth'])
+            self.plot1.plot(time_series[0], temperatures[0],
+                            '-', label=str(self.mdata[i]['depth']))
+            self.plot1.set(ylabel='Temperature (DEG C)',
+                           title='Temperature at depths:' + depths + " - Region: " + str(
+                               self.mdata[i]['region']))
+            self.plot1.legend()
+
+            self.plot2.plot(time_series[1], temperatures[1],
+                            '-', label=str(self.mdata[i]['depth']))
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title='Temperature at depths:' + depths + " - Region: " + str(
+                               self.mdata[i]['region']))
+            self.plot2.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+        self.consolescreen.insert("end", "Plotting zoom of depths: ", 'action')
+        self.consolescreen.insert("end", depths)
+        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+        self.consolescreen.insert("end", "\n =============\n")
 
     def plot_dif(self):
         """
@@ -260,7 +394,85 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-        pass
+
+        self.clear_plots()
+        depths = ""
+        try:
+            dfdelta, _ = fm.temp_difference(self)
+
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+
+
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.consolescreen.insert("end", "Plotting temp differences: ", 'action')
+            self.consolescreen.insert("end", depths)
+            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+            self.consolescreen.insert("end", "\n =============\n")
+        except UnboundLocalError:
+            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+
+    def plot_dif_filter1d(self):
+        self.clear_plots()
+        depths = ""
+        try:
+            dfdelta = fm.apply_uniform_filter(self)
+
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+
+
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences filtered')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.consolescreen.insert("end", "Plotting temp differences filtered: ", 'action')
+            self.consolescreen.insert("end", depths)
+            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
+            self.consolescreen.insert("end", "\n =============\n")
+        except UnboundLocalError:
+            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+
+    def plot_hovmoller(self):
+        global cb
+        self.clear_plots()
+        df, depths, _ = fm.list_to_df(self)
+        depths = np.array(depths)
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        self.plot = self.fig.add_subplot(111)
+
+        levels = np.arange(np.floor(np.min(df.values)), np.ceil(np.max(df.values)), 1)
+        # df.resample(##) if we want to filter the results in a direct way
+        # Draws a contourn line. Right now looks messy
+        #ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+        cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+
+        cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
+        self.cbexists = True
+        self.plot.set(ylabel='Depth (m)',
+                      title='Hovmoller Diagram')
+        self.canvas.draw()
 
     def clear_plots(self):
         """
@@ -275,7 +487,20 @@ class tmednet(tk.Frame):
         self.consolescreen.insert("end", "Clearing Plots \n =============\n")
         self.index = []
         self.counter = []
-        self.plot.clear()
+        if self.plot.axes:
+            self.plot.clear()
+            plt.Axes.remove(self.plot)
+        if self.plot1.axes:
+            self.plot1.clear()
+            self.plot2.clear()
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        if self.cbexists:
+            cb.remove()
+            self.cbexists = False
+        #if self.plotcb.axes():
+          #  self.plotcb.clear()
+          #  plt.Axes.remove(self.plotcb)
         self.canvas.draw()
 
     def on_save(self):
