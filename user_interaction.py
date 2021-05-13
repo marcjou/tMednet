@@ -80,7 +80,7 @@ class tmednet(tk.Frame):
         editmenu.add_command(label="To UTC", command=self.to_utc)
         editmenu.add_command(label="Plot1", command=self.help)
         editmenu.add_command(label="Merge Files", command=self.merge)
-        editmenu.add_command(label="Zoom", command=self.plot_zoom)
+        editmenu.add_command(label="Cut Endings", command=self.cut_endings)
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -276,15 +276,17 @@ class tmednet(tk.Frame):
         #if self.plotcb.axes:
           #  plt.Axes.remove(self.plotcb)
 
+        masked_ending_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
+                                                        np.array(self.mdata[index]['temp']))
         if self.plot.axes:
             # self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+            self.plot.plot(self.mdata[index]['timegmt'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
                           title='Multiple depths at Region: ' + str(self.mdata[index]['region']))
         else:
             self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['timegmt'], self.mdata[index]['temp'],
+            self.plot.plot(self.mdata[index]['timegmt'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
                           title=self.files[index] + "\n" + 'Depth:' + str(
@@ -315,7 +317,8 @@ class tmednet(tk.Frame):
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
 
-
+        masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1][int(indexes[0]) - 1:]) == 999,
+                                                        np.array(temperatures[1][int(indexes[0]) - 1:]))
         self.plot1.plot(time_series[0], temperatures[0],
                         '-', color='steelblue', label=str(self.mdata[index]['depth']))
         self.plot1.set(ylabel='Temperature (DEG C)',
@@ -327,7 +330,7 @@ class tmednet(tk.Frame):
                         '-', color='steelblue', label=str(self.mdata[index]['depth']))
         self.plot2.legend()
         # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-        self.plot2.plot(time_series[1][int(indexes[0]) - 1:], temperatures[1][int(indexes[0]) - 1:],
+        self.plot2.plot(time_series[1][int(indexes[0]) - 1:], masked_ending_temperatures,
                         '-', color='red', label=str(self.mdata[index]['depth']))
         self.plot2.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
@@ -363,6 +366,9 @@ class tmednet(tk.Frame):
         for i in index:
             time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
             depths = depths + " " + str(self.mdata[i]['depth'])
+
+            masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
+                                                            np.array(temperatures[1]))
             self.plot1.plot(time_series[0], temperatures[0],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot1.set(ylabel='Temperature (DEG C)',
@@ -370,7 +376,7 @@ class tmednet(tk.Frame):
                                self.mdata[i]['region']))
             self.plot1.legend()
 
-            self.plot2.plot(time_series[1], temperatures[1],
+            self.plot2.plot(time_series[1], masked_ending_temperatures,
                             '-', label=str(self.mdata[i]['depth']))
             self.plot2.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
@@ -405,9 +411,9 @@ class tmednet(tk.Frame):
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
 
-
+            masked_df = dfdelta.mask((dfdelta < -50) | (dfdelta > 50))
             self.plot = self.fig.add_subplot(111)
-            dfdelta.plot(ax=self.plot)
+            masked_df.plot(ax=self.plot)
             self.plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences')
 
@@ -502,6 +508,15 @@ class tmednet(tk.Frame):
           #  self.plotcb.clear()
           #  plt.Axes.remove(self.plotcb)
         self.canvas.draw()
+
+    def cut_endings(self):
+        self.tempdataold = []
+        for data in self.mdata:
+            self.tempdataold.append(data['temp'].copy())
+            _, temperatures, indexes = fm.zoom_data(data)
+            for i in indexes:
+                data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+        # self.mdata[0]['temp'] = self.tempdataold[0].copy() //Recover the old temp data
 
     def on_save(self):
         """

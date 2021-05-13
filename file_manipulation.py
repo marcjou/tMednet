@@ -211,6 +211,8 @@ def df_to_geojson(df, properties, SN, lat,
 
 
 def zoom_data(data):
+    # Gets the first and last day of operation to look for the possible errors.
+    # TODO Possibility of making it more than a day
     time_series = [data['timegmt'][:24], data['timegmt'][-24:]]
     temperatures = [data['temp'][:24], data['temp'][-24:]]
     ftimestamp = [item.timestamp() for item in time_series[1]]
@@ -237,9 +239,10 @@ def temp_difference(data):
 
 def apply_uniform_filter(data):
     df, depths = temp_difference(data)
+    masked_df = df.mask((df < -50) | (df > 50))
     i = 1
     for depth in depths[:-1]:
-        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
+        series1 = pd.DataFrame(uniform_filter1d(masked_df[str(depth) + "-" + str(depths[i])], size=240),
                                index=data.mdata[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
