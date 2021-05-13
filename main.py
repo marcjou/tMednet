@@ -6,7 +6,8 @@
 # Author: Marc Jou
 # Date: 28/04/2021
 
-__version__ = "0.5"
+version = open("VERSION.TXT", "r").read()
+
 __author__ = "Marc Jou"
 __date__ = "April 2018"
 
