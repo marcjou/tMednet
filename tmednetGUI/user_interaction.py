@@ -216,7 +216,7 @@ class tmednet(tk.Frame):
         """
 
         self.path = "./"
-        files = askopenfilenames(initialdir=self.path, title="Open files",
+        files = askopenfilenames(initialdir='../src', title="Open files",
                                  filetypes=[("All files", "*.*")])
         try:
             filesname, self.path = fm.openfile(self, files, self.consolescreen)
@@ -560,7 +560,7 @@ class tmednet(tk.Frame):
                 filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
                            + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename
 
-            file = asksaveasfilename(filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
+            file = asksaveasfilename(initialdir='../src/output_images', filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)

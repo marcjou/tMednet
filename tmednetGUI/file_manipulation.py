@@ -203,7 +203,7 @@ def df_to_geojson(df, properties, SN, lat,
     point = Point((lat, lon))
     feature = Feature(geometry=point, properties=props)
 
-    output_filename = 'dataset.geojson'
+    output_filename = '../src/output_files/dataset.geojson'
     with open(output_filename, 'w') as output_file:  # Crashes when opened with text editor
         dump(feature, output_file)
     print('geojson written')

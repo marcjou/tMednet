@@ -4,3 +4,5 @@ exit
 venv/
 __pycache__
 .idea/
+prova.py
+
