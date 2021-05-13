@@ -176,7 +176,8 @@ def list_to_df(args):
         SN.append(data['S/N'])
         df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)  # Merges by index which is the date
 
-    return df1, depths, SN
+    masked_df = df1.mask((df1 < -50) | (df1 > 50))
+    return masked_df, depths, SN
 
 
 def df_to_txt(df):
@@ -234,15 +235,15 @@ def temp_difference(data):
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
         else:
             dfdelta = pd.DataFrame(series1)
+
     return dfdelta, depths
 
 
 def apply_uniform_filter(data):
     df, depths = temp_difference(data)
-    masked_df = df.mask((df < -50) | (df > 50))
     i = 1
     for depth in depths[:-1]:
-        series1 = pd.DataFrame(uniform_filter1d(masked_df[str(depth) + "-" + str(depths[i])], size=240),
+        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
                                index=data.mdata[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():

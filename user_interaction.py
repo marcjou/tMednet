@@ -78,7 +78,7 @@ class tmednet(tk.Frame):
 
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="To UTC", command=self.to_utc)
-        editmenu.add_command(label="Plot1", command=self.help)
+        editmenu.add_command(label="Get original data", command=self.go_back)
         editmenu.add_command(label="Merge Files", command=self.merge)
         editmenu.add_command(label="Cut Endings", command=self.cut_endings)
         menubar.add_cascade(label="Edit", menu=editmenu)
@@ -411,9 +411,9 @@ class tmednet(tk.Frame):
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
 
-            masked_df = dfdelta.mask((dfdelta < -50) | (dfdelta > 50))
+
             self.plot = self.fig.add_subplot(111)
-            masked_df.plot(ax=self.plot)
+            dfdelta.plot(ax=self.plot)
             self.plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences')
 
@@ -459,26 +459,45 @@ class tmednet(tk.Frame):
             self.consolescreen.insert("end", " \n =============\n")
 
     def plot_hovmoller(self):
-        global cb
-        self.clear_plots()
-        df, depths, _ = fm.list_to_df(self)
-        depths = np.array(depths)
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        self.plot = self.fig.add_subplot(111)
+        try:
+            fm.to_utc(self)
+            global cb
+            self.clear_plots()
+            df, depths, _ = fm.list_to_df(self)
+            depths = np.array(depths)
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+            self.plot = self.fig.add_subplot(111)
 
-        levels = np.arange(np.floor(np.min(df.values)), np.ceil(np.max(df.values)), 1)
-        # df.resample(##) if we want to filter the results in a direct way
-        # Draws a contourn line. Right now looks messy
-        #ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-        cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+            levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
+            # df.resample(##) if we want to filter the results in a direct way
+            # Draws a contourn line. Right now looks messy
+            #ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+            cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
-        cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
-        self.cbexists = True
-        self.plot.set(ylabel='Depth (m)',
-                      title='Hovmoller Diagram')
-        self.canvas.draw()
+            cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
+            self.cbexists = True
+            self.plot.set(ylabel='Depth (m)',
+                          title='Hovmoller Diagram')
+            self.canvas.draw()
+            self.consolescreen.insert("end", "Plotting the HOVMOLLER DIAGRAM at region: ", 'action')
+            self.consolescreen.insert("end", self.mdata[0]['region'])
+            self.consolescreen.insert("end", "\n =============\n")
+        except IndexError:
+            self.consolescreen.insert("end", "Load several files before creating a diagram", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+        except TypeError:
+            self.consolescreen.insert("end", "Load more than a file for the Hovmoller Diagram", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+
+    def go_back(self):
+        try:
+            self.mdata[0]['temp'] = self.tempdataold[0].copy()
+        except AttributeError:
+            self.consolescreen.insert("end", "Cut the ending of a file before trying to recover it", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
+
 
     def clear_plots(self):
         """
@@ -510,13 +529,16 @@ class tmednet(tk.Frame):
         self.canvas.draw()
 
     def cut_endings(self):
-        self.tempdataold = []
-        for data in self.mdata:
-            self.tempdataold.append(data['temp'].copy())
-            _, temperatures, indexes = fm.zoom_data(data)
-            for i in indexes:
-                data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
-        # self.mdata[0]['temp'] = self.tempdataold[0].copy() //Recover the old temp data
+        if self.mdata:
+            self.tempdataold = []
+            for data in self.mdata:
+                self.tempdataold.append(data['temp'].copy())
+                _, temperatures, indexes = fm.zoom_data(data)
+                for i in indexes:
+                    data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+        else:
+            self.consolescreen.insert("end", "Load a file before trying to cut it", 'warning')
+            self.consolescreen.insert("end", " \n =============\n")
 
     def on_save(self):
         """
