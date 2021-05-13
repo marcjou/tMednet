@@ -1,0 +1,6 @@
+*.pyc
+tmednetGUI/__pycache__/
+exit
+venv/
+__pycache__
+.idea/
