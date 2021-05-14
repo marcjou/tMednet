@@ -1,3 +1,3 @@
 from distutils.core import setup
 
-setup(name='tMednet GUI tool', version='0.5', author='Marc Jou')
+setup(name='tMednet GUI tool', version=open("../VERSION.TXT", "r").read(), author='Marc Jou')
