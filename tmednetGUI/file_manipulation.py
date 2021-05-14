@@ -50,17 +50,61 @@ def load_data(args, consolescreen):
             datos['GMT'] = gmtout
             datos['S/N'] = a[0][a[0].index('S/N:') + 1]
             args.mdata.append(datos)
-        check_hour_interval(args.mdata)
+        # check_hour_interval(args.mdata)
+        # convert_round_hour(args.mdata)    # TODO launch an interpolation even if the difference is an hour
+                                            # TODO e.g. all the file has an offset of 20s
+        interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
 
 
+def interpolate_hours(data):
+    to_utc(data)
+    for dat in data:
+        for i in range(len(dat['time'])):
+            if dat['time'][i].timestamp() % 3600 == 0:  # Check if the difference between timestamps is an hour
+                pass
+            else:
+                # If it isn't, interpolates
+                dfraw = pd.DataFrame(dat['temp'], index=dat['time'])
+                daterange = pd.date_range(dat['datainici'], dat['datafin'], freq='H')
+                dfcontrol = pd.DataFrame(np.arange(len(daterange)), index=daterange)
+                dfmerge = dfraw.merge(dfcontrol, how='outer', left_index=True,
+                                      right_index=True).interpolate(method='index', limit_direction='both')
+                dfinter = dfmerge.drop(columns='0_y')
+                sinter = dfinter['0_x'].round(3)
+                dat['temp'] = sinter[daterange].values.tolist()
+                break
+
+
+def convert_round_hour(data):
+    # If there is a time desviation from the usual round hours, it corrects it
+    for dat in data:
+        for i in range(len(dat['timegmt'])):
+            if dat['timegmt'][i].timestamp() % 3600 == 0:
+                pass
+            else:
+                # Round the hour
+                dt_start_of_hour = dat['timegmt'][i].replace(minute=0, second=0, microsecond=0)
+                dt_half_hour = dat['timegmt'][i].replace(minute=30, second=0, microsecond=0)
+
+                if dat['timegmt'][i] >= dt_half_hour:
+                    # round up
+                    dat['timegmt'][i] = dt_start_of_hour + timedelta(hours=1)
+                else:
+                    # round down
+                    dat['timegmt'][i] = dt_start_of_hour
+
+
 def check_hour_interval(data):
+    to_utc(data)
+    df, depths, _ = list_to_df(data)
     for dat in data:
         for i in range(len(dat['timegmt'])):
             if i + 1 == len(dat['timegmt']):
                 break
+            # Ancillary code
             if (dat['timegmt'][i + 1] - dat['timegmt'][i]).seconds > 3600:
                 print("Difference of an hour in depth " + str(dat['depth']) + " line" + str(i))
         print("Finished depth" + str(dat['depth']))
@@ -131,19 +175,19 @@ def openfile(args, files, consolescreen):
         consolescreen.insert("end", "=============\n")
 
 
-def to_utc(args):
+def to_utc(data):
     """
     Method: to_utc(self)
     Purpose: Shift temporal axis
     Require:
     Version: 01/2021, EGL: Documentation
     """
-    for i in range(len(args.mdata)):
-        gmthshift = int(args.mdata[i]["GMT"][1:])
+    for i in range(len(data)):
+        gmthshift = int(data[i]["GMT"][1:])
         # Mirar timedelta
-        args.mdata[i]["time"] = [args.mdata[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in
-                                 range(len(args.mdata[i]["timegmt"]))]
-        print(args.mdata[i]["time"][10], args.mdata[i]["timegmt"][10])
+        data[i]["time"] = [data[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in
+                                 range(len(data[i]["timegmt"]))]
+        print(data[i]["time"][10], data[i]["timegmt"][10])
 
 
 def merge(args):
@@ -157,7 +201,7 @@ def merge(args):
 
     print('merging files')
     # Merges all the available files while making sure that the times match
-    df1, depths, SN = list_to_df(args)
+    df1, depths, SN = list_to_df(args.mdata)
     if len(args.mdata) < 2:
         merging = False
     else:
@@ -165,15 +209,15 @@ def merge(args):
     return df1, depths, SN, merging
 
 
-def list_to_df(args):
-    df1 = pd.DataFrame(args.mdata[0]['temp'], index=args.mdata[0]['time'], columns=[str(args.mdata[0]['depth']) +
+def list_to_df(data):
+    df1 = pd.DataFrame(data[0]['temp'], index=data[0]['time'], columns=[str(data[0]['depth']) +
                                                                                     'm temp'])
-    depths = [args.mdata[0]['depth']]
-    SN = [args.mdata[0]['S/N']]
-    for data in args.mdata[1:]:
-        dfi = pd.DataFrame(data['temp'], index=data['time'], columns=[str(data['depth']) + 'm temp'])
-        depths.append(data['depth'])
-        SN.append(data['S/N'])
+    depths = [data[0]['depth']]
+    SN = [data[0]['S/N']]
+    for dat in data[1:]:
+        dfi = pd.DataFrame(dat['temp'], index=dat['time'], columns=[str(dat['depth']) + 'm temp'])
+        depths.append(dat['depth'])
+        SN.append(dat['S/N'])
         df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)  # Merges by index which is the date
 
     masked_df = df1.mask((df1 < -50) | (df1 > 50))
@@ -245,7 +289,7 @@ def apply_uniform_filter(data):
     i = 1
     for depth in depths[:-1]:
         series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
-                               index=data.mdata[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
+                               index=data[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)

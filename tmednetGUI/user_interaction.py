@@ -252,7 +252,7 @@ class tmednet(tk.Frame):
             self.consolescreen.insert("end", "=============\n")
         else:
             try:
-                fm.to_utc(self)
+                fm.to_utc(self.mdata)
             except IndexError:
                 self.consolescreen.insert("end", "Please, load a file before converting to UTC\n =============\n")
 
@@ -404,7 +404,7 @@ class tmednet(tk.Frame):
         self.clear_plots()
         depths = ""
         try:
-            dfdelta, _ = fm.temp_difference(self)
+            dfdelta, _ = fm.temp_difference(self.mdata)
 
             # Creates the subplots and deletes the old plot
             if self.plot1.axes:
@@ -433,7 +433,7 @@ class tmednet(tk.Frame):
         self.clear_plots()
         depths = ""
         try:
-            dfdelta = fm.apply_uniform_filter(self)
+            dfdelta = fm.apply_uniform_filter(self.mdata)
 
             # Creates the subplots and deletes the old plot
             if self.plot1.axes:
@@ -460,10 +460,10 @@ class tmednet(tk.Frame):
 
     def plot_hovmoller(self):
         try:
-            fm.to_utc(self)
+            fm.to_utc(self.mdata)
             global cb
             self.clear_plots()
-            df, depths, _ = fm.list_to_df(self)
+            df, depths, _ = fm.list_to_df(self.mdata)
             depths = np.array(depths)
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
@@ -609,7 +609,7 @@ class tmednet(tk.Frame):
         top = Toplevel()
         top.title("About...")
 
-        img = Image.open("./TMEDNET_White.png").resize((250, 78))
+        img = Image.open("../res/logos/TMEDNET_White.png").resize((250, 78))
         photo = ImageTk.PhotoImage(img)
         label = Label(top, image=photo)
         label.image = photo  # keep a reference!
