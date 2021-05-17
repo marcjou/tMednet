@@ -17,6 +17,10 @@ matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
+import matplotlib.dates as dates
+
+from datetime import timedelta
+
 
 version = "0.5"
 build = "April 2021"
@@ -54,6 +58,7 @@ class tmednet(tk.Frame):
         self.index = []
         self.newfiles = 0
         self.counter = []
+        self.recoverindex = None
 
         # We build the GUI
         self.init_window()
@@ -332,20 +337,44 @@ class tmednet(tk.Frame):
                            self.mdata[index]['region']))
         self.plot1.legend()
         self.plot2.plot(time_series[1][:int(indexes[0])], temperatures[1][:int(indexes[0])],
-                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
+                        '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
         self.plot2.legend()
         # Plots in the same graph the last part which represents the errors in the data from removing the sensors
         self.plot2.plot(time_series[1][int(indexes[0]) - 1:], masked_ending_temperatures,
-                        '-', color='red', label=str(self.mdata[index]['depth']))
+                        '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
         self.plot2.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
+        cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
+
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
         self.console_writer('at site ', 'action', self.mdata[0]['region'])  # TODO change all consolescreens
+
+    def cut_data_manually(self, event, ind):
+        print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+              ('double' if event.dblclick else 'single', event.button,
+               event.x, event.y, event.xdata, event.ydata))
+        xtime = dates.num2date(event.xdata)
+        xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(hours=xtime.minute//30)
+        xtime_rounded = xtime_rounded.replace(tzinfo=None)
+        index = self.mdata[ind]['time'].index(xtime_rounded)
+        print('Cutting data')
+
+
+        if self.recoverindex:
+            self.recoverindex.append(ind)
+        else:
+            self.recoverindex = [ind]
+            self.tempdataold = []
+        self.tempdataold.append(self.mdata[ind]['temp'].copy())
+        for i in range(len(self.mdata[ind]['temp'][index:])):
+            self.mdata[ind]['temp'][i + index] = 999
+
+
 
     def plot_all_zoom(self):
         """
@@ -496,8 +525,17 @@ class tmednet(tk.Frame):
 
     def go_back(self):
         try:
-            self.mdata[0]['temp'] = self.tempdataold[0].copy()
-        except AttributeError:
+            if self.recoverindex:
+                for i in self.recoverindex:
+                    self.mdata[i]['temp'] = self.tempdataold[i].copy()
+                self.recoverindex = None
+                self.tempdataold = None
+            else:
+                i = 0
+                for data in self.mdata:
+                    data['temp'] = self.tempdataold[i].copy()
+                    i += 1
+        except (AttributeError, TypeError):
             self.consolescreen.insert("end", "Cut the ending of a file before trying to recover it", 'warning')
             self.consolescreen.insert("end", " \n =============\n")
 
