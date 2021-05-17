@@ -172,6 +172,14 @@ class tmednet(tk.Frame):
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
+    def console_writer(self, msg, mod, var=False):
+        if var:
+            self.consolescreen.insert("end", msg, mod)
+            self.consolescreen.insert("end", str(var) + "\n =============\n")
+        else:
+            self.consolescreen.insert("end", msg + "\n", mod)
+            self.consolescreen.insert("end", "=============\n")
+
     def do_popup(self, event):
         try:
             self.right_menu.tk_popup(event.x_root, event.y_root)
@@ -224,9 +232,7 @@ class tmednet(tk.Frame):
                 self.files.append(file)
             fm.load_data(self, self.consolescreen)  # Llegim els fitxers
         except TypeError:
-            self.consolescreen.insert("end", "Unable to read file\n", 'warning')
-            self.consolescreen.insert("end", "=============\n")
-
+            self.console_writer('Unable to read file', 'warning')
         return
 
     def report(self):
@@ -248,13 +254,12 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
         if not self.mdata:
-            self.consolescreen.insert("end", "Please, load a file before converting to UTC\n", 'warning')
-            self.consolescreen.insert("end", "=============\n")
+            self.console_writer('Please, load a file before converting to UTC', 'warning')
         else:
             try:
                 fm.to_utc(self.mdata)
             except IndexError:
-                self.consolescreen.insert("end", "Please, load a file before converting to UTC\n =============\n")
+                self.console_writer('Please, load a file before converting to UTC', 'warning')
 
     def plot_ts(self, index):
         """
@@ -339,10 +344,8 @@ class tmednet(tk.Frame):
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
-        self.consolescreen.insert("end", "Plotting zoom of depth: ", 'action')
-        self.consolescreen.insert("end", str(self.mdata[0]['depth']))
-        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
-        self.consolescreen.insert("end", "\n =============\n")
+        self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
+        self.console_writer('at site ', 'action', self.mdata[0]['region'])  # TODO change all consolescreens
 
     def plot_all_zoom(self):
         """
@@ -497,7 +500,6 @@ class tmednet(tk.Frame):
         except AttributeError:
             self.consolescreen.insert("end", "Cut the ending of a file before trying to recover it", 'warning')
             self.consolescreen.insert("end", " \n =============\n")
-
 
     def clear_plots(self):
         """
