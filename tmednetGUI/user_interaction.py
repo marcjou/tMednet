@@ -177,13 +177,17 @@ class tmednet(tk.Frame):
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
 
-    def console_writer(self, msg, mod, var=False):
+    def console_writer(self, msg, mod, var=False, liner=False):
         if var:
             self.consolescreen.insert("end", msg, mod)
-            self.consolescreen.insert("end", str(var) + "\n =============\n")
+            self.consolescreen.insert("end", str(var))
+            if liner:
+                self.consolescreen.insert("end", "\n =============\n")
+            self.consolescreen.see('end')
         else:
             self.consolescreen.insert("end", msg + "\n", mod)
             self.consolescreen.insert("end", "=============\n")
+            self.consolescreen.see('end')
 
     def do_popup(self, event):
         try:
@@ -209,8 +213,7 @@ class tmednet(tk.Frame):
             else:
                 self.value = w.get(index)
                 print(index, self.value)
-                self.consolescreen.insert("end", "Plotting: ", 'action')
-                self.consolescreen.insert("end", self.value + "\n =============\n")
+                self.console_writer('Plotting: ', 'action', self.value, True)
                 self.index.append(index)
                 self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
                 # dibuixem un cop seleccionat
@@ -352,7 +355,7 @@ class tmednet(tk.Frame):
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
-        self.console_writer('at site ', 'action', self.mdata[0]['region'])  # TODO change all consolescreens
+        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)  # TODO change all consolescreens
 
     def cut_data_manually(self, event, ind):
         print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
@@ -363,7 +366,8 @@ class tmednet(tk.Frame):
         xtime_rounded = xtime_rounded.replace(tzinfo=None)
         index = self.mdata[ind]['time'].index(xtime_rounded)
         print('Cutting data')
-
+        self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
+        self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
 
         if self.recoverindex:
             self.recoverindex.append(ind)
@@ -417,10 +421,8 @@ class tmednet(tk.Frame):
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
-        self.consolescreen.insert("end", "Plotting zoom of depths: ", 'action')
-        self.consolescreen.insert("end", depths)
-        self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
-        self.consolescreen.insert("end", "\n =============\n")
+        self.console_writer('Plotting zoom of depths: ', 'action', depths)
+        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
 
     def plot_dif(self):
         """
@@ -453,13 +455,10 @@ class tmednet(tk.Frame):
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
-            self.consolescreen.insert("end", "Plotting temp differences: ", 'action')
-            self.consolescreen.insert("end", depths)
-            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
-            self.consolescreen.insert("end", "\n =============\n")
+            self.console_writer('Plotting zoom of depths: ', 'action', depths)
+            self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
         except UnboundLocalError:
-            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def plot_dif_filter1d(self):
         self.clear_plots()
@@ -482,13 +481,10 @@ class tmednet(tk.Frame):
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
-            self.consolescreen.insert("end", "Plotting temp differences filtered: ", 'action')
-            self.consolescreen.insert("end", depths)
-            self.consolescreen.insert("end", " at site " + str(self.mdata[0]['region']), 'action')
-            self.consolescreen.insert("end", "\n =============\n")
+            self.console_writer('Plotting zoom of depths: ', 'action', depths)
+            self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
         except UnboundLocalError:
-            self.consolescreen.insert("end", "Load more than a file for plotting the difference", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def plot_hovmoller(self):
         try:
@@ -513,15 +509,12 @@ class tmednet(tk.Frame):
             self.plot.set(ylabel='Depth (m)',
                           title='Hovmoller Diagram')
             self.canvas.draw()
-            self.consolescreen.insert("end", "Plotting the HOVMOLLER DIAGRAM at region: ", 'action')
-            self.consolescreen.insert("end", self.mdata[0]['region'])
-            self.consolescreen.insert("end", "\n =============\n")
+
+            self.console_writer('Plotting the HOVMOLLER DIAGRAM at region: ', 'action', self.mdata[0]['region'], True)
         except IndexError:
-            self.consolescreen.insert("end", "Load several files before creating a diagram", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Load several files before creating a diagram', 'warning')
         except TypeError:
-            self.consolescreen.insert("end", "Load more than a file for the Hovmoller Diagram", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def go_back(self):
         try:
@@ -535,9 +528,9 @@ class tmednet(tk.Frame):
                 for data in self.mdata:
                     data['temp'] = self.tempdataold[i].copy()
                     i += 1
+            self.console_writer('Recovering old data', 'action')
         except (AttributeError, TypeError):
-            self.consolescreen.insert("end", "Cut the ending of a file before trying to recover it", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
 
     def clear_plots(self):
         """
@@ -549,7 +542,7 @@ class tmednet(tk.Frame):
         Version:
         01/2021, EGL: Documentation
         """
-        self.consolescreen.insert("end", "Clearing Plots \n =============\n")
+        self.console_writer('Clearing Plots', 'action')
         self.index = []
         self.counter = []
         if self.plot.axes:
@@ -577,8 +570,7 @@ class tmednet(tk.Frame):
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
         else:
-            self.consolescreen.insert("end", "Load a file before trying to cut it", 'warning')
-            self.consolescreen.insert("end", " \n =============\n")
+            self.console_writer('Load a file before trying to cut it', 'warning')
 
     def on_save(self):
         """
@@ -604,11 +596,9 @@ class tmednet(tk.Frame):
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)
-                self.consolescreen.insert("end", "Saving plot in: ", 'action')
-                self.consolescreen.insert("end", file + " \n=============\n")
+                self.console_writer('Saving plot in: ', 'action', file, True)
         except (AttributeError, UnboundLocalError, IndexError):
-            self.consolescreen.insert("end", "Error, couldn't find a plot to save\n", 'warning')
-            self.consolescreen.insert("end", " =============\n")
+            self.console_writer('Error, couldn\'t find a plot to save', 'warning')
 
     def merge(self):
         """
@@ -621,23 +611,20 @@ class tmednet(tk.Frame):
         # TODO give the option to save into txt, right now only saves into json. Extract the coordinates and use them
         try:
             if not self.mdata[0]['time']:
-                self.consolescreen.insert("end", "First select 'To UTC' option\n", 'warning')
-                self.consolescreen.insert("end", " =============\n")
+                self.console_writer('First select \'To UTC\' option', 'warning')
             else:
-                self.consolescreen.insert("end", "Creating Geojson\n =============\n")
+                self.console_writer('Creating Geojson', 'action')
                 df, depths, SN, merging = fm.merge(self)
                 if merging is False:
-                    self.consolescreen.insert("end", "Load more than a file for merging, creating an output of only a "
-                                                     "file instead", 'warning')
-                    self.consolescreen.insert("end", " \n =============\n")
+                    self.console_writer('Load more than a file for merging, creating an output of only a file instead',
+                                        'warning')
                 start_time = time.time()
                 fm.df_to_geojson(df, depths, SN, 7, 14)
 
                 self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                         time.time() - start_time) + "\n =============\n")
         except IndexError:
-            self.consolescreen.insert("end", "Please, load a file first\n", 'warning')
-            self.consolescreen.insert("end", " =============\n")
+            self.console_writer('Please, load a file first', 'warning')
 
     @staticmethod
     def help():
