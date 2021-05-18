@@ -1,0 +1,1051 @@
+{
+    "stations": {
+        "1": {
+            "lat": "39.89170",
+            "long": "0.67109",
+            "site_number": "1",
+            "site_name": "Columbretes_(Illa-Grossa)",
+            "site_code": "1",
+            "eco_region": "W-MED",
+            "sub_basin": "S-Catalan",
+            "start_year": "2007",
+            "end_year": "2017",
+            "institution": "Reserva Marina Islas Columbretes. Secretaria General del Mar"
+        },
+        "2": {
+            "lat": "40.09503",
+            "long": "4.07739",
+            "site_number": "2",
+            "site_name": "Menorca-N_(Illa-dels-Porros)",
+            "site_code": "2",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2004",
+            "end_year": "2007",
+            "institution": "Spanish Institute of Oceanography"
+        },
+        "3": {
+            "lat": "39.12372",
+            "long": "2.96034",
+            "site_number": "3",
+            "site_name": "Mallorca-S_(Cabrera-Imperial)",
+            "site_code": "3",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2007",
+            "end_year": "2017",
+            "institution": "Centre d'Estudis Avan\u00e7ats de Blanes"
+        },
+        "4": {
+            "lat": "38.96956",
+            "long": "1.16564",
+            "site_number": "4",
+            "site_name": "Ibiza_(Ses-Bledes)",
+            "site_code": "4",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2011",
+            "end_year": "2012",
+            "institution": "Ecology Department. University of Barcelona"
+        },
+        "5": {
+            "lat": "42.23698",
+            "long": "3.26141",
+            "site_number": "5",
+            "site_name": "Cap de Creus-S_(El-Gat)",
+            "site_code": "5",
+            "eco_region": "W-MED",
+            "sub_basin": "N-Catalan",
+            "start_year": "2007",
+            "end_year": "2018",
+            "institution": "Parc Natural Cap de Creus"
+        },
+        "6": {
+            "lat": "42.04970",
+            "long": "3.22540",
+            "site_number": "6",
+            "site_name": "Medes_(Pota-del-Llop)",
+            "site_code": "6",
+            "eco_region": "W-MED",
+            "sub_basin": "N-Catalan",
+            "start_year": "2002",
+            "end_year": "2018",
+            "institution": "Institute of Marine Science - CSIC"
+        },
+        "7": {
+            "lat": "42.33346",
+            "long": "3.28656",
+            "site_number": "7",
+            "site_name": "Cap de Creus-N_(Portalo)",
+            "site_code": "7",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "2007",
+            "end_year": "2018",
+            "institution": "Parc Natural Cap de Creus"
+        },
+        "8": {
+            "lat": "42.46810",
+            "long": "3.17025",
+            "site_number": "8",
+            "site_name": "Banyuls_(Park-buoy)",
+            "site_code": "8",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "2006",
+            "end_year": "2018",
+            "institution": "R\u00e9serve Naturelle Marine de Cerb\u00e8re Banyuls"
+        },
+        "9": {
+            "lat": "43.32317",
+            "long": "5.05524",
+            "site_number": "9",
+            "site_name": "Cap Couronne",
+            "site_code": "9",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "1999",
+            "end_year": "2016",
+            "institution": "Parc Marin C\u00f4te Bleue"
+        },
+        "10": {
+            "lat": "43.32835",
+            "long": "5.22447",
+            "site_number": "10",
+            "site_name": "Mejean",
+            "site_code": "10",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "2010",
+            "end_year": "2017",
+            "institution": "OSU Institut Pytheas"
+        },
+        "11": {
+            "lat": "43.25228",
+            "long": "3.53807",
+            "site_number": "11",
+            "site_name": "Agde",
+            "site_code": "11",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "2010",
+            "end_year": "2018",
+            "institution": "Aire Marine Prot\u00e9g\u00e9e de la c\u00f4te Agathoise"
+        },
+        "12": {
+            "lat": "43.32260",
+            "long": "5.16200",
+            "site_number": "12",
+            "site_name": "Carry-le-Rouet",
+            "site_code": "12",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "1997",
+            "end_year": "2016",
+            "institution": "Parc Marin C\u00f4te Bleue"
+        },
+        "13": {
+            "lat": "43.17196",
+            "long": "5.38987",
+            "site_number": "13",
+            "site_name": "Marseille_(Riou-S)",
+            "site_code": "13",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "1999",
+            "end_year": "2017",
+            "institution": "OSU Institut Pytheas"
+        },
+        "14": {
+            "lat": "43.01641",
+            "long": "6.37799",
+            "site_number": "14",
+            "site_name": "Port Cros_(NW,chanel-buoy)",
+            "site_code": "14",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "1999",
+            "end_year": "2018",
+            "institution": "Parc National d Port-Cros"
+        },
+        "15": {
+            "lat": "43.20106",
+            "long": "5.45188",
+            "site_number": "15",
+            "site_name": "Cap Morgiou",
+            "site_code": "15",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "2010",
+            "end_year": "2016",
+            "institution": "OSU Institut Pytheas"
+        },
+        "16": {
+            "lat": "43.14567",
+            "long": "5.54570",
+            "site_number": "16",
+            "site_name": "Cassis_(Cassidaigne)",
+            "site_code": "16",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "2010",
+            "end_year": "2018",
+            "institution": "OSU Institut Pytheas"
+        },
+        "17": {
+            "lat": "43.20747",
+            "long": "5.25250",
+            "site_number": "17",
+            "site_name": "Marseille_(Planier-Veyron)",
+            "site_code": "17",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "2010",
+            "end_year": "2017",
+            "institution": "OSU Institut Pytheas"
+        },
+        "18": {
+            "lat": "43.19947",
+            "long": "5.23467",
+            "site_number": "18",
+            "site_name": "Marseille_(Planier-Souquet)",
+            "site_code": "18",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "2010",
+            "end_year": "2018",
+            "institution": "OSU Institut Pytheas"
+        },
+        "19": {
+            "lat": "42.38020",
+            "long": "8.54635",
+            "site_number": "19",
+            "site_name": "Scandola_(Palazzu-S)",
+            "site_code": "19",
+            "eco_region": "W-MED",
+            "sub_basin": "Corsica",
+            "start_year": "2004",
+            "end_year": "2018",
+            "institution": "R\u00e9serve naturelle de Scandola"
+        },
+        "20": {
+            "lat": "41.38528",
+            "long": "9.13528",
+            "site_number": "20",
+            "site_name": "Bonifacio-W_(Park-buoy)",
+            "site_code": "20",
+            "eco_region": "W-MED",
+            "sub_basin": "Corsica",
+            "start_year": "2003",
+            "end_year": "2018",
+            "institution": "Office de l'Environnement de la Corse"
+        },
+        "23": {
+            "lat": "41.33333",
+            "long": "9.23861",
+            "site_number": "21",
+            "site_name": "Lavezzi",
+            "site_code": "23",
+            "eco_region": "W-MED",
+            "sub_basin": "Corsica",
+            "start_year": "2009",
+            "end_year": "2018",
+            "institution": "Office de l'Environnement de la Corse"
+        },
+        "24": {
+            "lat": "41.44361",
+            "long": "8.90083",
+            "site_number": "22",
+            "site_name": "Moines",
+            "site_code": "24",
+            "eco_region": "W-MED",
+            "sub_basin": "Corsica",
+            "start_year": "2008",
+            "end_year": "2018",
+            "institution": "Office de l'Environnement de la Corse"
+        },
+        "25": {
+            "lat": "41.50686",
+            "long": "9.39217",
+            "site_number": "23",
+            "site_name": "Toro",
+            "site_code": "25",
+            "eco_region": "W-MED",
+            "sub_basin": "Corsica",
+            "start_year": "2008",
+            "end_year": "2018",
+            "institution": "Office de l'Environnement de la Corse"
+        },
+        "26": {
+            "lat": "44.72472",
+            "long": "14.49333",
+            "site_number": "24",
+            "site_name": "Cutin",
+            "site_code": "26",
+            "eco_region": "ADR",
+            "sub_basin": "N-Adriatic",
+            "start_year": "2009",
+            "end_year": "2015",
+            "institution": "Zagreb University - PMF"
+        },
+        "27": {
+            "lat": "43.83639",
+            "long": "15.22000",
+            "site_number": "25",
+            "site_name": "Kornati_(Mali Obrucan)",
+            "site_code": "27",
+            "eco_region": "ADR",
+            "sub_basin": "Central Adriatic",
+            "start_year": "2009",
+            "end_year": "2017",
+            "institution": "Zagreb University - PMF"
+        },
+        "28": {
+            "lat": "39.33228",
+            "long": "26.42787",
+            "site_number": "26",
+            "site_name": "Lesvos Island_(Palios Reef )",
+            "site_code": "28",
+            "eco_region": "AEG",
+            "sub_basin": "S-Aegean",
+            "start_year": "2012",
+            "end_year": "2016",
+            "institution": "Department of Marine Sciences, University of the Aegean"
+        },
+        "34": {
+            "lat": "40.10751",
+            "long": "18.52089",
+            "site_number": "27",
+            "site_name": "Otranto_(Punta Palacia)",
+            "site_code": "34",
+            "eco_region": "ADR",
+            "sub_basin": "S-Adriatic",
+            "start_year": "2011",
+            "end_year": "2014",
+            "institution": "Universita del Salento"
+        },
+        "35": {
+            "lat": "39.20515",
+            "long": "2.97853",
+            "site_number": "28",
+            "site_name": "Mallorca_S_(Sa_Foradada)",
+            "site_code": "35",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2013",
+            "end_year": "2018",
+            "institution": "Spanish Institute of Oceanography"
+        },
+        "37": {
+            "lat": "37.14000",
+            "long": "10.80000",
+            "site_number": "29",
+            "site_name": "Zembra",
+            "site_code": "37",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf of Tunis",
+            "start_year": "2013",
+            "end_year": "2016",
+            "institution": "Institut National Agronomique de Tunis"
+        },
+        "38": {
+            "lat": "43.04322",
+            "long": "5.84360",
+            "site_number": "30",
+            "site_name": "Toulon_(Cap Sici\u00e9)",
+            "site_code": "38",
+            "eco_region": "W-MED",
+            "sub_basin": "Provence",
+            "start_year": "2014",
+            "end_year": "2018",
+            "institution": "IFREMER"
+        },
+        "39": {
+            "lat": "35.90528",
+            "long": "-5.29833",
+            "site_number": "31",
+            "site_name": "Ceuta",
+            "site_code": "39",
+            "eco_region": "ALB",
+            "sub_basin": "Alboran",
+            "start_year": "2014",
+            "end_year": "2017",
+            "institution": "Fundaci\u00f3n Museo del Mar de Ceuta"
+        },
+        "40": {
+            "lat": "43.50022",
+            "long": "3.87317",
+            "site_number": "32",
+            "site_name": "Magobs",
+            "site_code": "40",
+            "eco_region": "W-MED",
+            "sub_basin": "Gulf_of_Lion",
+            "start_year": "2011",
+            "end_year": "2012",
+            "institution": "OSU OREME"
+        },
+        "43": {
+            "lat": "39.79972",
+            "long": "4.28833",
+            "site_number": "33",
+            "site_name": "Menorca_(Illa_de_l'aire)",
+            "site_code": "43",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2014",
+            "end_year": "2018",
+            "institution": "Spanish Institute of Oceanography"
+        },
+        "44": {
+            "lat": "40.08861",
+            "long": "4.07750",
+            "site_number": "34",
+            "site_name": "Menorca_(Illa_Porros_2)",
+            "site_code": "44",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2014",
+            "end_year": "2018",
+            "institution": "Spanish Institute of Oceanography"
+        },
+        "46": {
+            "lat": "36.15194",
+            "long": "29.62139",
+            "site_number": "35",
+            "site_name": "Kas-Kovanli island",
+            "site_code": "46",
+            "eco_region": "AEG",
+            "sub_basin": "S-Aegean",
+            "start_year": "2014",
+            "end_year": "2015",
+            "institution": "Mediterranean Conservation Society"
+        },
+        "47": {
+            "lat": "36.93900",
+            "long": "28.12400",
+            "site_number": "36",
+            "site_name": "G\u00f6kova Koremen",
+            "site_code": "47",
+            "eco_region": "AEG",
+            "sub_basin": "S-Aegean",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Mediterranean Conservation Society"
+        },
+        "48": {
+            "lat": "44.31372",
+            "long": "9.16584",
+            "site_number": "37",
+            "site_name": "Portofino",
+            "site_code": "48",
+            "eco_region": "W-MED",
+            "sub_basin": "Ligurian",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "\u00c1rea marina protegida de Portofino"
+        },
+        "49": {
+            "lat": "44.89366",
+            "long": "13.76009",
+            "site_number": "38",
+            "site_name": "Brijuni-Kamik",
+            "site_code": "49",
+            "eco_region": "ADR",
+            "sub_basin": "N-Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Brijuni National Park - Zagreb University - PMF"
+        },
+        "53": {
+            "lat": "35.52058",
+            "long": "12.62798",
+            "site_number": "39",
+            "site_name": "Lampedusa",
+            "site_code": "53",
+            "eco_region": "TUN",
+            "sub_basin": "Sicily Channel",
+            "start_year": "2017",
+            "end_year": "2018",
+            "institution": "Isole Pelagie MPA - Municipalty of Lampedusa"
+        },
+        "54": {
+            "lat": "43.08568889",
+            "long": "16.19349444",
+            "site_number": "40",
+            "site_name": "Vis1-Volici",
+            "site_code": "54",
+            "eco_region": "ADR",
+            "sub_basin": "Central Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Faculty of Science University of Zagreb - PMF - D.I.I.V Ltd"
+        },
+        "55": {
+            "lat": "43.06606667",
+            "long": "16.26036111",
+            "site_number": "41",
+            "site_name": "Vis2-Plocica",
+            "site_code": "55",
+            "eco_region": "ADR",
+            "sub_basin": "Central Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Faculty of Science University of Zagreb - PMF - D.I.I.V Ltd"
+        }
+    },
+    "regions": {
+        "W-MED": {
+            "name": "W-MED",
+            "stations": [
+                {
+                    "lat": "39.89170",
+                    "long": "0.67109",
+                    "site_number": "1",
+                    "site_name": "Columbretes_(Illa-Grossa)",
+                    "site_code": "1",
+                    "eco_region": "W-MED",
+                    "sub_basin": "S-Catalan",
+                    "start_year": "2007",
+                    "end_year": "2017",
+                    "institution": "Reserva Marina Islas Columbretes. Secretaria General del Mar"
+                },
+                {
+                    "lat": "40.09503",
+                    "long": "4.07739",
+                    "site_number": "2",
+                    "site_name": "Menorca-N_(Illa-dels-Porros)",
+                    "site_code": "2",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2004",
+                    "end_year": "2007",
+                    "institution": "Spanish Institute of Oceanography"
+                },
+                {
+                    "lat": "39.12372",
+                    "long": "2.96034",
+                    "site_number": "3",
+                    "site_name": "Mallorca-S_(Cabrera-Imperial)",
+                    "site_code": "3",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2007",
+                    "end_year": "2017",
+                    "institution": "Centre d'Estudis Avan\u00e7ats de Blanes"
+                },
+                {
+                    "lat": "38.96956",
+                    "long": "1.16564",
+                    "site_number": "4",
+                    "site_name": "Ibiza_(Ses-Bledes)",
+                    "site_code": "4",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2011",
+                    "end_year": "2012",
+                    "institution": "Ecology Department. University of Barcelona"
+                },
+                {
+                    "lat": "42.23698",
+                    "long": "3.26141",
+                    "site_number": "5",
+                    "site_name": "Cap de Creus-S_(El-Gat)",
+                    "site_code": "5",
+                    "eco_region": "W-MED",
+                    "sub_basin": "N-Catalan",
+                    "start_year": "2007",
+                    "end_year": "2018",
+                    "institution": "Parc Natural Cap de Creus"
+                },
+                {
+                    "lat": "42.04970",
+                    "long": "3.22540",
+                    "site_number": "6",
+                    "site_name": "Medes_(Pota-del-Llop)",
+                    "site_code": "6",
+                    "eco_region": "W-MED",
+                    "sub_basin": "N-Catalan",
+                    "start_year": "2002",
+                    "end_year": "2018",
+                    "institution": "Institute of Marine Science - CSIC"
+                },
+                {
+                    "lat": "42.33346",
+                    "long": "3.28656",
+                    "site_number": "7",
+                    "site_name": "Cap de Creus-N_(Portalo)",
+                    "site_code": "7",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "2007",
+                    "end_year": "2018",
+                    "institution": "Parc Natural Cap de Creus"
+                },
+                {
+                    "lat": "42.46810",
+                    "long": "3.17025",
+                    "site_number": "8",
+                    "site_name": "Banyuls_(Park-buoy)",
+                    "site_code": "8",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "2006",
+                    "end_year": "2018",
+                    "institution": "R\u00e9serve Naturelle Marine de Cerb\u00e8re Banyuls"
+                },
+                {
+                    "lat": "43.32317",
+                    "long": "5.05524",
+                    "site_number": "9",
+                    "site_name": "Cap Couronne",
+                    "site_code": "9",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "1999",
+                    "end_year": "2016",
+                    "institution": "Parc Marin C\u00f4te Bleue"
+                },
+                {
+                    "lat": "43.32835",
+                    "long": "5.22447",
+                    "site_number": "10",
+                    "site_name": "Mejean",
+                    "site_code": "10",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "2010",
+                    "end_year": "2017",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "43.25228",
+                    "long": "3.53807",
+                    "site_number": "11",
+                    "site_name": "Agde",
+                    "site_code": "11",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "2010",
+                    "end_year": "2018",
+                    "institution": "Aire Marine Prot\u00e9g\u00e9e de la c\u00f4te Agathoise"
+                },
+                {
+                    "lat": "43.32260",
+                    "long": "5.16200",
+                    "site_number": "12",
+                    "site_name": "Carry-le-Rouet",
+                    "site_code": "12",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "1997",
+                    "end_year": "2016",
+                    "institution": "Parc Marin C\u00f4te Bleue"
+                },
+                {
+                    "lat": "43.17196",
+                    "long": "5.38987",
+                    "site_number": "13",
+                    "site_name": "Marseille_(Riou-S)",
+                    "site_code": "13",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "1999",
+                    "end_year": "2017",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "43.01641",
+                    "long": "6.37799",
+                    "site_number": "14",
+                    "site_name": "Port Cros_(NW,chanel-buoy)",
+                    "site_code": "14",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "1999",
+                    "end_year": "2018",
+                    "institution": "Parc National d Port-Cros"
+                },
+                {
+                    "lat": "43.20106",
+                    "long": "5.45188",
+                    "site_number": "15",
+                    "site_name": "Cap Morgiou",
+                    "site_code": "15",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "2010",
+                    "end_year": "2016",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "43.14567",
+                    "long": "5.54570",
+                    "site_number": "16",
+                    "site_name": "Cassis_(Cassidaigne)",
+                    "site_code": "16",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "2010",
+                    "end_year": "2018",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "43.20747",
+                    "long": "5.25250",
+                    "site_number": "17",
+                    "site_name": "Marseille_(Planier-Veyron)",
+                    "site_code": "17",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "2010",
+                    "end_year": "2017",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "43.19947",
+                    "long": "5.23467",
+                    "site_number": "18",
+                    "site_name": "Marseille_(Planier-Souquet)",
+                    "site_code": "18",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "2010",
+                    "end_year": "2018",
+                    "institution": "OSU Institut Pytheas"
+                },
+                {
+                    "lat": "42.38020",
+                    "long": "8.54635",
+                    "site_number": "19",
+                    "site_name": "Scandola_(Palazzu-S)",
+                    "site_code": "19",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Corsica",
+                    "start_year": "2004",
+                    "end_year": "2018",
+                    "institution": "R\u00e9serve naturelle de Scandola"
+                },
+                {
+                    "lat": "41.38528",
+                    "long": "9.13528",
+                    "site_number": "20",
+                    "site_name": "Bonifacio-W_(Park-buoy)",
+                    "site_code": "20",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Corsica",
+                    "start_year": "2003",
+                    "end_year": "2018",
+                    "institution": "Office de l'Environnement de la Corse"
+                },
+                {
+                    "lat": "41.33333",
+                    "long": "9.23861",
+                    "site_number": "21",
+                    "site_name": "Lavezzi",
+                    "site_code": "23",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Corsica",
+                    "start_year": "2009",
+                    "end_year": "2018",
+                    "institution": "Office de l'Environnement de la Corse"
+                },
+                {
+                    "lat": "41.44361",
+                    "long": "8.90083",
+                    "site_number": "22",
+                    "site_name": "Moines",
+                    "site_code": "24",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Corsica",
+                    "start_year": "2008",
+                    "end_year": "2018",
+                    "institution": "Office de l'Environnement de la Corse"
+                },
+                {
+                    "lat": "41.50686",
+                    "long": "9.39217",
+                    "site_number": "23",
+                    "site_name": "Toro",
+                    "site_code": "25",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Corsica",
+                    "start_year": "2008",
+                    "end_year": "2018",
+                    "institution": "Office de l'Environnement de la Corse"
+                },
+                {
+                    "lat": "39.20515",
+                    "long": "2.97853",
+                    "site_number": "28",
+                    "site_name": "Mallorca_S_(Sa_Foradada)",
+                    "site_code": "35",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2013",
+                    "end_year": "2018",
+                    "institution": "Spanish Institute of Oceanography"
+                },
+                {
+                    "lat": "37.14000",
+                    "long": "10.80000",
+                    "site_number": "29",
+                    "site_name": "Zembra",
+                    "site_code": "37",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf of Tunis",
+                    "start_year": "2013",
+                    "end_year": "2016",
+                    "institution": "Institut National Agronomique de Tunis"
+                },
+                {
+                    "lat": "43.04322",
+                    "long": "5.84360",
+                    "site_number": "30",
+                    "site_name": "Toulon_(Cap Sici\u00e9)",
+                    "site_code": "38",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Provence",
+                    "start_year": "2014",
+                    "end_year": "2018",
+                    "institution": "IFREMER"
+                },
+                {
+                    "lat": "43.50022",
+                    "long": "3.87317",
+                    "site_number": "32",
+                    "site_name": "Magobs",
+                    "site_code": "40",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Gulf_of_Lion",
+                    "start_year": "2011",
+                    "end_year": "2012",
+                    "institution": "OSU OREME"
+                },
+                {
+                    "lat": "39.79972",
+                    "long": "4.28833",
+                    "site_number": "33",
+                    "site_name": "Menorca_(Illa_de_l'aire)",
+                    "site_code": "43",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2014",
+                    "end_year": "2018",
+                    "institution": "Spanish Institute of Oceanography"
+                },
+                {
+                    "lat": "40.08861",
+                    "long": "4.07750",
+                    "site_number": "34",
+                    "site_name": "Menorca_(Illa_Porros_2)",
+                    "site_code": "44",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Balearic",
+                    "start_year": "2014",
+                    "end_year": "2018",
+                    "institution": "Spanish Institute of Oceanography"
+                },
+                {
+                    "lat": "44.31372",
+                    "long": "9.16584",
+                    "site_number": "37",
+                    "site_name": "Portofino",
+                    "site_code": "48",
+                    "eco_region": "W-MED",
+                    "sub_basin": "Ligurian",
+                    "start_year": "2015",
+                    "end_year": "2018",
+                    "institution": "\u00c1rea marina protegida de Portofino"
+                }
+            ],
+            "centroid": [
+                5.343022666666667,
+                41.815887000000004
+            ]
+        },
+        "ADR": {
+            "name": "ADR",
+            "stations": [
+                {
+                    "lat": "44.72472",
+                    "long": "14.49333",
+                    "site_number": "24",
+                    "site_name": "Cutin",
+                    "site_code": "26",
+                    "eco_region": "ADR",
+                    "sub_basin": "N-Adriatic",
+                    "start_year": "2009",
+                    "end_year": "2015",
+                    "institution": "Zagreb University - PMF"
+                },
+                {
+                    "lat": "43.83639",
+                    "long": "15.22000",
+                    "site_number": "25",
+                    "site_name": "Kornati_(Mali Obrucan)",
+                    "site_code": "27",
+                    "eco_region": "ADR",
+                    "sub_basin": "Central Adriatic",
+                    "start_year": "2009",
+                    "end_year": "2017",
+                    "institution": "Zagreb University - PMF"
+                },
+                {
+                    "lat": "40.10751",
+                    "long": "18.52089",
+                    "site_number": "27",
+                    "site_name": "Otranto_(Punta Palacia)",
+                    "site_code": "34",
+                    "eco_region": "ADR",
+                    "sub_basin": "S-Adriatic",
+                    "start_year": "2011",
+                    "end_year": "2014",
+                    "institution": "Universita del Salento"
+                },
+                {
+                    "lat": "44.89366",
+                    "long": "13.76009",
+                    "site_number": "38",
+                    "site_name": "Brijuni-Kamik",
+                    "site_code": "49",
+                    "eco_region": "ADR",
+                    "sub_basin": "N-Adriatic",
+                    "start_year": "2015",
+                    "end_year": "2018",
+                    "institution": "Brijuni National Park - Zagreb University - PMF"
+                },
+                {
+                    "lat": "43.08568889",
+                    "long": "16.19349444",
+                    "site_number": "40",
+                    "site_name": "Vis1-Volici",
+                    "site_code": "54",
+                    "eco_region": "ADR",
+                    "sub_basin": "Central Adriatic",
+                    "start_year": "2015",
+                    "end_year": "2018",
+                    "institution": "Faculty of Science University of Zagreb - PMF - D.I.I.V Ltd"
+                },
+                {
+                    "lat": "43.06606667",
+                    "long": "16.26036111",
+                    "site_number": "41",
+                    "site_name": "Vis2-Plocica",
+                    "site_code": "55",
+                    "eco_region": "ADR",
+                    "sub_basin": "Central Adriatic",
+                    "start_year": "2015",
+                    "end_year": "2018",
+                    "institution": "Faculty of Science University of Zagreb - PMF - D.I.I.V Ltd"
+                }
+            ],
+            "centroid": [
+                15.741360925,
+                43.285672593333324
+            ]
+        },
+        "AEG": {
+            "name": "AEG",
+            "stations": [
+                {
+                    "lat": "39.33228",
+                    "long": "26.42787",
+                    "site_number": "26",
+                    "site_name": "Lesvos Island_(Palios Reef )",
+                    "site_code": "28",
+                    "eco_region": "AEG",
+                    "sub_basin": "S-Aegean",
+                    "start_year": "2012",
+                    "end_year": "2016",
+                    "institution": "Department of Marine Sciences, University of the Aegean"
+                },
+                {
+                    "lat": "36.15194",
+                    "long": "29.62139",
+                    "site_number": "35",
+                    "site_name": "Kas-Kovanli island",
+                    "site_code": "46",
+                    "eco_region": "AEG",
+                    "sub_basin": "S-Aegean",
+                    "start_year": "2014",
+                    "end_year": "2015",
+                    "institution": "Mediterranean Conservation Society"
+                },
+                {
+                    "lat": "36.93900",
+                    "long": "28.12400",
+                    "site_number": "36",
+                    "site_name": "G\u00f6kova Koremen",
+                    "site_code": "47",
+                    "eco_region": "AEG",
+                    "sub_basin": "S-Aegean",
+                    "start_year": "2015",
+                    "end_year": "2018",
+                    "institution": "Mediterranean Conservation Society"
+                }
+            ],
+            "centroid": [
+                28.057753333333334,
+                37.47440666666666
+            ]
+        },
+        "ALB": {
+            "name": "ALB",
+            "stations": [
+                {
+                    "lat": "35.90528",
+                    "long": "-5.29833",
+                    "site_number": "31",
+                    "site_name": "Ceuta",
+                    "site_code": "39",
+                    "eco_region": "ALB",
+                    "sub_basin": "Alboran",
+                    "start_year": "2014",
+                    "end_year": "2017",
+                    "institution": "Fundaci\u00f3n Museo del Mar de Ceuta"
+                }
+            ],
+            "centroid": [
+                -5.29833,
+                35.90528
+            ]
+        },
+        "TUN": {
+            "name": "TUN",
+            "stations": [
+                {
+                    "lat": "35.52058",
+                    "long": "12.62798",
+                    "site_number": "39",
+                    "site_name": "Lampedusa",
+                    "site_code": "53",
+                    "eco_region": "TUN",
+                    "sub_basin": "Sicily Channel",
+                    "start_year": "2017",
+                    "end_year": "2018",
+                    "institution": "Isole Pelagie MPA - Municipalty of Lampedusa"
+                }
+            ],
+            "centroid": [
+                12.62798,
+                35.52058
+            ]
+        },
+        "ION": {
+            "name": "ION",
+            "stations": [],
+            "centroid": [
+                16.9746176,
+                38.4402972
+            ]
+        },
+        "LEV": {
+            "name": "LEV",
+            "stations": [],
+            "centroid": [
+                34,
+                34
+            ]
+        }
+    }
+}

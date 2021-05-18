@@ -355,7 +355,7 @@ class tmednet(tk.Frame):
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
-        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)  # TODO change all consolescreens
+        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
 
     def cut_data_manually(self, event, ind):
         print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
@@ -619,7 +619,7 @@ class tmednet(tk.Frame):
                     self.console_writer('Load more than a file for merging, creating an output of only a file instead',
                                         'warning')
                 start_time = time.time()
-                fm.df_to_geojson(df, depths, SN, 7, 14)
+                fm.df_to_geojson(df, depths, SN, self.mdata[0]['latitude'], self.mdata[0]['longitude'])
 
                 self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                         time.time() - start_time) + "\n =============\n")

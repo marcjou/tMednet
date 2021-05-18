@@ -8,7 +8,15 @@ import os
 from numpy import diff
 import numpy as np
 from scipy.ndimage.filters import uniform_filter1d
+import json
 
+
+def load_coordinates(region):
+    with open('../src/metadata.json') as f:
+        data = json.load(f)
+    lat = float(data['stations'][str(region)]['lat'])
+    lon = float(data['stations'][str(region)]['long'])
+    return lat, lon
 
 def load_data(args, consolescreen):
     """
@@ -22,10 +30,11 @@ def load_data(args, consolescreen):
                      len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
             filein = args.path + ifile
 
+            lat, lon = load_coordinates(int(ifile.split('_')[0]))
             # Extraemos campos del nombre del fichero
             datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
                      "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
-                     "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
+                     "latitude": lat, "longitude": lon, "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
                      "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H')}
 
             print("file", filein)
