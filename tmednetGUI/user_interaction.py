@@ -21,7 +21,6 @@ import matplotlib.dates as dates
 
 from datetime import timedelta
 
-
 version = "0.5"
 build = "April 2021"
 
@@ -124,7 +123,7 @@ class tmednet(tk.Frame):
         plt.Axes.remove(self.plot2)
         plt.Axes.remove(self.plot)
 
-        self.cbexists = False   # Control for the colorbar of the Hovmoller
+        self.cbexists = False  # Control for the colorbar of the Hovmoller
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
@@ -178,6 +177,16 @@ class tmednet(tk.Frame):
     # p.add(f2,width=1200)
 
     def console_writer(self, msg, mod, var=False, liner=False):
+        """
+                Method: console_writer(self, msg, mod, var=False, liner=False)
+                Purpose: Writes messages to the console
+                Require:
+                    msg: The message that the console will output
+                    mod: Modifier for the message (if it is a warning, an action...)
+                    var: If there is an additional variable to be added to the message. False by default.
+                    liner: Controls when to end the message with '==='. False by default.
+                Version: 05/2021, MJB: Documentation
+                """
         if var:
             self.consolescreen.insert("end", msg, mod)
             self.consolescreen.insert("end", str(var))
@@ -190,6 +199,12 @@ class tmednet(tk.Frame):
             self.consolescreen.see('end')
 
     def do_popup(self, event):
+        """
+        Method: do_popup(self, event)
+        Purpose: Event controller to raise a right-click menu
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
         try:
             self.right_menu.tk_popup(event.x_root, event.y_root)
         finally:
@@ -197,16 +212,14 @@ class tmednet(tk.Frame):
 
     def select_list(self, evt):
         """
-        Method: clear_plots(self)
-        Purpose: Clear plot
+        Method: select_list(self, evt)
+        Purpose: Event handler for when an item of the list is selected
         Require:
-            canvas: refrence to canvas widget
-            subplot: plot object
-        Version: 01/2021, EGL: Documentation
+        Version: 05/2021, MJB: Documentation
         """
         try:
 
-            w = evt.widget  # Que es EVT???
+            w = evt.widget
             index = int(w.curselection()[0])
             if index in self.index:
                 pass
@@ -286,8 +299,8 @@ class tmednet(tk.Frame):
         if self.cbexists:
             self.clear_plots()
 
-        #if self.plotcb.axes:
-          #  plt.Axes.remove(self.plotcb)
+        # if self.plotcb.axes:
+        #  plt.Axes.remove(self.plotcb)
 
         masked_ending_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
                                                         np.array(self.mdata[index]['temp']))
@@ -317,8 +330,7 @@ class tmednet(tk.Frame):
             Require:
                 canvas: reference to canvas widget
                 subplot: plot object
-            Version:
-            01/2021, EGL: Documentation
+            Version: 05/2021, MJB: Documentation
         """
         self.clear_plots()
         # w = evt.widget  # Que es EVT???
@@ -358,11 +370,16 @@ class tmednet(tk.Frame):
         self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
 
     def cut_data_manually(self, event, ind):
-        print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-              ('double' if event.dblclick else 'single', event.button,
-               event.x, event.y, event.xdata, event.ydata))
+        """
+        Method: cut_data_manually(self, event, ind)
+        Purpose: Event controller to cut the data by selecting the plot
+        Require:
+            ind: Index of the data to be cut
+        Version: 05/2021, MJB: Documentation
+        """
         xtime = dates.num2date(event.xdata)
-        xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(hours=xtime.minute//30)
+        xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
+            hours=xtime.minute // 30)
         xtime_rounded = xtime_rounded.replace(tzinfo=None)
         index = self.mdata[ind]['time'].index(xtime_rounded)
         print('Cutting data')
@@ -378,18 +395,15 @@ class tmednet(tk.Frame):
         for i in range(len(self.mdata[ind]['temp'][index:])):
             self.mdata[ind]['temp'][i + index] = 999
 
-
-
     def plot_all_zoom(self):
         """
-                    Method: plot_all_zoom(self)
-                    Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
-                    Require:
-                        canvas: reference to canvas widget
-                        subplot: plot object
-                    Version:
-                    01/2021, EGL: Documentation
-                """
+            Method: plot_all_zoom(self)
+            Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
+            Require:
+                canvas: reference to canvas widget
+                subplot: plot object
+            Version: 05/2021, MJB: Documentation
+        """
         self.clear_plots()
         index = self.list.curselection()
         depths = ""
@@ -397,7 +411,6 @@ class tmednet(tk.Frame):
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
-
 
         for i in index:
             time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
@@ -431,8 +444,7 @@ class tmednet(tk.Frame):
         Require:
             canvas: refrence to canvas widget
             subplot: axis object
-        Version:
-        01/2021, EGL: Documentation
+        Version: 05/2021, MJB: Documentation
         """
 
         self.clear_plots()
@@ -444,7 +456,6 @@ class tmednet(tk.Frame):
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
-
 
             self.plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.plot)
@@ -461,6 +472,12 @@ class tmednet(tk.Frame):
             self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def plot_dif_filter1d(self):
+        """
+        Method: plot_dif_filter1d(self)
+        Purpose: Plot time series of differences filtered with a 10 day running
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
         self.clear_plots()
         depths = ""
         try:
@@ -470,7 +487,6 @@ class tmednet(tk.Frame):
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
-
 
             self.plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.plot)
@@ -487,6 +503,12 @@ class tmednet(tk.Frame):
             self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def plot_hovmoller(self):
+        """
+        Method: plot_hovmoller(self)
+        Purpose: Plot a Hovmoller Diagram of the loaded files
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
         try:
             fm.to_utc(self.mdata)
             global cb
@@ -501,7 +523,7 @@ class tmednet(tk.Frame):
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             # df.resample(##) if we want to filter the results in a direct way
             # Draws a contourn line. Right now looks messy
-            #ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+            # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
             cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
             cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
@@ -517,6 +539,12 @@ class tmednet(tk.Frame):
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def go_back(self):
+        """
+        Method: go_back(self)
+        Purpose: Returns to the original data, before applying any cuts
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
         try:
             if self.recoverindex:
                 for i in self.recoverindex:
@@ -556,12 +584,18 @@ class tmednet(tk.Frame):
         if self.cbexists:
             cb.remove()
             self.cbexists = False
-        #if self.plotcb.axes():
-          #  self.plotcb.clear()
-          #  plt.Axes.remove(self.plotcb)
+        # if self.plotcb.axes():
+        #  self.plotcb.clear()
+        #  plt.Axes.remove(self.plotcb)
         self.canvas.draw()
 
     def cut_endings(self):
+        """
+        Method: cut_endings(self)
+        Purpose: Cuts the endings of the data that is considered 'not real' (from the fm.zoom_data function)
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
         if self.mdata:
             self.tempdataold = []
             for data in self.mdata:
@@ -578,9 +612,8 @@ class tmednet(tk.Frame):
         Purpose: Saves the file with a proposed name and lets the user choose one of their liking.
         Require:
         Version:
-        01/2021, EGL: Documentation
+        05/2021, MJB: Documentation
         """
-
         try:  # If there is no plot, it shows an error message
 
             if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
@@ -592,7 +625,8 @@ class tmednet(tk.Frame):
                 filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
                            + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename
 
-            file = asksaveasfilename(initialdir='../src/output_images', filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
+            file = asksaveasfilename(initialdir='../src/output_images',
+                                     filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)
@@ -606,9 +640,8 @@ class tmednet(tk.Frame):
         Purpose: Merges all of the loaded files into a single geojson one
         Require:
         Version:
-        01/2021, EGL: Documentation
+        05/2021, MJB: Documentation
         """
-        # TODO give the option to save into txt, right now only saves into json. Extract the coordinates and use them
         try:
             if not self.mdata[0]['time']:
                 self.console_writer('First select \'To UTC\' option', 'warning')
@@ -629,8 +662,10 @@ class tmednet(tk.Frame):
     @staticmethod
     def help():
         """
-        Version:
-        01/2021, EGL: Documentation
+        Method: help()
+        Purpose: Shows an 'About' message
+        Require:
+        Version: 05/2021, MJB: Documentation
         """
 
         top = Toplevel()

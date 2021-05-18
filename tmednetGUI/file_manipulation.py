@@ -12,18 +12,28 @@ import json
 
 
 def load_coordinates(region):
+    """
+    Method: load_coordinates(region)
+    Purpose: Loads the coordinates of the file from the 'metadata.json' auxiliary file
+    Require:
+        region: The number of the site where the data is taken from
+    Version: 05/2021, MJB: Documentation
+    """
     with open('../src/metadata.json') as f:
         data = json.load(f)
     lat = float(data['stations'][str(region)]['lat'])
     lon = float(data['stations'][str(region)]['long'])
     return lat, lon
 
+
 def load_data(args, consolescreen):
     """
-    Method: load_data(args)
+    Method: load_data(args, consolescreen)
     Purpose: read tmednet *.txt data files
     Require:
-    Version: 01/2021, EGL: Documentation
+        args: For the mdata dictionary
+        consolescreen: In order to write to the consolescreen
+    Version: 05/2021, MJB: Documentation
     """
     try:
         for ifile in args.files[
@@ -68,6 +78,13 @@ def load_data(args, consolescreen):
 
 
 def interpolate_hours(data):
+    """
+    Method: interpolate_hours(data)
+    Purpose: Interpolates the values of temp in case the hours are not round
+    Require:
+        data: The mdata
+    Version: 05/2021, MJB: Documentation
+    """
     to_utc(data)
     for dat in data:
         for i in range(len(dat['time'])):
@@ -87,6 +104,12 @@ def interpolate_hours(data):
 
 
 def convert_round_hour(data):
+    """
+    Method: convert_round_hour(data)
+    Purpose: Currently deprecated
+    Require:
+    Version: 05/2021, MJB: Documentation
+    """
     # If there is a time desviation from the usual round hours, it corrects it
     for dat in data:
         for i in range(len(dat['timegmt'])):
@@ -106,6 +129,12 @@ def convert_round_hour(data):
 
 
 def check_hour_interval(data):
+    """
+    Method: check_hour_interval(data)
+    Purpose: Currently deprecated
+    Require:
+    Version: 05/2021, MJB: Documentation
+    """
     to_utc(data)
     df, depths, _ = list_to_df(data)
     for dat in data:
@@ -144,9 +173,12 @@ def report(args, textbox):
 
 def openfile(args, files, consolescreen):
     """
-    Method: onOpen(self)
-    Purpose: Launches the askopen widget to set data filenames
+    Method: openfile(args, files, consolescreen)
+    Purpose: Opens the files to be used with the GUI
     Require:
+        args: The mdata
+        files: The filenames to be opened
+        consolescreen: In order to write to the console
     Version: 01/2021, EGL: Documentation
     """
 
@@ -185,7 +217,7 @@ def openfile(args, files, consolescreen):
 
 def to_utc(data):
     """
-    Method: to_utc(self)
+    Method: to_utc(data)
     Purpose: Shift temporal axis
     Require:
     Version: 01/2021, EGL: Documentation
@@ -200,11 +232,11 @@ def to_utc(data):
 
 def merge(args):
     """
-            Method: merge(self)
-            Purpose: Merges all of the loaded files into a single one
-            Require:
-            Version:
-            01/2021, EGL: Documentation
+    Method: merge(data)
+    Purpose: Merges all of the loaded files into a single one
+    Require:
+    Version:
+    01/2021, EGL: Documentation
     """
 
     print('merging files')
@@ -218,6 +250,13 @@ def merge(args):
 
 
 def list_to_df(data):
+    """
+    Method: list_to_df(data)
+    Purpose: Converts the list mdata to a dataframe
+    Require:
+        data: List mdata
+    Version: 05/2021, MJB: Documentation
+    """
     df1 = pd.DataFrame(data[0]['temp'], index=data[0]['time'], columns=[str(data[0]['depth']) +
                                                                                     'm temp'])
     depths = [data[0]['depth']]
@@ -233,6 +272,15 @@ def list_to_df(data):
 
 
 def df_to_txt(df, data, SN):
+    """
+    Method: df_to_txt(df, data, SN)
+    Purpose: Writes a txt with the Dataframe values
+    Requires:
+        df: The Dataframe to be read
+        data: List mdata
+        SN: The serial number list
+    Version: 05/2021, MJB: Documentation
+    """
     print('writing txt')  # TODO Create progress bar
     with open('../src/output_files/merged.txt', 'w') as f:
         f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
@@ -245,8 +293,18 @@ def df_to_txt(df, data, SN):
     print('txt written')
 
 
-def df_to_geojson(df, properties, SN, lat,
-                  lon):  # Iterates through the DF in order to create the properties for the Geojson file
+def df_to_geojson(df, properties, SN, lat, lon):
+    """
+    Method: df_to_geojson(df, properties, SN, lat, lon)
+    Purpose: Iterates through the DF in order to create the properties for the Geojson file
+    Require:
+        df: The Dataframe to be read
+        properties: The properties of the geojson
+        SN: List of serial numbers
+        lat: The latitude coordinate
+        lon: The longitude coordinate
+    Version: 05/2021, MJB: Documentation
+    """
     start_time = time.time()
     df = df.fillna(999)
     print('writing geojson')
@@ -270,6 +328,13 @@ def df_to_geojson(df, properties, SN, lat,
 
 
 def zoom_data(data):
+    """
+    Method: zoom_data(data)
+    Purpose: Gets the first and last day of operation data
+    Require:
+        data: The mdata dictionary
+    Version: 05/2021, MJB: Documentation
+    """
     # Gets the first and last day of operation to look for the possible errors.
     # TODO Possibility of making it more than a day
     time_series = [data['timegmt'][:24], data['timegmt'][-24:]]
@@ -282,6 +347,13 @@ def zoom_data(data):
 
 
 def temp_difference(data):
+    """
+    Method: temp_difference(data)
+    Purpose: Gets the difference in temperature between levels
+    Require:
+        data: The mdata dictionary
+    Version: 05/2021, MJB: Documentation
+    """
     to_utc(data)
     df, depths, _ = list_to_df(data)
     i = 1
@@ -299,6 +371,13 @@ def temp_difference(data):
 
 
 def apply_uniform_filter(data):
+    """
+    Method: apply_uniform_filter(data)
+    Purpose: Applies the 10 running day filter to the data
+    Require:
+        data: The mdata dictionary
+    Version: 05/2021, MJB: Documentation
+    """
     df, depths = temp_difference(data)
     i = 1
     for depth in depths[:-1]:
