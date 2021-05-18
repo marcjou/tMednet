@@ -620,7 +620,7 @@ class tmednet(tk.Frame):
                                         'warning')
                 start_time = time.time()
                 fm.df_to_geojson(df, depths, SN, self.mdata[0]['latitude'], self.mdata[0]['longitude'])
-
+                fm.df_to_txt(df, self.mdata[0], SN)
                 self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                         time.time() - start_time) + "\n =============\n")
         except IndexError:

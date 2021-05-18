@@ -60,8 +60,7 @@ def load_data(args, consolescreen):
             datos['S/N'] = a[0][a[0].index('S/N:') + 1]
             args.mdata.append(datos)
         # check_hour_interval(args.mdata)
-        # convert_round_hour(args.mdata)    # TODO launch an interpolation even if the difference is an hour
-                                            # TODO e.g. all the file has an offset of 20s
+        # convert_round_hour(args.mdata)
         interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
@@ -233,9 +232,15 @@ def list_to_df(data):
     return masked_df, depths, SN
 
 
-def df_to_txt(df):
+def df_to_txt(df, data, SN):
     print('writing txt')  # TODO Create progress bar
-    with open('out.txt', 'w') as f:
+    with open('../src/output_files/merged.txt', 'w') as f:
+        f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
+        f.write('\n# Site: ' + str(data['region']))
+        f.write('\n# Start time: ' + data['datainici'].strftime('%Y-%m-%d, %H:%M:%S'))
+        f.write('\n# End time: ' + data['datafin'].strftime('%Y-%m-%d, %H:%M:%S'))
+        f.write('\n# Serial Numbers: ' + ''.join(SN) + '\n')
+        f.write(('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16) + '\n\n\n'))
         df.to_string(f, col_space=10)
     print('txt written')
 
