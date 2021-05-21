@@ -58,6 +58,7 @@ class tmednet(tk.Frame):
         self.newfiles = 0
         self.counter = []
         self.recoverindex = None
+        self.reportlogger = []
 
         # We build the GUI
         self.init_window()
@@ -603,6 +604,8 @@ class tmednet(tk.Frame):
                 _, temperatures, indexes = fm.zoom_data(data)
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+            self.console_writer('Endings of all the files cut', 'action', liner=True)
+            self.reportlogger.append('Endings automatically cut')
         else:
             self.console_writer('Load a file before trying to cut it', 'warning')
 
@@ -656,6 +659,7 @@ class tmednet(tk.Frame):
                 fm.df_to_txt(df, self.mdata[0], SN)
                 self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                         time.time() - start_time) + "\n =============\n")
+                self.reportlogger.append('Geojson and CSV file created')
         except IndexError:
             self.console_writer('Please, load a file first', 'warning')
 

@@ -167,8 +167,14 @@ def report(args, textbox):
         cadena += "DInit: " + item["timegmt"][0].isoformat() + "\n"
         cadena += "DEnd: " + item["timegmt"][-1].isoformat() + "\n"
         textbox.insert("end", cadena)
-
     textbox.insert("end", "=========\n")
+    for text in args.reportlogger:
+        textbox.insert("end", text + "\n")
+        textbox.insert("end", "=========\n")
+    with open('../src/output_files/report.txt', 'w') as fr:
+        text = textbox.get('1.0', 'end').splitlines()
+        for line in text:
+            fr.write(line + "\n")
 
 
 def openfile(args, files, consolescreen):
