@@ -58,7 +58,9 @@ class tmednet(tk.Frame):
         self.newfiles = 0
         self.counter = []
         self.recoverindex = None
+        self.recoverindexpos = None
         self.reportlogger = []
+        self.tempdataold = []
 
         # We build the GUI
         self.init_window()
@@ -390,8 +392,7 @@ class tmednet(tk.Frame):
             self.recoverindex.append(ind)
         else:
             self.recoverindex = [ind]
-            self.tempdataold = []
-        self.tempdataold.append(self.mdata[ind]['temp'].copy())
+        # self.tempdataold.append(self.mdata[ind]['temp'].copy())
         for i in range(len(self.mdata[ind]['temp'][index:])):
             self.mdata[ind]['temp'][i + index] = 999
 
@@ -550,7 +551,7 @@ class tmednet(tk.Frame):
                 for i in self.recoverindex:
                     self.mdata[i]['temp'] = self.tempdataold[i].copy()
                 self.recoverindex = None
-                self.tempdataold = None
+                # self.tempdataold = None
             else:
                 i = 0
                 for data in self.mdata:
@@ -597,9 +598,9 @@ class tmednet(tk.Frame):
         Version: 05/2021, MJB: Documentation
         """
         if self.mdata:
-            self.tempdataold = []
+            # self.tempdataold = []
             for data in self.mdata:
-                self.tempdataold.append(data['temp'].copy())
+                # self.tempdataold.append(data['temp'].copy())
                 _, temperatures, indexes = fm.zoom_data(data)
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999

@@ -69,6 +69,7 @@ def load_data(args, consolescreen):
             datos['GMT'] = gmtout
             datos['S/N'] = a[0][a[0].index('S/N:') + 1]
             args.mdata.append(datos)
+            args.tempdataold.append(datos['temp'].copy())
         # check_hour_interval(args.mdata)
         # convert_round_hour(args.mdata)
         interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
