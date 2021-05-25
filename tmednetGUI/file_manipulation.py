@@ -348,7 +348,13 @@ def zoom_data(data):
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1]) / diff(ftimestamp)
     indexes = np.argwhere(finaldydx > 0.0002) + 1  # Gets the indexes in which the variation is too big (removing)
-    indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
+    # Choses whether if the error values begin before the declarated time of removal or later.
+    # If later, the time of removal is the marked time to be removed
+    if data['datafin'] < data['timegmt'][int(indexes[0])-24]:
+        index = np.argwhere(np.array(time_series[1]) == np.array(data['datafin']))
+        indexes = np.array(range(int(index), len(temperatures[0])))
+    else:
+        indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
     return time_series, temperatures, indexes
 
 

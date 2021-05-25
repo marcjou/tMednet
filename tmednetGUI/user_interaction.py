@@ -334,7 +334,6 @@ class tmednet(tk.Frame):
             Version: 05/2021, MJB: Documentation
         """
         self.clear_plots()
-        # w = evt.widget  # Que es EVT???
         index = int(self.list.curselection()[0])
         time_series, temperatures, indexes = fm.zoom_data(self.mdata[index])
 
