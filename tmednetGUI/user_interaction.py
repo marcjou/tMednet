@@ -488,6 +488,15 @@ class tmednet(tk.Frame):
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
+            for _, rows in dfdelta.iterrows():  # Checks if there is an erroneous value and if there is, logs it.
+                for row in rows:
+                    if float(row) <= -0.2:
+                        self.console_writer('Attention, value under -0.2 threshold', 'warning')
+                        self.reportlogger.append('Attention, value under -0.2 threshold')
+                        break
+                else:
+                    continue
+                break
 
             self.plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.plot)
