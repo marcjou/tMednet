@@ -348,9 +348,6 @@ class tmednet(tk.Frame):
         masked_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
                                                         np.array(self.mdata[index]['temp']))
 
-        masked_start_temperatures = np.ma.masked_where(np.array(temperatures[0][int(start_index):]) == 999,
-                                                        np.array(temperatures[0][int(start_index):]))
-
         self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
                         '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
         self.plot1.legend()
@@ -442,16 +439,19 @@ class tmednet(tk.Frame):
             time_series, temperatures, _, bad = fm.zoom_data(self.mdata[i])
             depths = depths + " " + str(self.mdata[i]['depth'])
 
+            masked_temperatures = np.ma.masked_where(np.array(self.mdata[i]['temp']) == 999,
+                                                     np.array(self.mdata[i]['temp']))
+
             masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
                                                             np.array(temperatures[1]))
-            self.plot1.plot(time_series[0], temperatures[0],
+            self.plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot1.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
                                self.mdata[i]['region']))
             self.plot1.legend()
 
-            self.plot2.plot(time_series[1], masked_ending_temperatures,
+            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[0]):],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot2.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
