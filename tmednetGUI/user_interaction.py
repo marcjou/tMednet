@@ -400,6 +400,8 @@ class tmednet(tk.Frame):
         # self.tempdataold.append(self.mdata[ind]['temp'].copy())
         for i in range(len(self.mdata[ind]['temp'][index:])):
             self.mdata[ind]['temp'][i + index] = 999
+        self.plot_zoom()
+
 
     def plot_all_zoom(self):
         """
@@ -572,6 +574,7 @@ class tmednet(tk.Frame):
                     data['temp'] = self.tempdataold[i].copy()
                     i += 1
             self.console_writer('Recovering old data', 'action')
+            self.clear_plots()
         except (AttributeError, TypeError):
             self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
 
