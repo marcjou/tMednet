@@ -356,7 +356,9 @@ def zoom_data(data):
         indexes = np.array(range(int(index), len(temperatures[0])))
     else:
         indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
-    return time_series, temperatures, indexes
+    start_index = np.argwhere(np.array(time_series[0]) == np.array(data['datainici']))
+    # start_index = np.array(range(int(start_index), len(temperatures[0])))
+    return time_series, temperatures, indexes, start_index
 
 
 def temp_difference(data):
