@@ -61,6 +61,7 @@ class tmednet(tk.Frame):
         self.recoverindexpos = None
         self.reportlogger = []
         self.tempdataold = []
+        self.controlevent = False
 
         # We build the GUI
         self.init_window()
@@ -326,7 +327,7 @@ class tmednet(tk.Frame):
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
-    def plot_zoom(self):
+    def plot_zoom(self, controller=False):
         """
             Method: plot_zoom(self)
             Purpose: Plot a zoom of the begining and ending of the data
@@ -344,13 +345,16 @@ class tmednet(tk.Frame):
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
 
-        masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1][int(indexes[0]):]) == 999,
-                                                        np.array(temperatures[1][int(indexes[0]):]))
+        masked_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
+                                                        np.array(self.mdata[index]['temp']))
 
-        self.plot1.plot(time_series[0][int(start_index):], temperatures[0][int(start_index):],
+        masked_start_temperatures = np.ma.masked_where(np.array(temperatures[0][int(start_index):]) == 999,
+                                                        np.array(temperatures[0][int(start_index):]))
+
+        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
                         '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
         self.plot1.legend()
-        self.plot1.plot(time_series[0][:int(start_index) + 1], temperatures[0][:int(start_index) + 1],
+        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[:int(start_index) + 1],
                         '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
 
         self.plot1.set(ylabel='Temperature (DEG C)',
@@ -358,11 +362,11 @@ class tmednet(tk.Frame):
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
 
-        self.plot2.plot(time_series[1][:int(indexes[0] + 1)], temperatures[1][:int(indexes[0]) + 1],
+        self.plot2.plot(time_series[1][:int(indexes[0] + 1)], masked_temperatures[-len(time_series[0]):(int(indexes[0])-len(time_series[0])+1)],
                         '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
         self.plot2.legend()
         # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-        self.plot2.plot(time_series[1][int(indexes[0]):], masked_ending_temperatures,
+        self.plot2.plot(time_series[1][int(indexes[0]):], masked_temperatures[(int(indexes[0])-len(time_series[0])):],
                         '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
         self.plot2.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
@@ -370,7 +374,10 @@ class tmednet(tk.Frame):
                            self.mdata[index]['region']))
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
-        cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
+        # Controls if we are accesing the event handler through a real click or it loops.
+        if not controller:
+            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
+
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
@@ -384,23 +391,34 @@ class tmednet(tk.Frame):
             ind: Index of the data to be cut
         Version: 05/2021, MJB: Documentation
         """
-        xtime = dates.num2date(event.xdata)
-        xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
-            hours=xtime.minute // 30)
-        xtime_rounded = xtime_rounded.replace(tzinfo=None)
-        index = self.mdata[ind]['time'].index(xtime_rounded)
-        print('Cutting data')
-        self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
-        self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
+        #TODO Fix a bug that duplicates the event handler click when using the Go_Back function
+        try:
+            xtime = dates.num2date(event.xdata)
+            xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
+                hours=xtime.minute // 30)
+            xtime_rounded = xtime_rounded.replace(tzinfo=None)
+            index = self.mdata[ind]['time'].index(xtime_rounded)
+            print('Cutting data')
+            self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
+            self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
 
-        if self.recoverindex:
-            self.recoverindex.append(ind)
-        else:
-            self.recoverindex = [ind]
-        # self.tempdataold.append(self.mdata[ind]['temp'].copy())
-        for i in range(len(self.mdata[ind]['temp'][index:])):
-            self.mdata[ind]['temp'][i + index] = 999
-        self.plot_zoom()
+            if self.recoverindex:
+                self.recoverindex.append(ind)
+            else:
+                self.recoverindex = [ind]
+            # self.tempdataold.append(self.mdata[ind]['temp'].copy())
+
+            if index < 50:
+                for i in range(len(self.mdata[ind]['temp'][:index - 1])):
+                    self.mdata[ind]['temp'][i] = 999
+            else:
+                for i in range(len(self.mdata[ind]['temp'][index:])):
+                    self.mdata[ind]['temp'][i + index] = 999
+        except ValueError:
+            self.console_writer('Select value that is not the start or ending', 'warning')
+            return
+
+
 
 
     def plot_all_zoom(self):
