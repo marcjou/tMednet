@@ -406,10 +406,10 @@ class tmednet(tk.Frame):
             # self.tempdataold.append(self.mdata[ind]['temp'].copy())
 
             if index < 50:
-                for i in range(len(self.mdata[ind]['temp'][:index - 1])):
+                for i in range(len(self.mdata[ind]['temp'][:index])):
                     self.mdata[ind]['temp'][i] = 999
             else:
-                for i in range(len(self.mdata[ind]['temp'][index:])):
+                for i in range(1, len(self.mdata[ind]['temp'][index:])):
                     self.mdata[ind]['temp'][i + index] = 999
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
