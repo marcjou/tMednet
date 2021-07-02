@@ -75,6 +75,7 @@ def load_data(args, consolescreen):
         args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
         args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
         interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
+        
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
