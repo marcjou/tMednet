@@ -354,12 +354,12 @@ def zoom_data(data):
 
     enddate = data["datafin"] - timedelta(hours=int(data["GMT"][1:]))
     startdate = data["datainici"] - timedelta(hours=int(data["GMT"][1:]))
-
-    if enddate < data['time'][int(indexes[0])-24]:
-        index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
-        indexes = np.array(range(int(index), len(temperatures[0])))
-    else:
-        indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
+    if indexes.size != 0:
+        if enddate < data['time'][int(indexes[0])-24]:
+            index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
+            indexes = np.array(range(int(index), len(temperatures[0])))
+        else:
+            indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
     start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
     # start_index = np.array(range(int(start_index), len(temperatures[0])))
     return time_series, temperatures, indexes, start_index

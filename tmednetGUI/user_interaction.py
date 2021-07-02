@@ -358,18 +358,26 @@ class tmednet(tk.Frame):
                        title=self.files[index] + "\n" + 'Depth:' + str(
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
-
-        self.plot2.plot(time_series[1][:int(indexes[0] + 1)], masked_temperatures[-len(time_series[0]):(int(indexes[0])-len(time_series[0])+1)],
-                        '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-        self.plot2.legend()
-        # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-        self.plot2.plot(time_series[1][int(indexes[0]):], masked_temperatures[(int(indexes[0])-len(time_series[0])):],
-                        '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
-        self.plot2.set(ylabel='Temperature (DEG C)',
-                       title=self.files[index] + "\n" + 'Depth:' + str(
-                           self.mdata[index]['depth']) + " - Region: " + str(
-                           self.mdata[index]['region']))
-
+        if indexes.size != 0:
+            self.plot2.plot(time_series[1][:int(indexes[0] + 1)], masked_temperatures[-len(time_series[0]):(int(indexes[0])-len(time_series[0])+1)],
+                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.legend()
+            # Plots in the same graph the last part which represents the errors in the data from removing the sensors
+            self.plot2.plot(time_series[1][int(indexes[0]):], masked_temperatures[(int(indexes[0])-len(time_series[0])):],
+                            '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=self.files[index] + "\n" + 'Depth:' + str(
+                               self.mdata[index]['depth']) + " - Region: " + str(
+                               self.mdata[index]['region']))
+        else:
+            self.plot2.plot(time_series[1],
+                            masked_temperatures[-len(time_series[0]):],
+                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.legend()
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=self.files[index] + "\n" + 'Depth:' + str(
+                               self.mdata[index]['depth']) + " - Region: " + str(
+                               self.mdata[index]['region']))
         # fig.set_size_inches(14.5, 10.5, forward=True)
         # Controls if we are accesing the event handler through a real click or it loops.
         if not controller:
