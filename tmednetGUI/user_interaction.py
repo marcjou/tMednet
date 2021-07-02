@@ -591,13 +591,13 @@ class tmednet(tk.Frame):
         try:
             if self.recoverindex:
                 for i in self.recoverindex:
-                    self.mdata[i]['temp'] = self.tempdataold[i].copy()
+                    self.mdata[i]['temp'] = self.tempdataold[i]['temp'].copy()
                 self.recoverindex = None
                 # self.tempdataold = None
             else:
                 i = 0
                 for data in self.mdata:
-                    data['temp'] = self.tempdataold[i].copy()
+                    data['temp'] = self.tempdataold[i]['temp'].copy()
                     i += 1
             self.console_writer('Recovering old data', 'action')
             self.clear_plots()

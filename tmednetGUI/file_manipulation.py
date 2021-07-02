@@ -69,9 +69,11 @@ def load_data(args, consolescreen):
             datos['GMT'] = gmtout
             datos['S/N'] = a[0][a[0].index('S/N:') + 1]
             args.mdata.append(datos)
-            args.tempdataold.append(datos['temp'].copy())
+            args.tempdataold.append(datos.copy())
         # check_hour_interval(args.mdata)
         # convert_round_hour(args.mdata)
+        args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
+        args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
         interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
