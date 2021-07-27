@@ -345,20 +345,20 @@ def zoom_data(data):
         data: The mdata dictionary
     Version: 05/2021, MJB: Documentation
     """
-    # Gets the first and last day of operation to look for the possible errors.
-    # TODO Possibility of making it more than a day
-    time_series = [data['time'][:24], data['time'][-24:]]
-    temperatures = [data['temp'][:24], data['temp'][-24:]]
+    # Gets the first and last 72h of operation to look for the possible errors.
+    # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
+    time_series = [data['time'][:72], data['time'][-72:]]
+    temperatures = [data['temp'][:72], data['temp'][-72:]]
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1]) / diff(ftimestamp)
     indexes = np.argwhere(finaldydx > 0.0002) + 1  # Gets the indexes in which the variation is too big (removing)
-    # Choses whether if the error values begin before the declarated time of removal or later.
+    # Checks whether if the error values begin before the declarated time of removal or later.
     # If later, the time of removal is the marked time to be removed
 
     enddate = data["datafin"] - timedelta(hours=int(data["GMT"][1:]))
     startdate = data["datainici"] - timedelta(hours=int(data["GMT"][1:]))
     if indexes.size != 0:
-        if enddate < data['time'][int(indexes[0])-24]:
+        if enddate < data['time'][int(indexes[0])-72]:
             index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
             indexes = np.array(range(int(index), len(temperatures[0])))
         else:
