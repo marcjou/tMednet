@@ -404,7 +404,7 @@ def apply_uniform_filter(data):
     i = 1
     for depth in depths[:-1]:
         series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
-                               index=data[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
+                               index=data[1]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
