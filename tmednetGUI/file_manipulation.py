@@ -59,7 +59,7 @@ def load_data(args, consolescreen):
             bad = []
             good = []
             for i in range(len(a)):
-                if a[i][-1] == "Enregistré":
+                if a[i][3] == "Enregistré":
                     bad.append(i)
                 else:
                     good.append(a[i])   #Only uses the data without the "Enregistré" string to avoid errors
