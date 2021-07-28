@@ -426,7 +426,7 @@ def apply_uniform_filter(data):
     df, depths = temp_difference(data)
     i = 1
     longest = 0
-    indi = 0
+    indi = 0    # Checks the longest time series of all to use it as the base for the plots
     for u in range(0, len(data)):
         if len(data[u]['time']) > longest:
             longest = len(data[u]['time'])
