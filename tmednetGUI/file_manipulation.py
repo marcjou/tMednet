@@ -57,17 +57,24 @@ def load_data(args, consolescreen):
             # We clean and separate values that contain "Enregistré"
             a[:] = map(lambda item: re.sub('\t+', ' ', item.strip()).split(' '), a)
             bad = []
+            good = []
             for i in range(len(a)):
                 if a[i][-1] == "Enregistré":
                     bad.append(i)
-            nl = len(a) - len(bad) + 1
-            datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
-                                range(1, nl)]
-            datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
-            igm = '_'.join(a[0]).find("GMT")
-            gmtout = '_'.join(a[0])[igm + 3:igm + 6]
+                else:
+                    good.append(a[i])   #Only uses the data without the "Enregistré" string to avoid errors
+            #Deprecated nl = len(a) - len(bad) + 1
+            #Deprecated datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
+            #                    range(1, nl)]
+            datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
+                                range(1, len(good))]
+            #Deprecated datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
+            datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
+            #UPDATE: Changed all a[] to good[]
+            igm = '_'.join(good[0]).find("GMT")
+            gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
-            datos['S/N'] = a[0][a[0].index('S/N:') + 1]
+            datos['S/N'] = good[0][good[0].index('S/N:') + 1]
             args.mdata.append(datos)
             args.tempdataold.append(datos.copy())
         # check_hour_interval(args.mdata)
