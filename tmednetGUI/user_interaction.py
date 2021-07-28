@@ -338,7 +338,7 @@ class tmednet(tk.Frame):
         """
         self.clear_plots()
         index = int(self.list.curselection()[0])
-        time_series, temperatures, indexes, start_index = fm.zoom_data(self.mdata[index])
+        time_series, temperatures, indexes, start_index = fm.zoom_data(self.mdata[index], self.consolescreen)
 
         # Creates the subplots and deletes the old plot
         if not self.plot1.axes:
@@ -444,7 +444,7 @@ class tmednet(tk.Frame):
             self.plot2 = self.fig.add_subplot(212)
 
         for i in index:
-            time_series, temperatures, _, bad = fm.zoom_data(self.mdata[i])
+            time_series, temperatures, _, bad = fm.zoom_data(self.mdata[i], self.consolescreen)
             depths = depths + " " + str(self.mdata[i]['depth'])
 
             masked_temperatures = np.ma.masked_where(np.array(self.mdata[i]['temp']) == 999,
@@ -644,7 +644,7 @@ class tmednet(tk.Frame):
             # self.tempdataold = []
             for data in self.mdata:
                 # self.tempdataold.append(data['temp'].copy())
-                _, temperatures, indexes, bad = fm.zoom_data(data)
+                _, temperatures, indexes, bad = fm.zoom_data(data, self.consolescreen)
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
             self.console_writer('Endings of all the files cut', 'action', liner=True)

@@ -9,6 +9,7 @@ from numpy import diff
 import numpy as np
 from scipy.ndimage.filters import uniform_filter1d
 import json
+import user_interaction
 
 
 def load_coordinates(region):
@@ -344,7 +345,7 @@ def df_to_geojson(df, properties, SN, lat, lon):
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-def zoom_data(data):
+def zoom_data(data, consolescreen):
     """
     Method: zoom_data(data)
     Purpose: Gets the first and last day of operation data
@@ -364,15 +365,30 @@ def zoom_data(data):
 
     enddate = data["datafin"] - timedelta(hours=int(data["GMT"][1:]))
     startdate = data["datainici"] - timedelta(hours=int(data["GMT"][1:]))
-    if indexes.size != 0:
-        if enddate < data['time'][int(indexes[0])-72]:
-            index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
-            indexes = np.array(range(int(index), len(temperatures[0])))
-        else:
-            indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
-    start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
-    # start_index = np.array(range(int(start_index), len(temperatures[0])))
-    return time_series, temperatures, indexes, start_index
+    # If the removal time is way earlier than 72h from the last registered data, a warning is raised
+    try:
+
+        if indexes.size != 0:
+            if enddate < data['time'][int(indexes[0])-72]:
+                index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
+                indexes = np.array(range(int(index), len(temperatures[0])))
+            else:
+                indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
+            start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
+            # start_index = np.array(range(int(start_index), len(temperatures[0])))
+            return time_series, temperatures, indexes, start_index
+    except TypeError:
+        consolescreen.insert("end", "WARNING, day of end of operation "
+                             + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.\n",
+                             'warning')
+        consolescreen.insert("end", "=============\n")
+        indexes = np.array(range(0, len(temperatures[0])))
+        start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
+        # start_index = np.array(range(int(start_index), len(temperatures[0])))
+        return time_series, temperatures, indexes, start_index
+
+
+
 
 
 def temp_difference(data):
