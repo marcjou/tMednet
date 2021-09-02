@@ -58,7 +58,10 @@ class tmednet(tk.Frame):
         self.newfiles = 0
         self.counter = []
         self.recoverindex = None
+        self.recoverindexpos = None
         self.reportlogger = []
+        self.tempdataold = []
+        self.controlevent = False
 
         # We build the GUI
         self.init_window()
@@ -324,7 +327,7 @@ class tmednet(tk.Frame):
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
-    def plot_zoom(self):
+    def plot_zoom(self, controller=False):
         """
             Method: plot_zoom(self)
             Purpose: Plot a zoom of the begining and ending of the data
@@ -334,37 +337,52 @@ class tmednet(tk.Frame):
             Version: 05/2021, MJB: Documentation
         """
         self.clear_plots()
-        # w = evt.widget  # Que es EVT???
         index = int(self.list.curselection()[0])
-        time_series, temperatures, indexes = fm.zoom_data(self.mdata[index])
+        time_series, temperatures, indexes, start_index = fm.zoom_data(self.mdata[index], self.consolescreen)
 
         # Creates the subplots and deletes the old plot
         if not self.plot1.axes:
             self.plot1 = self.fig.add_subplot(211)
             self.plot2 = self.fig.add_subplot(212)
 
-        masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1][int(indexes[0]) - 1:]) == 999,
-                                                        np.array(temperatures[1][int(indexes[0]) - 1:]))
-        self.plot1.plot(time_series[0], temperatures[0],
-                        '-', color='steelblue', label=str(self.mdata[index]['depth']))
+        masked_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
+                                                        np.array(self.mdata[index]['temp']))
+
+        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
+                        '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+        self.plot1.legend()
+        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[:int(start_index) + 1],
+                        '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
+
         self.plot1.set(ylabel='Temperature (DEG C)',
                        title=self.files[index] + "\n" + 'Depth:' + str(
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
-        self.plot1.legend()
-        self.plot2.plot(time_series[1][:int(indexes[0])], temperatures[1][:int(indexes[0])],
-                        '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-        self.plot2.legend()
-        # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-        self.plot2.plot(time_series[1][int(indexes[0]) - 1:], masked_ending_temperatures,
-                        '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
-        self.plot2.set(ylabel='Temperature (DEG C)',
-                       title=self.files[index] + "\n" + 'Depth:' + str(
-                           self.mdata[index]['depth']) + " - Region: " + str(
-                           self.mdata[index]['region']))
-
+        if indexes.size != 0:
+            self.plot2.plot(time_series[1][:int(indexes[0] + 1)], masked_temperatures[-len(time_series[0]):(int(indexes[0])-len(time_series[0])+1)],
+                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.legend()
+            # Plots in the same graph the last part which represents the errors in the data from removing the sensors
+            self.plot2.plot(time_series[1][int(indexes[0]):], masked_temperatures[(int(indexes[0])-len(time_series[0])):],
+                            '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=self.files[index] + "\n" + 'Depth:' + str(
+                               self.mdata[index]['depth']) + " - Region: " + str(
+                               self.mdata[index]['region']))
+        else:
+            self.plot2.plot(time_series[1],
+                            masked_temperatures[-len(time_series[0]):],
+                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            self.plot2.legend()
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=self.files[index] + "\n" + 'Depth:' + str(
+                               self.mdata[index]['depth']) + " - Region: " + str(
+                               self.mdata[index]['region']))
         # fig.set_size_inches(14.5, 10.5, forward=True)
-        cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
+        # Controls if we are accesing the event handler through a real click or it loops.
+        if not controller:
+            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
+
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
@@ -378,23 +396,35 @@ class tmednet(tk.Frame):
             ind: Index of the data to be cut
         Version: 05/2021, MJB: Documentation
         """
-        xtime = dates.num2date(event.xdata)
-        xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
-            hours=xtime.minute // 30)
-        xtime_rounded = xtime_rounded.replace(tzinfo=None)
-        index = self.mdata[ind]['time'].index(xtime_rounded)
-        print('Cutting data')
-        self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
-        self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
+        #TODO Fix a bug that duplicates the event handler click when using the Go_Back function
+        try:
+            xtime = dates.num2date(event.xdata)
+            xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
+                hours=xtime.minute // 30)
+            xtime_rounded = xtime_rounded.replace(tzinfo=None)
+            index = self.mdata[ind]['time'].index(xtime_rounded)
+            print('Cutting data')
+            self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
+            self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
 
-        if self.recoverindex:
-            self.recoverindex.append(ind)
-        else:
-            self.recoverindex = [ind]
-            self.tempdataold = []
-        self.tempdataold.append(self.mdata[ind]['temp'].copy())
-        for i in range(len(self.mdata[ind]['temp'][index:])):
-            self.mdata[ind]['temp'][i + index] = 999
+            if self.recoverindex:
+                self.recoverindex.append(ind)
+            else:
+                self.recoverindex = [ind]
+            # self.tempdataold.append(self.mdata[ind]['temp'].copy())
+
+            if index < 50:
+                for i in range(len(self.mdata[ind]['temp'][:index])):
+                    self.mdata[ind]['temp'][i] = 999
+            else:
+                for i in range(1, len(self.mdata[ind]['temp'][index:])):
+                    self.mdata[ind]['temp'][i + index] = 999
+        except ValueError:
+            self.console_writer('Select value that is not the start or ending', 'warning')
+            return
+
+
+
 
     def plot_all_zoom(self):
         """
@@ -414,19 +444,22 @@ class tmednet(tk.Frame):
             self.plot2 = self.fig.add_subplot(212)
 
         for i in index:
-            time_series, temperatures, _ = fm.zoom_data(self.mdata[i])
+            time_series, temperatures, _, bad = fm.zoom_data(self.mdata[i], self.consolescreen)
             depths = depths + " " + str(self.mdata[i]['depth'])
+
+            masked_temperatures = np.ma.masked_where(np.array(self.mdata[i]['temp']) == 999,
+                                                     np.array(self.mdata[i]['temp']))
 
             masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
                                                             np.array(temperatures[1]))
-            self.plot1.plot(time_series[0], temperatures[0],
+            self.plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot1.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
                                self.mdata[i]['region']))
             self.plot1.legend()
 
-            self.plot2.plot(time_series[1], masked_ending_temperatures,
+            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[0]):],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot2.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
@@ -558,15 +591,16 @@ class tmednet(tk.Frame):
         try:
             if self.recoverindex:
                 for i in self.recoverindex:
-                    self.mdata[i]['temp'] = self.tempdataold[i].copy()
+                    self.mdata[i]['temp'] = self.tempdataold[i]['temp'].copy()
                 self.recoverindex = None
-                self.tempdataold = None
+                # self.tempdataold = None
             else:
                 i = 0
                 for data in self.mdata:
-                    data['temp'] = self.tempdataold[i].copy()
+                    data['temp'] = self.tempdataold[i]['temp'].copy()
                     i += 1
             self.console_writer('Recovering old data', 'action')
+            self.clear_plots()
         except (AttributeError, TypeError):
             self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
 
@@ -607,10 +641,10 @@ class tmednet(tk.Frame):
         Version: 05/2021, MJB: Documentation
         """
         if self.mdata:
-            self.tempdataold = []
+            # self.tempdataold = []
             for data in self.mdata:
-                self.tempdataold.append(data['temp'].copy())
-                _, temperatures, indexes = fm.zoom_data(data)
+                # self.tempdataold.append(data['temp'].copy())
+                _, temperatures, indexes, bad = fm.zoom_data(data, self.consolescreen)
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
             self.console_writer('Endings of all the files cut', 'action', liner=True)

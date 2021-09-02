@@ -3,4 +3,9 @@ geojson~=2.5.0
 matplotlib~=3.3.4
 Pillow~=8.2.0
 scipy~=1.6.2
+<<<<<<< HEAD
 numpy~=1.20.2
+=======
+numpy~=1.20.2
+future~=0.18.2
+>>>>>>> 1791b5018e1d3b9e6291591bf9179ab9a39aa7b4

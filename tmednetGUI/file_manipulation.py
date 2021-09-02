@@ -9,6 +9,7 @@ from numpy import diff
 import numpy as np
 from scipy.ndimage.filters import uniform_filter1d
 import json
+import user_interaction
 
 
 def load_coordinates(region):
@@ -57,21 +58,32 @@ def load_data(args, consolescreen):
             # We clean and separate values that contain "Enregistré"
             a[:] = map(lambda item: re.sub('\t+', ' ', item.strip()).split(' '), a)
             bad = []
+            good = []
             for i in range(len(a)):
-                if a[i][-1] == "Enregistré":
+                if a[i][3] == "Enregistré":
                     bad.append(i)
-            nl = len(a) - len(bad) + 1
-            datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
-                                range(1, nl)]
-            datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
-            igm = '_'.join(a[0]).find("GMT")
-            gmtout = '_'.join(a[0])[igm + 3:igm + 6]
+                else:
+                    good.append(a[i])   #Only uses the data without the "Enregistré" string to avoid errors
+            #Deprecated nl = len(a) - len(bad) + 1
+            #Deprecated datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
+            #                    range(1, nl)]
+            datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
+                                range(1, len(good))]
+            #Deprecated datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
+            datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
+            #UPDATE: Changed all a[] to good[]
+            igm = '_'.join(good[0]).find("GMT")
+            gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
-            datos['S/N'] = a[0][a[0].index('S/N:') + 1]
+            datos['S/N'] = good[0][good[0].index('S/N:') + 1]
             args.mdata.append(datos)
+            args.tempdataold.append(datos.copy())
         # check_hour_interval(args.mdata)
         # convert_round_hour(args.mdata)
+        args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
+        args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
         interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
+        
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
@@ -333,7 +345,7 @@ def df_to_geojson(df, properties, SN, lat, lon):
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-def zoom_data(data):
+def zoom_data(data, consolescreen):
     """
     Method: zoom_data(data)
     Purpose: Gets the first and last day of operation data
@@ -341,15 +353,42 @@ def zoom_data(data):
         data: The mdata dictionary
     Version: 05/2021, MJB: Documentation
     """
-    # Gets the first and last day of operation to look for the possible errors.
-    # TODO Possibility of making it more than a day
-    time_series = [data['timegmt'][:24], data['timegmt'][-24:]]
-    temperatures = [data['temp'][:24], data['temp'][-24:]]
+    # Gets the first and last 72h of operation to look for the possible errors.
+    # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
+    time_series = [data['time'][:72], data['time'][-72:]]
+    temperatures = [data['temp'][:72], data['temp'][-72:]]
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1]) / diff(ftimestamp)
     indexes = np.argwhere(finaldydx > 0.0002) + 1  # Gets the indexes in which the variation is too big (removing)
-    indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
-    return time_series, temperatures, indexes
+    # Checks whether if the error values begin before the declarated time of removal or later.
+    # If later, the time of removal is the marked time to be removed
+
+    enddate = data["datafin"] - timedelta(hours=int(data["GMT"][1:]))
+    startdate = data["datainici"] - timedelta(hours=int(data["GMT"][1:]))
+    # If the removal time is way earlier than 72h from the last registered data, a warning is raised
+    try:
+
+        if indexes.size != 0:
+            if enddate < data['time'][int(indexes[0])-72]:
+                index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
+                indexes = np.array(range(int(index), len(temperatures[0])))
+            else:
+                indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
+            start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
+            # start_index = np.array(range(int(start_index), len(temperatures[0])))
+            return time_series, temperatures, indexes, start_index
+    except TypeError:
+        consolescreen.insert("end", "WARNING, day of end of operation "
+                             + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.\n",
+                             'warning')
+        consolescreen.insert("end", "=============\n")
+        indexes = np.array(range(0, len(temperatures[0])))
+        start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
+        # start_index = np.array(range(int(start_index), len(temperatures[0])))
+        return time_series, temperatures, indexes, start_index
+
+
+
 
 
 def temp_difference(data):
@@ -386,9 +425,15 @@ def apply_uniform_filter(data):
     """
     df, depths = temp_difference(data)
     i = 1
+    longest = 0
+    indi = 0    # Checks the longest time series of all to use it as the base for the plots
+    for u in range(0, len(data)):
+        if len(data[u]['time']) > longest:
+            longest = len(data[u]['time'])
+            indi = u
     for depth in depths[:-1]:
         series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
-                               index=data[0]['time'], columns=[str(depth) + "-" + str(depths[i])])
+                               index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
