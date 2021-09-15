@@ -45,7 +45,8 @@ def load_data(args, consolescreen):
             # Extraemos campos del nombre del fichero
             datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
                      "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
-                     "latitude": lat, "longitude": lon, "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
+                     "latitude": lat, "longitude": lon,
+                     "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
                      "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H')}
 
             print("file", filein)
@@ -63,15 +64,15 @@ def load_data(args, consolescreen):
                 if a[i][3] == "Enregistré":
                     bad.append(i)
                 else:
-                    good.append(a[i])   #Only uses the data without the "Enregistré" string to avoid errors
-            #Deprecated nl = len(a) - len(bad) + 1
-            #Deprecated datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
+                    good.append(a[i])  # Only uses the data without the "Enregistré" string to avoid errors
+            # Deprecated nl = len(a) - len(bad) + 1
+            # Deprecated datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
             #                    range(1, nl)]
             datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
                                 range(1, len(good))]
-            #Deprecated datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
+            # Deprecated datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
             datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
-            #UPDATE: Changed all a[] to good[]
+            # UPDATE: Changed all a[] to good[]
             igm = '_'.join(good[0]).find("GMT")
             gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
@@ -82,8 +83,8 @@ def load_data(args, consolescreen):
         # convert_round_hour(args.mdata)
         args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
         args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
-        interpolate_hours(args.mdata)   # Interpolates the temperature between different not round hours
-        
+        interpolate_hours(args.mdata)  # Interpolates the temperature between different not round hours
+
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
@@ -244,7 +245,7 @@ def to_utc(data):
         gmthshift = int(data[i]["GMT"][1:])
         # Mirar timedelta
         data[i]["time"] = [data[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in
-                                 range(len(data[i]["timegmt"]))]
+                           range(len(data[i]["timegmt"]))]
         print(data[i]["time"][10], data[i]["timegmt"][10])
 
 
@@ -276,7 +277,7 @@ def list_to_df(data):
     Version: 05/2021, MJB: Documentation
     """
     df1 = pd.DataFrame(data[0]['temp'], index=data[0]['time'], columns=[str(data[0]['depth']) +
-                                                                                    'm temp'])
+                                                                        'm temp'])
     depths = [data[0]['depth']]
     SN = [data[0]['S/N']]
     for dat in data[1:]:
@@ -369,7 +370,7 @@ def zoom_data(data, consolescreen):
     try:
 
         if indexes.size != 0:
-            if enddate < data['time'][int(indexes[0])-72]:
+            if enddate < data['time'][int(indexes[0]) - 72]:
                 index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
                 indexes = np.array(range(int(index), len(temperatures[0])))
             else:
@@ -386,9 +387,6 @@ def zoom_data(data, consolescreen):
         start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
         return time_series, temperatures, indexes, start_index
-
-
-
 
 
 def temp_difference(data):
@@ -426,7 +424,7 @@ def apply_uniform_filter(data):
     df, depths = temp_difference(data)
     i = 1
     longest = 0
-    indi = 0    # Checks the longest time series of all to use it as the base for the plots
+    indi = 0  # Checks the longest time series of all to use it as the base for the plots
     for u in range(0, len(data)):
         if len(data[u]['time']) > longest:
             longest = len(data[u]['time'])
@@ -434,6 +432,34 @@ def apply_uniform_filter(data):
     for depth in depths[:-1]:
         series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
                                index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
+        i += 1
+        if 'dfdelta' in locals():
+            dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
+        else:
+            dfdelta = pd.DataFrame(series1)
+
+    return dfdelta
+
+
+def running_average(data, running=240):
+    """
+    Method: apply_uniform_filter(data)
+    Purpose: Applies the 10 running day filter to the data
+    Require:
+        data: The mdata dictionary
+    Version: 05/2021, MJB: Documentation
+    """
+    df, depths, _ = list_to_df(data)
+    i = 1
+    longest = 0
+    indi = 0  # Checks the longest time series of all to use it as the base for the plots
+    for u in range(0, len(data)):
+        if len(data[u]['time']) > longest:
+            longest = len(data[u]['time'])
+            indi = u
+    for depth in depths:
+        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "m temp"], size=running),
+                               index=data[indi]['time'], columns=[str(depth) + "m temp"])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
