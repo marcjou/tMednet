@@ -61,7 +61,7 @@ def load_data(args, consolescreen):
             bad = []
             good = []
             for i in range(len(a)):
-                if a[i][3] == "Enregistré":
+                if a[i][3] == "Enregistré" or a[i][3] == "Registrado":
                     bad.append(i)
                 else:
                     good.append(a[i])  # Only uses the data without the "Enregistré" string to avoid errors
@@ -209,7 +209,7 @@ def openfile(args, files, consolescreen):
             path = "/".join(files[0].split("/")[:-1]) + "/"
             for ifile in files:
                 _, file_extension = os.path.splitext(ifile)
-                if file_extension != '.txt':
+                if file_extension != '.txt' and file_extension != '.csv':
                     raise ValueError('Error, file not loadable')
                 filesname.append(ifile.split("/")[-1])
                 # consolescreen.insert("end", "files: " + ifile + "\n") # Redundant

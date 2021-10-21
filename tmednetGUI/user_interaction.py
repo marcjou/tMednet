@@ -599,7 +599,7 @@ class tmednet(tk.Frame):
         self.plot = self.fig.add_subplot(111)
         dfdelta.plot(ax=self.plot)
         self.plot.set(ylabel='Temperature (DEG C)',
-                      title='Temperature differences filtered')
+                      title='Annual T Cycles')
 
         self.plot.legend()
 
