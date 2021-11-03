@@ -83,13 +83,27 @@ def load_data(args, consolescreen):
         # convert_round_hour(args.mdata)
         args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
         args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
+        check_start(args.mdata, consolescreen)
         interpolate_hours(args.mdata)  # Interpolates the temperature between different not round hours
 
     except ValueError:
         consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
         consolescreen.insert("end", "=============\n")
 
-
+def check_start(data, consolescreen):
+    """
+        Method: check_start(data)
+        Purpose: Checks that the start time is correct
+        Require:
+            data: The mdata
+        Version: 11/2021, MJB: Documentation
+    """
+    for dat in data:
+        titlestart = dat['datainici'].timestamp()
+        filestart= dat['timegmt'][0].timestamp()
+        if titlestart < filestart:
+            consolescreen.insert("end", "Error, start date on the title of the file set before the start date of the file in depth " + str(dat['depth']) + "\n", 'warning')
+            consolescreen.insert("end", "=============\n")
 def interpolate_hours(data):
     """
     Method: interpolate_hours(data)
