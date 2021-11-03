@@ -669,9 +669,11 @@ class tmednet(tk.Frame):
             # self.tempdataold = []
             for data in self.mdata:
                 # self.tempdataold.append(data['temp'].copy())
-                _, temperatures, indexes, bad = fm.zoom_data(data, self.consolescreen)
+                _, temperatures, indexes, start_index = fm.zoom_data(data, self.consolescreen)
                 for i in indexes:
                     data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+                for i in range(0, int(start_index)):
+                    data['temp'][int(i)] = 999
             self.console_writer('Endings of all the files cut', 'action', liner=True)
             self.reportlogger.append('Endings automatically cut')
         else:
