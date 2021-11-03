@@ -552,9 +552,11 @@ class tmednet(tk.Frame):
         Version: 05/2021, MJB: Documentation
         """
         try:
+
             fm.to_utc(self.mdata)
             global cb
             self.clear_plots()
+            self.counter.append("Hovmoller")
             df, depths, _ = fm.list_to_df(self.mdata)
             depths = np.array(depths)
             if self.plot1.axes:
@@ -675,7 +677,7 @@ class tmednet(tk.Frame):
                 for i in range(0, int(start_index)):
                     data['temp'][int(i)] = 999
             self.console_writer('Endings of all the files cut', 'action', liner=True)
-            self.reportlogger.append('Endings automatically cut')
+            self.reportlogger.append('Endings and start automatically cut')
         else:
             self.console_writer('Load a file before trying to cut it', 'warning')
 
@@ -690,7 +692,10 @@ class tmednet(tk.Frame):
         try:  # If there is no plot, it shows an error message
 
             if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
-                filename = self.value[:-4]
+                if self.counter[0] == "Hovmoller":
+                    filename = str(self.value[:-7]) + " Hovmoller"
+                else:
+                    filename = self.value[:-4]
             if len(self.counter) > 1:
                 filename = ""
                 for n in self.counter:
