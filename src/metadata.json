@@ -491,6 +491,18 @@
             "start_year": "2015",
             "end_year": "2018",
             "institution": "Faculty of Science University of Zagreb - PMF - D.I.I.V Ltd"
+        },
+        "150": {
+            "lat": "41.8880",
+            "long": "3.2003",
+            "site_number": "",
+            "site_name": "Ullastres",
+            "site_code": "150",
+            "eco_region": "W-MED",
+            "sub_basin": "Balearic",
+            "start_year": "2020",
+            "end_year": "2021",
+            "institution": "Institut de Ciencies del Mar"
         }
     },
     "regions": {
