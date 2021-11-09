@@ -290,12 +290,11 @@ def list_to_df(data):
         data: List mdata
     Version: 05/2021, MJB: Documentation
     """
-    df1 = pd.DataFrame(data[0]['temp'], index=data[0]['time'], columns=[str(data[0]['depth']) +
-                                                                        'm temp'])
+    df1 = pd.DataFrame(data[0]['temp'], index=data[0]['time'], columns=[str(data[0]['depth'])])
     depths = [data[0]['depth']]
     SN = [data[0]['S/N']]
     for dat in data[1:]:
-        dfi = pd.DataFrame(dat['temp'], index=dat['time'], columns=[str(dat['depth']) + 'm temp'])
+        dfi = pd.DataFrame(dat['temp'], index=dat['time'], columns=[str(dat['depth'])])
         depths.append(dat['depth'])
         SN.append(dat['S/N'])
         df1 = pd.merge(df1, dfi, how='outer', left_index=True, right_index=True)  # Merges by index which is the date
@@ -346,7 +345,7 @@ def df_to_geojson(df, properties, SN, lat, lon):
         props['depth'].append(prop)
         temp = []
         for _, row in df.iterrows():
-            temp.append(row[str(prop) + 'm temp'])
+            temp.append(row[str(prop)])
         props['temp'].append(temp)
 
     point = Point((lat, lon))
