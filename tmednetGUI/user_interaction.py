@@ -286,14 +286,16 @@ class tmednet(tk.Frame):
     def reset(self):
         """
         Method: reset(self)
-        Purpose: Reset the parameters and clear the lists and plots
+        Purpose: Reset the parameters and clear the lists, plots, console and report windows
         Require:
         Version: 11/2021, MJB: Documentation
         """
         self.clear_plots()
         self.list.delete(0, END)
+        self.textBox.delete('1.0', END)
+        self.consolescreen.delete('1.0', END)
         self.init_variables()
-        
+
 
     def to_utc(self):
         """
