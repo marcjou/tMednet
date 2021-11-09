@@ -51,17 +51,7 @@ class tmednet(tk.Frame):
         self.master.option_add("*Font", def_font)
 
         # DEFINIR VARIABLES
-        self.path = ""
-        self.files = []
-        self.mdata = []
-        self.index = []
-        self.newfiles = 0
-        self.counter = []
-        self.recoverindex = None
-        self.recoverindexpos = None
-        self.reportlogger = []
-        self.tempdataold = []
-        self.controlevent = False
+        self.init_variables()
 
         # We build the GUI
         self.init_window()
@@ -81,6 +71,7 @@ class tmednet(tk.Frame):
         filemenu.add_command(label="Save", command=self.on_save)
         filemenu.add_command(label="Report", command=self.report)
         filemenu.add_separator()
+        filemenu.add_command(label="Reset", command=self.reset)
         filemenu.add_command(label="Exit", command=lambda: close(self))
         menubar.add_cascade(label="File", menu=filemenu)
 
@@ -180,6 +171,26 @@ class tmednet(tk.Frame):
 
     # p.add(f1,width=300)
     # p.add(f2,width=1200)
+    def init_variables(self):
+        """
+        Method: init_variables(self)
+        Purpose: Initializes the variables
+        Require:
+        Version: 11/2021, MJB: Documentation
+        """
+        # DEFINIR VARIABLES
+        self.path = ""
+        self.files = []
+        self.mdata = []
+        self.index = []
+        self.newfiles = 0
+        self.counter = []
+        self.recoverindex = None
+        self.recoverindexpos = None
+        self.reportlogger = []
+        self.tempdataold = []
+        self.controlevent = False
+
 
     def console_writer(self, msg, mod, var=False, liner=False):
         """
@@ -271,6 +282,18 @@ class tmednet(tk.Frame):
         """
 
         fm.report(self, self.textBox)
+
+    def reset(self):
+        """
+        Method: reset(self)
+        Purpose: Reset the parameters and clear the lists and plots
+        Require:
+        Version: 11/2021, MJB: Documentation
+        """
+        self.clear_plots()
+        self.list.delete(0, END)
+        self.init_variables()
+        
 
     def to_utc(self):
         """
