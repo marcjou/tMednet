@@ -1,27 +1,42 @@
+import math
+
 import numpy as np
 import pandas as pd
 from datetime import datetime
 
 df = pd.read_csv("../src/output_files/mergy.txt", '\t')
 n = 0
-total5 = 0
+total = {}
 firstdate = df['Date'][0]
 lastdate = df['Date'][len(df) - 1]
 
 mydf = pd.DataFrame(columns=['date','depth(m)', 'N', 'mean', 'std', 'max', 'min'])
 
-appendict = {'date': 0, 'depth(m)':0, 'N': 0, 'mean': 0, 'std': 0, 'max': 0, 'min':0}
+appendict = {}
+
+for column in df:
+    if column != 'Date' and column != 'Time':
+        total[column] = 0
+        appendict[column] = {'date': 0, 'depth(m)':0, 'N': 0, 'mean': 0, 'std': 0, 'max': 0, 'min':0}
+
 for i in range(len(df)):
     if df['Date'][i] == firstdate or df['Date'][i] == df['Date'][i-1]:
-        total5 = df['5'][i] + total5
-        n = n+1
+        for column in df:
+            if column != 'Date' and column != 'Time':
+                appendict[column]['date'] = df['Date'][i]
+                if df[column][i] <= 0 or math.isnan(df[column][i]):
+                    pass
+                else:
+                    appendict[column]['N'] = appendict[column]['N'] + 1
+                appendict[column]['depth(m)'] = column
+                total[column] = total[column] + df[column][i]
     else:
-        appendict['N'] = n
-        appendict['depth(m)'] = 5
-        appendict['mean'] = round(total5/n, 3)
-        mydf = mydf.append(appendict, ignore_index=True)
-        total5=0
-        n = 0
+        for column in df:
+            if column != 'Date' and column != 'Time':
+                appendict[column]['depth(m)'] = column
+                appendict[column]['mean'] = round(total[column]/appendict[column]['N'], 3)
+                mydf = mydf.append(appendict[column], ignore_index=True)
+
     print("me")
 
 print('me')
