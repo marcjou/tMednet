@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-df1 = pd.read_csv("../src/output_files/mergy.txt", '\t')
+df1 = pd.read_csv("../src/input_files/Database_T_05_Cap de Creus-S_200705-201811.txt", '\t')
 df2 = pd.read_csv("../src/output_files/merged.txt", sep="\s+", skiprows=6)
 df2.index.set_names(["Date", "Time"], level=[0, 1], inplace=True)
 df2.reset_index(inplace=True)
