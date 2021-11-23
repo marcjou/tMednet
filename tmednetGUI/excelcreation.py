@@ -43,7 +43,6 @@ for column in df:
                               'Ndays>=23': 0, 'Ndays>=24': 0, 'Ndays>=25': 0, 'Ndays>=26': 0, 'Ndays>=27': 0,
                               'Ndays>=28': 0}
 
-flag = False
 firstmonth = datetime.strftime(datetime.strptime(df['Date'][0], '%d/%m/%Y'), '%m')
 firstyear = datetime.strftime(datetime.strptime(df['Date'][0], '%d/%m/%Y'), '%Y')
 for i in range(len(df)):
