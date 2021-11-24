@@ -1,4 +1,6 @@
 import tkinter as tk
+from threading import Thread
+
 import file_writer as fw
 import tkinter.font as tkFont
 from tkinter import ttk
@@ -84,6 +86,7 @@ class tmednet(tk.Frame):
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         toolsmenu = Menu(menubar, tearoff=0)
+        toolsmenu.add_command(label='Historical Merge', command=self.bigmerger)
         toolsmenu.add_command(label='Create Excel', command=self.create_excel)
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
@@ -791,6 +794,27 @@ class tmednet(tk.Frame):
         self.writefileinput.grid(row=1, column=1)
         writefile = Button(self.newwindow, text='Write', command=self.write_excel).grid(row=1, column=2)
 
+    def bigmerger(self):
+        self.newwindow = Toplevel()
+        self.newwindow.title('Create Merge Historical')
+
+        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        openfileLabel2 = Label(self.newwindow, text='New:').grid(row=1, pady=10)
+        self.openfileinput2 = Entry(self.newwindow, width=20)
+        self.openfileinput2.grid(row=1, column=1)
+        openfileBrowse2 = Button(self.newwindow, text='Browse', command=lambda: self.browse_file(True)).grid(row=1, column=2)
+        writefileLabel = Label(self.newwindow, text='Output file name:').grid(row=2, pady=10)
+        self.writefileinput = Entry(self.newwindow, width=20)
+        self.writefileinput.grid(row=2, column=1)
+        writefile = Button(self.newwindow, text='Write', command=lambda: self.call_merger(self.openfileinput.get(), self.openfileinput2.get(), self.writefileinput.get())).grid(row=2, column=2)
+
+    def call_merger(self, filename1, filename2, output):
+        self.newwindow.destroy()
+        self.console_writer('Historical Merge successful!', 'action')
+        fw.big_merge(filename1, filename2, output)
 
     def write_excel(self):
         """
@@ -807,8 +831,7 @@ class tmednet(tk.Frame):
         fw.Excel(input, '../src/output_files/' + output + '.xlsx')
         self.console_writer('Excel file successfully created!', 'action')
 
-
-    def browse_file(self):
+    def browse_file(self, merge=False):
         """
         Method: browse_file(self)
         Purpose: Browses directories and stores the file selected into a variable
@@ -816,9 +839,15 @@ class tmednet(tk.Frame):
         Version:
         11/2021, MJB: Documentation
         """
-        self.openfileinput.delete(0, END)
-        file = askopenfilename(initialdir='../src/')
-        self.openfileinput.insert(0, file)
+        if merge:
+            self.openfileinput2.delete(0, END)
+            file = askopenfilename(initialdir='../src/')
+            self.openfileinput2.insert(0, file)
+        else:
+            self.openfileinput.delete(0, END)
+            file = askopenfilename(initialdir='../src/')
+            self.openfileinput.insert(0, file)
+
 
 
     @staticmethod

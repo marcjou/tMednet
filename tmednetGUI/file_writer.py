@@ -231,5 +231,19 @@ class Excel:
         writer.save()
 
 
+def big_merge(filename1, filename2, output):
+    df1 = pd.read_csv(filename1, '\t')
+    df2 = pd.read_csv(filename2, sep="\s+", skiprows=6)
+    df2.index.set_names(["Date", "Time"], level=[0, 1], inplace=True)
+    df2.reset_index(inplace=True)
+
+    for i in range(len(df2["Date"])):
+        df2.at[i, "Date"] = datetime.strftime(datetime.strptime(df2["Date"][i], "%Y-%m-%d"), "%d/%m/%Y")
+
+    dfconc = pd.concat([df1, df2])
+    dfconc.replace(np.nan, '', regex=True, inplace=True)
+
+    dfconc.to_csv('../src/output_files/'+ output + '.txt', sep='\t', index=False)
+
 # prova = Excel("../src/output_files/mergo.txt", 'example2.xlsx')
 
