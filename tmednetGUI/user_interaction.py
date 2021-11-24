@@ -1,4 +1,5 @@
 import tkinter as tk
+import file_writer as fw
 import tkinter.font as tkFont
 from tkinter import ttk
 from tkinter import *
@@ -81,6 +82,10 @@ class tmednet(tk.Frame):
         editmenu.add_command(label="Merge Files", command=self.merge)
         editmenu.add_command(label="Cut Endings", command=self.cut_endings)
         menubar.add_cascade(label="Edit", menu=editmenu)
+
+        toolsmenu = Menu(menubar, tearoff=0)
+        toolsmenu.add_command(label='Create Excel', command=self.create_excel)
+        menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="About...", command=self.help)
@@ -762,6 +767,59 @@ class tmednet(tk.Frame):
                 self.reportlogger.append('Geojson and CSV file created')
         except IndexError:
             self.console_writer('Please, load a file first', 'warning')
+
+    def create_excel(self):
+        """
+        Method: create_excel(self)
+        Purpose: Loads a new window with the options to select the file from which the new excel will be created and
+                the name of the Excel file
+        Require:
+        Version:
+        11/2021, MJB: Documentation
+        """
+
+        self.newwindow = Toplevel()
+        self.newwindow.title('Create Excel')
+
+
+        openfileLabel = Label(self.newwindow, text='Input:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        writefileLabel = Label(self.newwindow, text='Output file name:').grid(row=1, pady=10)
+        self.writefileinput = Entry(self.newwindow, width=20)
+        self.writefileinput.grid(row=1, column=1)
+        writefile = Button(self.newwindow, text='Write', command=self.write_excel).grid(row=1, column=2)
+
+
+    def write_excel(self):
+        """
+        Method: write_excel(self)
+        Purpose: Informs the report and launches the write_excel function
+        Require:
+        Version:
+        11/2021, MJB: Documentation
+        """
+        self.console_writer('Writing the Excel file, please wait this could take some minutes...', 'action')
+        input = self.openfileinput.get()
+        output = self.writefileinput.get()
+        self.newwindow.destroy()
+        fw.Excel(input, '../src/output_files/' + output + '.xlsx')
+        self.console_writer('Excel file successfully created!', 'action')
+
+
+    def browse_file(self):
+        """
+        Method: browse_file(self)
+        Purpose: Browses directories and stores the file selected into a variable
+        Require:
+        Version:
+        11/2021, MJB: Documentation
+        """
+        self.openfileinput.delete(0, END)
+        file = askopenfilename(initialdir='../src/')
+        self.openfileinput.insert(0, file)
+
 
     @staticmethod
     def help():

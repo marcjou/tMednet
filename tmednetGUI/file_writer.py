@@ -231,6 +231,5 @@ class Excel:
         writer.save()
 
 
-prova = Excel("../src/output_files/mergo.txt", 'example2.xlsx')
+# prova = Excel("../src/output_files/mergo.txt", 'example2.xlsx')
 
-print(prova)
