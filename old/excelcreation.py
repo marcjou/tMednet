@@ -444,7 +444,7 @@ for i in range(len(df)):
     print(str(i) + ' de ' + str(len(df)))
 
 print('Now writing to excel')
-writer = ExcelWriter('example.xlsx')
+writer = ExcelWriter('../tmednetGUI/example.xlsx')
 mydf.to_excel(writer, 'Daily')
 mydf2.to_excel(writer, 'Monthly')
 mydf3.to_excel(writer, 'Seasonal')

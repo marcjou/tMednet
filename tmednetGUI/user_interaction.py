@@ -780,10 +780,8 @@ class tmednet(tk.Frame):
         Version:
         11/2021, MJB: Documentation
         """
-
         self.newwindow = Toplevel()
         self.newwindow.title('Create Excel')
-
 
         openfileLabel = Label(self.newwindow, text='Input:').grid(row=0, pady=10)
         self.openfileinput = Entry(self.newwindow, width=20)
@@ -795,6 +793,14 @@ class tmednet(tk.Frame):
         writefile = Button(self.newwindow, text='Write', command=self.write_excel).grid(row=1, column=2)
 
     def bigmerger(self):
+        """
+        Method: bigmerger(self)
+        Purpose: Creates a new window in order for the user to select the files and filenames for the historical
+                merger function
+        Require:
+        Version:
+        11/2021, MJB: Documentation
+        """
         self.newwindow = Toplevel()
         self.newwindow.title('Create Merge Historical')
 
@@ -812,6 +818,16 @@ class tmednet(tk.Frame):
         writefile = Button(self.newwindow, text='Write', command=lambda: self.call_merger(self.openfileinput.get(), self.openfileinput2.get(), self.writefileinput.get())).grid(row=2, column=2)
 
     def call_merger(self, filename1, filename2, output):
+        """
+        Method: call_merger(self, filename1, filename2, output)
+        Purpose: Calls the bigmerger function under file_writer
+        Require:
+            filename1: The path of the historical file
+            filename2: The path of the file to merge
+            output: The name of the final output
+        Version:
+        11/2021, MJB: Documentation
+        """
         self.newwindow.destroy()
         self.console_writer('Historical Merge successful!', 'action')
         fw.big_merge(filename1, filename2, output)
@@ -847,8 +863,6 @@ class tmednet(tk.Frame):
             self.openfileinput.delete(0, END)
             file = askopenfilename(initialdir='../src/')
             self.openfileinput.insert(0, file)
-
-
 
     @staticmethod
     def help():

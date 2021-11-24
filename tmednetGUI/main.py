@@ -11,7 +11,6 @@ version = open("../VERSION.TXT", "r").read()
 __author__ = "Marc Jou"
 __date__ = "April 2018"
 
-import file_manipulation as fm
 import user_interaction as ui
 
 
