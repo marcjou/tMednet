@@ -414,8 +414,8 @@ def temp_difference(data):
     df, depths, _ = list_to_df(data)
     i = 1
     for depth in depths[:-1]:
-        series1 = df[str(depth) + 'm temp'] - df[
-            str(depths[i]) + 'm temp']  # If fails, raises Key error (depth doesn't exist)
+        series1 = df[str(depth)] - df[
+            str(depths[i])]  # If fails, raises Key error (depth doesn't exist)
         series1 = series1.rename(str(depth) + "-" + str(depths[i]))
         i += 1
         if 'dfdelta' in locals():
@@ -471,8 +471,8 @@ def running_average(data, running=240):
             longest = len(data[u]['time'])
             indi = u
     for depth in depths:
-        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "m temp"], size=running),
-                               index=data[indi]['time'], columns=[str(depth) + "m temp"])
+        series1 = pd.DataFrame(uniform_filter1d(df[str(depth)], size=running),
+                               index=data[indi]['time'], columns=[str(depth)])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)

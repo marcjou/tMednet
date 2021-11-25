@@ -163,6 +163,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
         self.right_menu.add_command(label="Plot Annual T Cycles", command=self.plot_annualTCycle)
+        self.right_menu.add_command(label="Plot Thresholds", command=self.thresholds_browser)
 
         self.list.bind("<Button-3>", self.do_popup)
         cscrollb = tk.Scrollbar(frame2, width=20)
@@ -648,8 +649,43 @@ class tmednet(tk.Frame):
        Require:
        Version: 11/2021, MJB: Documentation
        """
-        self.clear_plots()
 
+        historical = self.openfileinput.get()
+        self.newwindow.destroy()
+        self.clear_plots()
+        excel_object = fw.Excel(historical, write_excel=False) #returns an excel object
+        df = excel_object.mydf3
+
+        # Creates the subplots and deletes the old plot
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+        self.plot = self.fig.add_subplot(111)
+
+        #TODO make the method work for the different temperatures (23,24,25,26,27,28)
+        #TODO add markers
+
+        # We get all the years on the dataset
+        years = df['year'].unique()
+        # Iterates through all the years and plots in the same canvas the different years for a given temperature
+        for year in years:
+            yearly_plot = np.column_stack((df.loc[df['year']==year, 'Ndays>=23'], df.loc[df['year']==year, 'depth(m)']))
+            yearly_plot = yearly_plot.astype(int)
+            self.plot.plot(yearly_plot[:,0], yearly_plot[:,1])
+            self.plot.invert_yaxis()
+            self.plot.xaxis.tick_top()
+            self.canvas.draw()
+        print('Ayo')
+
+    def thresholds_browser(self):
+        self.newwindow = Toplevel()
+        self.newwindow.title('Select historical file')
+
+        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=1, column=1)
 
 
     def go_back(self):

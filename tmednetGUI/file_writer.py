@@ -9,7 +9,7 @@ from pandas import ExcelWriter
 
 class Excel:
 
-    def __init__(self, input_path, output_path):
+    def __init__(self, input_path, output_path='', write_excel=True):
         self.df = pd.read_csv(input_path, '\t')
         self.n = 0
         self.total = {}
@@ -49,7 +49,10 @@ class Excel:
 
         self.firstmonth = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%m')
         self.firstyear = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%Y')
-        self.excel_writer(output_path)
+        if write_excel:
+            self.excel_writer(output_path)
+        else:
+            self.only_seasonal()
 
     def txt_getter(self, year, month, i):
         for column in self.df:
@@ -234,6 +237,73 @@ class Excel:
         self.mydf2.to_excel(writer, 'Monthly')
         self.mydf3.to_excel(writer, 'Seasonal')
         writer.save()
+
+    def calculate_seasonal(self):
+        for column in self.df:
+            if column != 'Date' and column != 'Time':
+                # Appendict3 part
+                self.appendict3[column]['depth(m)'] = column
+                if self.appendict3[column]['N'] == 0:
+                    self.appendict3[column]['mean'] = 0
+                else:
+                    self.total3[column] = [np.nan if tot == 0 else tot for tot in self.total3[column]]
+                    self.appendict3[column]['mean'] = round(np.nanmean(self.total3[column]), 3)
+                    self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
+                    self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
+                    self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
+                    self.appendict3[column]['Ndays>=23'] = len([days for days in self.total3[column] if days >= 23])
+                    self.appendict3[column]['Ndays>=24'] = len([days for days in self.total3[column] if days >= 24])
+                    self.appendict3[column]['Ndays>=25'] = len([days for days in self.total3[column] if days >= 25])
+                    self.appendict3[column]['Ndays>=26'] = len([days for days in self.total3[column] if days >= 26])
+                    self.appendict3[column]['Ndays>=27'] = len([days for days in self.total3[column] if days >= 27])
+                    self.appendict3[column]['Ndays>=28'] = len([days for days in self.total3[column] if days >= 28])
+                self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
+                self.appendict3[column]['N'] = 0
+                self.total3[column] = []
+
+    def txt_getter_seasonal(self, year, month, i):
+        for column in self.df:
+            if column != 'Date' and column != 'Time':
+                if month == '07' or month == '08' or month == '09':
+                    self.appendict3[column]['season'] = 3
+                    self.appendict3[column]['year'] = year
+                    if self.df[column][i] <= 0 or math.isnan(self.df[column][i]):
+                        pass
+                    else:
+                        self.appendict3[column]['N'] = self.appendict3[column]['N'] + 1
+                    self.appendict3[column]['depth(m)'] = column
+                    self.total3[column].append(self.df[column][i])
+
+    def only_seasonal(self):
+        for i in range(len(self.df)):
+            if type(self.df['Date'][i]) != type('27/12/1995'):
+                pass
+            elif i >= 1 and type(self.df['Date'][i - 1]) != type('27/12/1995'):
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+                if year == self.firstyear or year == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 2], '%d/%m/%Y'),
+                        '%Y'):
+
+                    self.txt_getter_seasonal(year, month, i)
+                else:
+                    self.calculate_seasonal()
+                    self.txt_getter_seasonal(year, month, i)
+            else:
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+                if year == self.firstyear or year == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
+                        '%Y'):
+
+                    self.txt_getter_seasonal(year, month, i)
+                else:
+                    self.calculate_seasonal()
+                    self.txt_getter_seasonal(year, month, i)
+            if i == len(self.df) - 1:
+                self.calculate_seasonal()
+
+            print(str(i) + ' de ' + str(len(self.df)))
 
 
 def big_merge(filename1, filename2, output):
