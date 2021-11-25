@@ -167,9 +167,12 @@ class Excel:
                     self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
+                    self.appendict3[column]['Ndays>=23'] = len([days for days in self.total3[column] if days >= 23])
                     self.appendict3[column]['Ndays>=24'] = len([days for days in self.total3[column] if days >= 24])
                     self.appendict3[column]['Ndays>=25'] = len([days for days in self.total3[column] if days >= 25])
                     self.appendict3[column]['Ndays>=26'] = len([days for days in self.total3[column] if days >= 26])
+                    self.appendict3[column]['Ndays>=27'] = len([days for days in self.total3[column] if days >= 27])
+                    self.appendict3[column]['Ndays>=28'] = len([days for days in self.total3[column] if days >= 28])
                 self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
@@ -219,6 +222,8 @@ class Excel:
                 else:
                     self.excel_setter3()
                     self.txt_getter(year, month, i)
+            if i == len(self.df) - 1:
+                self.excel_setter3()
 
             print(str(i) + ' de ' + str(len(self.df)))
 

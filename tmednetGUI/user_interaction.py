@@ -641,6 +641,17 @@ class tmednet(tk.Frame):
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
+    def plot_thresholds(self):
+        """
+       Method: plot_thresholds(self)
+       Purpose: Creates the thresholds graph
+       Require:
+       Version: 11/2021, MJB: Documentation
+       """
+        self.clear_plots()
+
+
+
     def go_back(self):
         """
         Method: go_back(self)
