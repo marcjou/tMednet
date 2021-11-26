@@ -651,6 +651,7 @@ class tmednet(tk.Frame):
        """
 
         historical = self.openfileinput.get()
+        region = self.regioninput.get()
         self.newwindow.destroy()
         self.clear_plots()
         excel_object = fw.Excel(historical, write_excel=False) #returns an excel object
@@ -687,12 +688,29 @@ class tmednet(tk.Frame):
                     maxdepth = yearly_plot[-1, -1]
                 temperatures[i] = np.copy(yearly_plot)
             year_dict[year] = temperatures.copy()
-
             self.plot.set(ylim=(0, maxdepth))
-            self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1]) # Temporary just to test Plots should go apart
+            if int(year) < 2000:
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
+                               , color=colors[0], linestyle=lines[0])
+            elif int(year) >= 2000 and int(year) < 2010:
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2000],
+                               color=colors[1], linestyle=lines[1])
+            elif int(year) >= 2010 and int(year) < 2020:
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2010],
+                               color=colors[2], linestyle=lines[2])
+            elif int(year) >= 2020 and int(year) < 2030:
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
+                               color=colors[3], linestyle=lines[3])
+
+
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
+        # Draws the legend for the different years
+        self.plot.legend(years)
+        self.plot.set(ylabel='Depth (m)',
+                      title=region + ' Summer days ≥ 23ºC')
+        self.canvas.draw()
         print('Ayo')
 
     def thresholds_browser(self):
@@ -703,7 +721,10 @@ class tmednet(tk.Frame):
         self.openfileinput = Entry(self.newwindow, width=20)
         self.openfileinput.grid(row=0, column=1)
         openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=1, column=1)
+        regionLabel = Label(self.newwindow, text='Region:').grid(row=1, pady=10)
+        self.regioninput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=1, column=1)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=2, column=1)
 
 
     def go_back(self):
