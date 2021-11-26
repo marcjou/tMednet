@@ -663,15 +663,33 @@ class tmednet(tk.Frame):
         self.plot = self.fig.add_subplot(111)
 
         #TODO make the method work for the different temperatures (23,24,25,26,27,28)
-        #TODO add markers
+        #TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
+
+        # Setting the properties of the line as lists to be used on a for loop depending on the year
+        markers = ['+', 'o', 'x', 's', 'd', '^', 'v', 'p', 'h', '*']
+        colors = ['b', 'b', 'k', 'k']
+        lines = ['solid', 'dotted', 'solid', 'dotted']
+
+        # Loop to decide each year which style has
 
         # We get all the years on the dataset
         years = df['year'].unique()
-        # Iterates through all the years and plots in the same canvas the different years for a given temperature
+        # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
+        maxdepth = 0 # Used to set the lowest depth as the lowest point in the Y axis
+        temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
+        year_dict = {}
         for year in years:
-            yearly_plot = np.column_stack((df.loc[df['year']==year, 'Ndays>=23'], df.loc[df['year']==year, 'depth(m)']))
-            yearly_plot = yearly_plot.astype(int)
-            self.plot.plot(yearly_plot[:,0], yearly_plot[:,1])
+            for i in range(23, 29):
+                yearly_plot = np.column_stack(
+                    (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
+                yearly_plot = yearly_plot.astype(int)
+                if yearly_plot[-1, -1] > maxdepth:
+                    maxdepth = yearly_plot[-1, -1]
+                temperatures[i] = np.copy(yearly_plot)
+            year_dict[year] = temperatures.copy()
+
+            self.plot.set(ylim=(0, maxdepth))
+            self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1]) # Temporary just to test Plots should go apart
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
