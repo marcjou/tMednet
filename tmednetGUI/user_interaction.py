@@ -95,6 +95,10 @@ class tmednet(tk.Frame):
         menubar.add_cascade(label="Help", menu=helpmenu)
         self.master.config(menu=menubar)
 
+        # Tabs to manipulate Thresholds Plots (refer to addTab() and raiseTab())
+        self.curtab = None
+        self.tabs = {}
+
         # General container
         fr = tk.Frame(self.master, width=1000, height=100)
         fr.grid(row=0, column=0, sticky='nsew')
@@ -130,12 +134,13 @@ class tmednet(tk.Frame):
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
-        toolbar = NavigationToolbar2Tk(self.canvas, f2)
-        toolbar.children['!button5'].pack_forget()
-        tk.Button(toolbar, text="Clear Plot", command=self.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
-        toolbar.pack(side=tk.TOP, fill=tk.BOTH, expand=0)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, f2)
+        self.toolbar.children['!button5'].pack_forget()
+        tk.Button(self.toolbar, text="Clear Plot", command=self.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
+
+        self.toolbar.pack(side=tk.TOP, fill=tk.BOTH, expand=0)
         self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-        toolbar.update()
+        self.toolbar.update()
 
         # Contingut de F1
         # Añadimos tabs
@@ -706,12 +711,53 @@ class tmednet(tk.Frame):
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
+
         # Draws the legend for the different years
         self.plot.legend(years)
         self.plot.set(ylabel='Depth (m)',
                       title=region + ' Summer days ≥ 23ºC')
         self.canvas.draw()
+        # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
+        for i in range(23, 29):
+            tab = {}
+            btn = tk.Button(self.toolbar, text=i, command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers, colors, lines, years, region)).pack(side=tk.LEFT,
+                                                                                               fill=tk.BOTH, expand=0)
+            tab['id'] = i
+            tab['btn'] = btn
+            self.tabs[i] = tab
         print('Ayo')
+
+    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region):
+        print(i)
+        print("curtab"+str(self.curtab))
+        if self.curtab!= None and self.curtab != i and len(self.tabs)>1:
+            # Plot the Thresholds here and clean the last one
+            self.clear_plots()
+            self.plot = self.fig.add_subplot(111)
+            self.plot.set(ylim=(0, maxdepth))
+            for year in years:
+                if int(year) < 2000:
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 1990]
+                                   , color=colors[0], linestyle=lines[0])
+                elif int(year) >= 2000 and int(year) < 2010:
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2000],
+                                   color=colors[1], linestyle=lines[1])
+                elif int(year) >= 2010 and int(year) < 2020:
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2010],
+                                   color=colors[2], linestyle=lines[2])
+                elif int(year) >= 2020 and int(year) < 2030:
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2020],
+                                   color=colors[3], linestyle=lines[3])
+
+            self.plot.invert_yaxis()
+            self.plot.xaxis.tick_top()
+            self.plot.legend(years)
+            self.plot.set(ylabel='Depth (m)',
+                          title=region + ' Summer days ≥ ' + str(i) + 'ºC')
+            self.canvas.draw()
+
+        self.curtab = i
+
 
     def thresholds_browser(self):
         self.newwindow = Toplevel()
@@ -723,7 +769,7 @@ class tmednet(tk.Frame):
         openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
         regionLabel = Label(self.newwindow, text='Region:').grid(row=1, pady=10)
         self.regioninput = Entry(self.newwindow, width=20)
-        self.openfileinput.grid(row=1, column=1)
+        self.regioninput.grid(row=1, column=1)
         actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=2, column=1)
 
 
