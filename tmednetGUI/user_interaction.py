@@ -668,7 +668,7 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
         self.plot = self.fig.add_subplot(111)
 
-        #TODO make the method work for the different temperatures (23,24,25,26,27,28)
+        #TODO make the tabs change instantly not on second click
         #TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
         # Setting the properties of the line as lists to be used on a for loop depending on the year
@@ -720,11 +720,12 @@ class tmednet(tk.Frame):
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
             tab = {}
-            btn = tk.Button(self.toolbar, text=i, command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers, colors, lines, years, region)).pack(side=tk.LEFT,
-                                                                                               fill=tk.BOTH, expand=0)
+            btn = tk.Button(self.toolbar, text=i, command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers, colors, lines, years, region))
+            btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
             self.tabs[i] = tab
+        self.curtab = 23
         print('Ayo')
 
     def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region):
@@ -732,7 +733,7 @@ class tmednet(tk.Frame):
         print("curtab"+str(self.curtab))
         if self.curtab!= None and self.curtab != i and len(self.tabs)>1:
             # Plot the Thresholds here and clean the last one
-            self.clear_plots()
+            self.clear_plots(clear_thresholds=False)
             self.plot = self.fig.add_subplot(111)
             self.plot.set(ylim=(0, maxdepth))
             for year in years:
@@ -757,6 +758,7 @@ class tmednet(tk.Frame):
             self.canvas.draw()
 
         self.curtab = i
+        self.console_writer("Plotting for over " + str(i) + " degrees", "action")
 
 
     def thresholds_browser(self):
@@ -796,7 +798,7 @@ class tmednet(tk.Frame):
         except (AttributeError, TypeError):
             self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
 
-    def clear_plots(self):
+    def clear_plots(self, clear_thresholds=True):
         """
         Method: clear_plots(self)
         Purpose: Clear plot
@@ -823,6 +825,11 @@ class tmednet(tk.Frame):
         # if self.plotcb.axes():
         #  self.plotcb.clear()
         #  plt.Axes.remove(self.plotcb)
+        if clear_thresholds:
+            for tab in self.tabs:
+                self.tabs[tab]['btn'].destroy()
+            self.tabs = {}
+            self.curtab = None
         self.canvas.draw()
 
     def cut_endings(self):
