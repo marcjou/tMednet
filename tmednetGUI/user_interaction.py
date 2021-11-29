@@ -1,20 +1,17 @@
-import tkinter as tk
-from threading import Thread
-
-import file_writer as fw
-import tkinter.font as tkFont
-from tkinter import ttk
-from tkinter import *
-from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename, asksaveasfilename, askdirectory
-from tkinter import messagebox, Button
-from tkinter import scrolledtext
-from PIL import Image, ImageTk
-import pandas as pd
 import time
+import tkinter as tk
+import tkinter.font as tkFont
+from tkinter import *
+from tkinter import messagebox, Button
+from tkinter import ttk
+from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
 
-import file_manipulation as fm
 import matplotlib
 import numpy as np
+from PIL import Image, ImageTk
+
+import file_manipulation as fm
+import file_writer as fw
 
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
@@ -205,7 +202,6 @@ class tmednet(tk.Frame):
         self.tempdataold = []
         self.controlevent = False
 
-
     def console_writer(self, msg, mod, var=False, liner=False):
         """
                 Method: console_writer(self, msg, mod, var=False, liner=False)
@@ -309,7 +305,6 @@ class tmednet(tk.Frame):
         self.textBox.delete('1.0', END)
         self.consolescreen.delete('1.0', END)
         self.init_variables()
-
 
     def to_utc(self):
         """
@@ -659,7 +654,7 @@ class tmednet(tk.Frame):
         region = self.regioninput.get()
         self.newwindow.destroy()
         self.clear_plots()
-        excel_object = fw.Excel(historical, write_excel=False) #returns an excel object
+        excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
         df = excel_object.mydf3
 
         # Creates the subplots and deletes the old plot
@@ -668,8 +663,8 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
         self.plot = self.fig.add_subplot(111)
 
-        #TODO make the tabs change instantly not on second click
-        #TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
+
+        # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
         # Setting the properties of the line as lists to be used on a for loop depending on the year
         markers = ['+', 'o', 'x', 's', 'd', '^', 'v', 'p', 'h', '*']
@@ -681,7 +676,7 @@ class tmednet(tk.Frame):
         # We get all the years on the dataset
         years = df['year'].unique()
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
-        maxdepth = 0 # Used to set the lowest depth as the lowest point in the Y axis
+        maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
         temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
         year_dict = {}
         for year in years:
@@ -707,7 +702,6 @@ class tmednet(tk.Frame):
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
                                color=colors[3], linestyle=lines[3])
 
-
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
@@ -720,7 +714,9 @@ class tmednet(tk.Frame):
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
             tab = {}
-            btn = tk.Button(self.toolbar, text=i, command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers, colors, lines, years, region))
+            btn = tk.Button(self.toolbar, text=i,
+                            command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers,
+                                                                                 colors, lines, years, region))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -729,9 +725,23 @@ class tmednet(tk.Frame):
         print('Ayo')
 
     def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region):
+        """
+           Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
+           Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
+           Require:
+                i: Temperature to be plotted
+                maxdepth: The maximum depth to plot on the y-axis
+                year_dict: The dictionary with the data for all the years
+                markers: The dictionary of markers
+                colors: The dictionary of colors
+                lines: The dictionary of lines
+                years: A list with all the years on the data
+                region: The name of the region to be plotted to use as the title of the graph
+           Version: 11/2021, MJB: Documentation
+           """
         print(i)
-        print("curtab"+str(self.curtab))
-        if self.curtab!= None and self.curtab != i and len(self.tabs)>1:
+        print("curtab" + str(self.curtab))
+        if self.curtab != None and self.curtab != i and len(self.tabs) > 1:
             # Plot the Thresholds here and clean the last one
             self.clear_plots(clear_thresholds=False)
             self.plot = self.fig.add_subplot(111)
@@ -760,8 +770,13 @@ class tmednet(tk.Frame):
         self.curtab = i
         self.console_writer("Plotting for over " + str(i) + " degrees", "action")
 
-
     def thresholds_browser(self):
+        """
+            Method: thresholds_browser(self)
+            Purpose: Opens a new window to select the file to be opened as well as to write the name of the region
+            Require:
+            Version: 11/2021, MJB: Documentation
+          """
         self.newwindow = Toplevel()
         self.newwindow.title('Select historical file')
 
@@ -773,7 +788,6 @@ class tmednet(tk.Frame):
         self.regioninput = Entry(self.newwindow, width=20)
         self.regioninput.grid(row=1, column=1)
         actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=2, column=1)
-
 
     def go_back(self):
         """
@@ -950,11 +964,14 @@ class tmednet(tk.Frame):
         openfileLabel2 = Label(self.newwindow, text='New:').grid(row=1, pady=10)
         self.openfileinput2 = Entry(self.newwindow, width=20)
         self.openfileinput2.grid(row=1, column=1)
-        openfileBrowse2 = Button(self.newwindow, text='Browse', command=lambda: self.browse_file(True)).grid(row=1, column=2)
+        openfileBrowse2 = Button(self.newwindow, text='Browse', command=lambda: self.browse_file(True)).grid(row=1,
+                                                                                                             column=2)
         writefileLabel = Label(self.newwindow, text='Output file name:').grid(row=2, pady=10)
         self.writefileinput = Entry(self.newwindow, width=20)
         self.writefileinput.grid(row=2, column=1)
-        writefile = Button(self.newwindow, text='Write', command=lambda: self.call_merger(self.openfileinput.get(), self.openfileinput2.get(), self.writefileinput.get())).grid(row=2, column=2)
+        writefile = Button(self.newwindow, text='Write',
+                           command=lambda: self.call_merger(self.openfileinput.get(), self.openfileinput2.get(),
+                                                            self.writefileinput.get())).grid(row=2, column=2)
 
     def call_merger(self, filename1, filename2, output):
         """
