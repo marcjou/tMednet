@@ -184,6 +184,7 @@ class Excel:
 
     def main(self):
         for i in range(len(self.df)):
+
             if type(self.df['Date'][i]) != type('27/12/1995'):
                 pass
             elif i >= 1 and type(self.df['Date'][i - 1]) != type('27/12/1995'):
@@ -202,6 +203,7 @@ class Excel:
                             self.excel_setter()
                             self.txt_getter(year, month, i)
                     else:
+                        self.firstmonth = '00'
                         self.excel_setter2()
                         self.txt_getter(year, month, i)
                 else:
@@ -217,14 +219,13 @@ class Excel:
                     if month == self.firstmonth or month == datetime.strftime(
                             datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
                             '%m'):
-                        if month == '12':
-                            print('stop')
                         if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 1]:
                             self.txt_getter(year, month, i)
                         else:
                             self.excel_setter()
                             self.txt_getter(year, month, i)
                     else:
+                        self.firstmonth = '00'
                         self.excel_setter2()
                         self.txt_getter(year, month, i)
                 else:
@@ -357,6 +358,7 @@ class Excel:
                     self.monthly_getter(year, month, i)
 
                 else:
+                    self.firstmonth = '00'
                     self.monthly_setter()
                     self.monthly_getter(year, month, i)
             else:
@@ -368,13 +370,13 @@ class Excel:
                         '%m'):
                     self.monthly_getter(year, month, i)
                 else:
+                    self.firstmonth = '00'
                     self.monthly_setter()
                     self.monthly_getter(year, month, i)
             if i == len(self.df) - 1:
                 self.monthly_setter()
 
             print(str(i) + ' de ' + str(len(self.df)))
-        # TODO excel creation doesn't create a month 04??????
         self.monthlymeandf = pd.DataFrame(columns=['month', 'depth', 'mean'])
         monthlydict = {'month':0, 'depth':0, 'mean':0}
         self.mydf2.replace(0, np.nan, inplace=True)
