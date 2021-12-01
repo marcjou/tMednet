@@ -164,7 +164,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
-        self.right_menu.add_command(label="Plot Annual T Cycles", command=self.plot_annualTCycle)
+        self.right_menu.add_command(label="Plot Annual T Cycles", command=self.annualcycle_browser)
         self.right_menu.add_command(label="Plot Thresholds", command=self.thresholds_browser)
 
         self.list.bind("<Button-3>", self.do_popup)
@@ -623,8 +623,12 @@ class tmednet(tk.Frame):
         Require:
         Version: 09/2021, MJB: Documentation
         """
+        # Gets the historical data to calculate the multi-year mean and deletes the old plots
+        historical = self.openfileinput.get()
+        self.newwindow.destroy()
         self.clear_plots()
-
+        excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
+        histdf = excel_object.mydf3
         dfdelta = fm.running_average(self.mdata)
 
         # Creates the subplots and deletes the old plot
@@ -788,6 +792,22 @@ class tmednet(tk.Frame):
         self.regioninput = Entry(self.newwindow, width=20)
         self.regioninput.grid(row=1, column=1)
         actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=2, column=1)
+
+    def annualcycle_browser(self):
+        """
+            Method: annualcycle_browser(self)
+            Purpose: Opens a new window to select the file to be opened
+            Require:
+            Version: 11/2021, MJB: Documentation
+          """
+        self.newwindow = Toplevel()
+        self.newwindow.title('Select historical file')
+
+        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_annualTCycle).grid(row=1, column=1)
 
     def go_back(self):
         """

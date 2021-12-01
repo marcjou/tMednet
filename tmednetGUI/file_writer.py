@@ -9,7 +9,7 @@ from pandas import ExcelWriter
 
 class Excel:
 
-    def __init__(self, input_path, output_path='', write_excel=True):
+    def __init__(self, input_path, output_path='', write_excel=True, seasonal=True):
         self.df = pd.read_csv(input_path, '\t')
         self.n = 0
         self.total = {}
@@ -51,8 +51,10 @@ class Excel:
         self.firstyear = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%Y')
         if write_excel:
             self.excel_writer(output_path)
-        else:
+        elif seasonal:
             self.only_seasonal()
+        else:
+            self.multiyear_mean_calculator()
 
     def txt_getter(self, year, month, i):
         for column in self.df:
@@ -193,6 +195,7 @@ class Excel:
 
                     if month == self.firstmonth or month == datetime.strftime(
                             datetime.strptime(self.df['Date'][i - 2], '%d/%m/%Y'), '%m'):
+
                         if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 2]:
                             self.txt_getter(year, month, i)
                         else:
@@ -214,6 +217,8 @@ class Excel:
                     if month == self.firstmonth or month == datetime.strftime(
                             datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
                             '%m'):
+                        if month == '12':
+                            print('stop')
                         if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 1]:
                             self.txt_getter(year, month, i)
                         else:
@@ -304,6 +309,82 @@ class Excel:
                 self.calculate_seasonal()
 
             print(str(i) + ' de ' + str(len(self.df)))
+
+    def monthly_getter(self, year, month, i):
+        for column in self.df:
+            if column != 'Date' and column != 'Time':
+                self.appendict2[column]['year'] = year
+                self.appendict2[column]['month'] = month
+                if self.df[column][i] <= 0 or math.isnan(self.df[column][i]):
+                    pass
+                else:
+                    self.appendict2[column]['N'] = self.appendict2[column]['N'] + 1
+                self.appendict2[column]['depth(m)'] = column
+                self.total2[column].append(self.df[column][i])
+
+    def monthly_setter(self):
+        for column in self.df:
+            if column != 'Date' and column != 'Time':
+                # Appendict2 part
+                self.appendict2[column]['depth(m)'] = column
+                if self.appendict2[column]['N'] == 0:
+                    self.appendict2[column]['mean'] = 0
+                else:
+                    self.total2[column] = [np.nan if tot == 0 else tot for tot in self.total2[column]]
+                    self.appendict2[column]['mean'] = round(np.nanmean(self.total2[column]), 3)
+                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
+                    self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
+                    self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
+                    self.appendict2[column]['Ndays>=24'] = len([days for days in self.total2[column] if days >= 24])
+                    self.appendict2[column]['Ndays>=25'] = len([days for days in self.total2[column] if days >= 25])
+                    self.appendict2[column]['Ndays>=26'] = len([days for days in self.total2[column] if days >= 26])
+                self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
+                self.appendict2[column]['N'] = 0
+                self.total2[column] = []
+
+    def multiyear_mean_calculator(self):
+        #Calculates the multiyear mean for the annual t-cycles plot
+        for i in range(len(self.df)):
+            if type(self.df['Date'][i]) != type('27/12/1995'):
+                pass
+            elif i >= 1 and type(self.df['Date'][i - 1]) != type('27/12/1995'):
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+
+                if month == self.firstmonth or month == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 2], '%d/%m/%Y'), '%m'):
+
+                    self.monthly_getter(year, month, i)
+
+                else:
+                    self.monthly_setter()
+                    self.monthly_getter(year, month, i)
+            else:
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+
+                if month == self.firstmonth or month == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
+                        '%m'):
+                    self.monthly_getter(year, month, i)
+                else:
+                    self.monthly_setter()
+                    self.monthly_getter(year, month, i)
+            if i == len(self.df) - 1:
+                self.monthly_setter()
+
+            print(str(i) + ' de ' + str(len(self.df)))
+        # TODO excel creation doesn't create a month 04??????
+        self.monthlymeandf = pd.DataFrame(columns=['month', 'depth', 'mean'])
+        monthlydict = {'month':0, 'depth':0, 'mean':0}
+        self.mydf2.replace(0, np.nan, inplace=True)
+        for month in self.mydf2['month'].unique():
+            for depth in self.mydf2['depth(m)'].unique():
+                monthlydict['month'] = month
+                monthlydict['depth'] = depth
+                monthlydict['mean'] = np.nanmean(self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
+                self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)
+
 
 
 def big_merge(filename1, filename2, output):
