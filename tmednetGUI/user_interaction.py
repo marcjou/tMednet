@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 import tkinter as tk
 import tkinter.font as tkFont
@@ -627,10 +628,30 @@ class tmednet(tk.Frame):
         historical = self.openfileinput.get()
         self.newwindow.destroy()
         self.clear_plots()
+
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
-        histdf = excel_object.mydf3
+        histdf = excel_object.monthlymeandf
+
         dfdelta = fm.running_average(self.mdata)
 
+        #TODO change the month in the histdf so to change it from a string to a plottable sorted datetime
+
+        # Dict to change from string months to datetime
+
+        monthDict = {}
+        for i in range(1, 13):
+            if i < 10:
+                monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',
+                                                          '%Y-%m-%d')
+            else:
+                monthDict[str(i)] = datetime.strptime(
+                    datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
+                '%Y-%m-%d')
+
+        for month in histdf['month'].unique():
+            histdf['month'].replace(month, monthDict[month], inplace=True)
+        for depth in histdf['depth'].unique():
+            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot)
         # Creates the subplots and deletes the old plot
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)

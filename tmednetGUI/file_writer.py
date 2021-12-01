@@ -387,8 +387,6 @@ class Excel:
                 monthlydict['mean'] = np.nanmean(self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
                 self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)
 
-
-
 def big_merge(filename1, filename2, output):
     df1 = pd.read_csv(filename1, '\t')
     df2 = pd.read_csv(filename2, sep="\s+", skiprows=6)
