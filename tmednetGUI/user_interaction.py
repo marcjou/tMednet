@@ -648,20 +648,34 @@ class tmednet(tk.Frame):
                     datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
                 '%Y-%m-%d')
 
-        for month in histdf['month'].unique():
-            histdf['month'].replace(month, monthDict[month], inplace=True)
-        for depth in histdf['depth'].unique():
-            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot)
+
         # Creates the subplots and deletes the old plot
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
 
         self.plot = self.fig.add_subplot(111)
+
+        for month in histdf['month'].unique():
+            histdf['month'].replace(month, monthDict[month], inplace=True)
+        usedf = histdf.copy()
+        usedf.set_index('month', inplace=True)
+        usedf.sort_index(inplace=True)
+        oldepth = 0
+        for depth in usedf['depth'].unique():
+            if oldepth != 0:
+                self.plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
+                                       usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
+            oldepth = depth
+
+        for depth in histdf['depth'].unique():
+            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white', legend=False)
+
+
         dfdelta.plot(ax=self.plot)
         self.plot.set(ylabel='Temperature (DEG C)',
                       title='Annual T Cycles')
-
+        self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
         self.plot.legend()
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
