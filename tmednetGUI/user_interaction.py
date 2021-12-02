@@ -7,6 +7,7 @@ from tkinter import messagebox, Button
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
 
+import pandas as pd
 import matplotlib
 import numpy as np
 from PIL import Image, ImageTk
@@ -632,9 +633,26 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        dfdelta = fm.running_average(self.mdata)
+        dfdelta = fm.running_average(self.mdata, running=360)
 
-        #TODO change the month in the histdf so to change it from a string to a plottable sorted datetime
+        # All this block serves only to transform the data from hourly to daily. It shoul be inside its own method
+        daylist = []
+        for time in dfdelta.index:
+            old = datetime.strftime(time, '%Y-%m-%d')
+            new = datetime.strptime(old, '%Y-%m-%d')
+            daylist.append(new)
+        dfdelta['day'] = daylist
+        newdf = None
+        for depth in dfdelta.columns:
+            if depth != 'day':
+                if newdf is not None:
+                    newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
+                else:
+                    newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
+
+        # BLOCK ENDS HERE!!!!!!!
+
+        #TODO Why the filter does not look the same? ASk Nathaniel
 
         # Dict to change from string months to datetime
 
@@ -672,11 +690,11 @@ class tmednet(tk.Frame):
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white', legend=False)
 
 
-        dfdelta.plot(ax=self.plot)
+        newdf.plot(ax=self.plot)
         self.plot.set(ylabel='Temperature (DEG C)',
                       title='Annual T Cycles')
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
-        self.plot.legend()
+        # self.plot.legend()
 
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
