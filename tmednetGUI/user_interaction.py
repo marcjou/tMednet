@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import time
 import tkinter as tk
@@ -547,6 +548,8 @@ class tmednet(tk.Frame):
         Require:
         Version: 05/2021, MJB: Documentation
         """
+
+        #TODO FOR CPS the filter plots in blank
         self.clear_plots()
         depths = ""
         try:
@@ -625,6 +628,8 @@ class tmednet(tk.Frame):
         Require:
         Version: 09/2021, MJB: Documentation
         """
+
+        # TODO for the CPS only plots the multiyear not the dfdelta
         # Gets the historical data to calculate the multi-year mean and deletes the old plots
         historical = self.openfileinput.get()
         self.newwindow.destroy()
@@ -706,7 +711,7 @@ class tmednet(tk.Frame):
        Require:
        Version: 11/2021, MJB: Documentation
        """
-
+        # TODO FIX the X axis so it always shows roughly the same
         historical = self.openfileinput.get()
         region = self.regioninput.get()
         self.newwindow.destroy()

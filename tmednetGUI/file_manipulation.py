@@ -313,7 +313,7 @@ def df_to_txt(df, data, SN):
         SN: The serial number list
     Version: 05/2021, MJB: Documentation
     """
-    print('writing txt')  # TODO Create progress bar
+    print('writing txt')  # TODO Change merged.txt for a real filename
     with open('../src/output_files/merged.txt', 'w') as f:
         f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
         f.write('\n# Site: ' + str(data['region']))
@@ -471,8 +471,9 @@ def running_average(data, running=240):
             longest = len(data[u]['time'])
             indi = u
     for depth in depths:
-        series1 = pd.DataFrame(uniform_filter1d(df[str(depth)], size=running),
-                               index=data[indi]['time'], columns=[str(depth)])
+        # Cambiado entre otros index del data al dropna
+        series1 = pd.DataFrame(uniform_filter1d(df[str(depth)].dropna(), size=running),
+                               index=df[str(depth)].dropna().index, columns=[str(depth)]).reindex(data[indi]['time'])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
