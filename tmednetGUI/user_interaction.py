@@ -739,6 +739,7 @@ class tmednet(tk.Frame):
         years = df['year'].unique()
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
+        maxdays = 0   # Used to set the maximum number of days to point in the X axis
         temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
         year_dict = {}
         for year in years:
@@ -748,9 +749,12 @@ class tmednet(tk.Frame):
                 yearly_plot = yearly_plot.astype(int)
                 if yearly_plot[-1, -1] > maxdepth:
                     maxdepth = yearly_plot[-1, -1]
+                if np.max(yearly_plot[:, 0]) > maxdays:
+                    maxdays = np.max(yearly_plot[:, 0])
                 temperatures[i] = np.copy(yearly_plot)
             year_dict[year] = temperatures.copy()
             self.plot.set(ylim=(0, maxdepth))
+            self.plot.set(xlim=(0, maxdays))
             if int(year) < 2000:
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
                                , color=colors[0], linestyle=lines[0])
@@ -777,8 +781,8 @@ class tmednet(tk.Frame):
         for i in range(23, 29):
             tab = {}
             btn = tk.Button(self.toolbar, text=i,
-                            command=lambda i=i, maxdepth=maxdepth: self.raiseTab(i, maxdepth, year_dict, markers,
-                                                                                 colors, lines, years, region))
+                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth, year_dict, markers,
+                                                                                 colors, lines, years, region, maxdays))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -786,7 +790,7 @@ class tmednet(tk.Frame):
         self.curtab = 23
         print('Ayo')
 
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region):
+    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region, maxdays):
         """
            Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
            Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
@@ -808,6 +812,7 @@ class tmednet(tk.Frame):
             self.clear_plots(clear_thresholds=False)
             self.plot = self.fig.add_subplot(111)
             self.plot.set(ylim=(0, maxdepth))
+            self.plot.set(xlim=(0, maxdays))
             for year in years:
                 if int(year) < 2000:
                     self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 1990]
