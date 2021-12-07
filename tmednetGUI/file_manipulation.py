@@ -443,8 +443,10 @@ def apply_uniform_filter(data):
             longest = len(data[u]['time'])
             indi = u
     for depth in depths[:-1]:
-        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
-                               index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
+        series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])].dropna(), size=240),
+                               index=df[str(depth) + "-" + str(depths[i])].dropna().index, columns=[str(depth) + "-" + str(depths[i])]).reindex(data[indi]['time'])
+        #series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
+        #                       index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)

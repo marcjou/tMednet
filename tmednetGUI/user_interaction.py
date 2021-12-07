@@ -549,7 +549,6 @@ class tmednet(tk.Frame):
         Version: 05/2021, MJB: Documentation
         """
 
-        #TODO FOR CPS the filter plots in blank
         self.clear_plots()
         depths = ""
         try:
@@ -629,7 +628,6 @@ class tmednet(tk.Frame):
         Version: 09/2021, MJB: Documentation
         """
 
-        # TODO for the CPS only plots the multiyear not the dfdelta
         # Gets the historical data to calculate the multi-year mean and deletes the old plots
         historical = self.openfileinput.get()
         self.newwindow.destroy()
@@ -640,7 +638,7 @@ class tmednet(tk.Frame):
 
         dfdelta = fm.running_average(self.mdata, running=360)
 
-        # All this block serves only to transform the data from hourly to daily. It shoul be inside its own method
+        # All this block serves only to transform the data from hourly to daily. It should be inside its own method
         daylist = []
         for time in dfdelta.index:
             old = datetime.strftime(time, '%Y-%m-%d')
@@ -711,7 +709,6 @@ class tmednet(tk.Frame):
        Require:
        Version: 11/2021, MJB: Documentation
        """
-        # TODO FIX the X axis so it always shows roughly the same
         historical = self.openfileinput.get()
         region = self.regioninput.get()
         self.newwindow.destroy()
