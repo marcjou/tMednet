@@ -32,8 +32,13 @@ class Excel:
         self.appendict3 = {}
         self.df = self.df.fillna(0)
 
+        self.dailymeans = {}
+        self.seasonalmeans = {}
+
         for column in self.df:
             if column != 'Date' and column != 'Time':
+                self.dailymeans[column] = []
+                self.seasonalmeans[column] = []
                 self.total[column] = []
                 self.total2[column] = []
                 self.total3[column] = []
@@ -81,7 +86,7 @@ class Excel:
                 self.total[column].append(self.df[column][i])
                 self.total2[column].append(self.df[column][i])
 
-    def excel_setter(self):
+    def excel_setter(self, month):
         for column in self.df:
             if column != 'Date' and column != 'Time':
                 self.appendict[column]['depth(m)'] = column
@@ -93,6 +98,11 @@ class Excel:
                     self.appendict[column]['std'] = round(stdev(self.total[column]), 3)
                     self.appendict[column]['max'] = round(max(self.total[column]), 3)
                     self.appendict[column]['min'] = round(min(self.total[column]), 3)
+
+                    self.dailymeans[column].append(round(np.nanmean(self.total[column]), 3))
+                    if month == '07' or month == '08' or month == '09':
+                        self.seasonalmeans[column].append(round(np.nanmean(self.total[column]), 3))
+
                 self.mydf = self.mydf.append(self.appendict[column], ignore_index=True)
                 self.appendict[column]['N'] = 0
                 self.total[column] = []
@@ -100,19 +110,6 @@ class Excel:
     def excel_setter2(self):
         for column in self.df:
             if column != 'Date' and column != 'Time':
-                # Appendict1 part
-                self.appendict[column]['depth(m)'] = column
-                if self.appendict[column]['N'] == 0:
-                    self.appendict[column]['mean'] = 0
-                else:
-                    self.total[column] = [np.nan if tot == 0 else tot for tot in self.total[column]]
-                    self.appendict[column]['mean'] = round(np.nanmean(self.total[column]), 3)
-                    self.appendict[column]['std'] = round(stdev(self.total[column]), 3)
-                    self.appendict[column]['max'] = round(max(self.total[column]), 3)
-                    self.appendict[column]['min'] = round(min(self.total[column]), 3)
-                self.mydf = self.mydf.append(self.appendict[column], ignore_index=True)
-                self.appendict[column]['N'] = 0
-                self.total[column] = []
                 # Appendict2 part
                 self.appendict2[column]['depth(m)'] = column
                 if self.appendict2[column]['N'] == 0:
@@ -123,45 +120,17 @@ class Excel:
                     self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
                     self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
                     self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
-                    self.appendict2[column]['Ndays>=24'] = len([days for days in self.total2[column] if days >= 24])
-                    self.appendict2[column]['Ndays>=25'] = len([days for days in self.total2[column] if days >= 25])
-                    self.appendict2[column]['Ndays>=26'] = len([days for days in self.total2[column] if days >= 26])
+                    self.appendict2[column]['Ndays>=24'] = len([days for days in self.dailymeans[column] if days >= 24])
+                    self.appendict2[column]['Ndays>=25'] = len([days for days in self.dailymeans[column] if days >= 25])
+                    self.appendict2[column]['Ndays>=26'] = len([days for days in self.dailymeans[column] if days >= 26])
                 self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
                 self.appendict2[column]['N'] = 0
                 self.total2[column] = []
+                self.dailymeans[column] = []
 
     def excel_setter3(self):
         for column in self.df:
             if column != 'Date' and column != 'Time':
-                # Appendict1 part
-                self.appendict[column]['depth(m)'] = column
-                if self.appendict[column]['N'] == 0:
-                    self.appendict[column]['mean'] = 0
-                else:
-                    self.total[column] = [np.nan if tot == 0 else tot for tot in self.total[column]]
-                    self.appendict[column]['mean'] = round(np.nanmean(self.total[column]), 3)
-                    self.appendict[column]['std'] = round(stdev(self.total[column]), 3)
-                    self.appendict[column]['max'] = round(max(self.total[column]), 3)
-                    self.appendict[column]['min'] = round(min(self.total[column]), 3)
-                self.mydf = self.mydf.append(self.appendict[column], ignore_index=True)
-                self.appendict[column]['N'] = 0
-                self.total[column] = []
-                # Appendict2 part
-                self.appendict2[column]['depth(m)'] = column
-                if self.appendict2[column]['N'] == 0:
-                    self.appendict2[column]['mean'] = 0
-                else:
-                    self.total2[column] = [np.nan if tot == 0 else tot for tot in self.total2[column]]
-                    self.appendict2[column]['mean'] = round(np.nanmean(self.total2[column]), 3)
-                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
-                    self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
-                    self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
-                    self.appendict2[column]['Ndays>=24'] = len([days for days in self.total2[column] if days >= 24])
-                    self.appendict2[column]['Ndays>=25'] = len([days for days in self.total2[column] if days >= 25])
-                    self.appendict2[column]['Ndays>=26'] = len([days for days in self.total2[column] if days >= 26])
-                self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
-                self.appendict2[column]['N'] = 0
-                self.total2[column] = []
                 # Appendict3 part
                 self.appendict3[column]['depth(m)'] = column
                 if self.appendict3[column]['N'] == 0:
@@ -172,15 +141,16 @@ class Excel:
                     self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
-                    self.appendict3[column]['Ndays>=23'] = len([days for days in self.total3[column] if days >= 23])
-                    self.appendict3[column]['Ndays>=24'] = len([days for days in self.total3[column] if days >= 24])
-                    self.appendict3[column]['Ndays>=25'] = len([days for days in self.total3[column] if days >= 25])
-                    self.appendict3[column]['Ndays>=26'] = len([days for days in self.total3[column] if days >= 26])
-                    self.appendict3[column]['Ndays>=27'] = len([days for days in self.total3[column] if days >= 27])
-                    self.appendict3[column]['Ndays>=28'] = len([days for days in self.total3[column] if days >= 28])
+                    self.appendict3[column]['Ndays>=23'] = len([days for days in self.seasonalmeans[column] if days >= 23])
+                    self.appendict3[column]['Ndays>=24'] = len([days for days in self.seasonalmeans[column] if days >= 24])
+                    self.appendict3[column]['Ndays>=25'] = len([days for days in self.seasonalmeans[column] if days >= 25])
+                    self.appendict3[column]['Ndays>=26'] = len([days for days in self.seasonalmeans[column] if days >= 26])
+                    self.appendict3[column]['Ndays>=27'] = len([days for days in self.seasonalmeans[column] if days >= 27])
+                    self.appendict3[column]['Ndays>=28'] = len([days for days in self.seasonalmeans[column] if days >= 28])
                 self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
+                self.seasonalmeans[column] = []
 
     def main(self):
         for i in range(len(self.df)):
@@ -200,14 +170,17 @@ class Excel:
                         if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 2]:
                             self.txt_getter(year, month, i)
                         else:
-                            self.excel_setter()
+                            self.excel_setter(month)
                             self.txt_getter(year, month, i)
                     else:
                         self.firstmonth = '00'
+                        self.excel_setter(month)
                         self.excel_setter2()
                         self.txt_getter(year, month, i)
                 else:
-                    self.excel_setter3()
+                    self.excel_setter(month)
+                    self.excel_setter2()
+                    self.excel_setter()
                     self.txt_getter(year, month, i)
             else:
                 year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
@@ -222,16 +195,21 @@ class Excel:
                         if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 1]:
                             self.txt_getter(year, month, i)
                         else:
-                            self.excel_setter()
+                            self.excel_setter(month)
                             self.txt_getter(year, month, i)
                     else:
                         self.firstmonth = '00'
+                        self.excel_setter(month)
                         self.excel_setter2()
                         self.txt_getter(year, month, i)
                 else:
+                    self.excel_setter(month)
+                    self.excel_setter2()
                     self.excel_setter3()
                     self.txt_getter(year, month, i)
             if i == len(self.df) - 1:
+                self.excel_setter(month)
+                self.excel_setter2()
                 self.excel_setter3()
 
             print(str(i) + ' de ' + str(len(self.df)))
