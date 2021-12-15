@@ -313,8 +313,8 @@ def df_to_txt(df, data, SN):
         SN: The serial number list
     Version: 05/2021, MJB: Documentation
     """
-    print('writing txt')  # TODO Change merged.txt for a real filename
-    with open('../src/output_files/merged.txt', 'w') as f:
+    print('writing txt')
+    with open('../src/output_files/' + str(data['region']) + '_' + data['datainici'].strftime('%Y-%m-%d') + '_' + data['datafin'].strftime('%Y-%m-%d')+'_merged.txt', 'w') as f:
         f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
         f.write('\n# Site: ' + str(data['region']))
         f.write('\n# Start time: ' + data['datainici'].strftime('%Y-%m-%d, %H:%M:%S'))
