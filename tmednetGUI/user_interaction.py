@@ -10,6 +10,7 @@ from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilen
 
 import pandas as pd
 import matplotlib
+import matplotlib.dates as mdates
 import numpy as np
 from PIL import Image, ImageTk
 
@@ -656,6 +657,7 @@ class tmednet(tk.Frame):
         # BLOCK ENDS HERE!!!!!!!
 
         #TODO Why the filter does not look the same? ASk Nathaniel
+        #TODO change the x axis to reflect the name of the month
 
         # Dict to change from string months to datetime
 
@@ -676,6 +678,8 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
 
         self.plot = self.fig.add_subplot(111)
+
+
 
         for month in histdf['month'].unique():
             histdf['month'].replace(month, monthDict[month], inplace=True)
@@ -699,7 +703,12 @@ class tmednet(tk.Frame):
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
         # self.plot.legend()
 
-        # fig.set_size_inches(14.5, 10.5, forward=True)
+        #Sets the X axis as the initials of the months
+        locator = mdates.MonthLocator()
+        self.plot.xaxis.set_major_locator(locator)
+        fmt = mdates.DateFormatter('%b')
+        self.plot.xaxis.set_major_formatter(fmt)
+                # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
     def plot_thresholds(self):
