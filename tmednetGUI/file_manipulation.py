@@ -10,6 +10,7 @@ import numpy as np
 from scipy.ndimage.filters import uniform_filter1d
 import json
 import user_interaction
+from fpdf import FPDF
 
 
 def load_coordinates(region):
