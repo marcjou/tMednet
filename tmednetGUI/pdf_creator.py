@@ -1,6 +1,10 @@
 from fpdf import FPDF
 import numpy as np
 
+# PDF dimensions on A4
+pdf_w = 210
+pdf_h = 297
+
 class PDF(FPDF):
 
 
@@ -30,11 +34,11 @@ class PDF(FPDF):
         self.write(10, text)
 
 
-def pdf_starter():
 
-    # PDF dimensions on A4
-    pdf_w=210
-    pdf_h=297
+
+
+
+def pdf_starter():
     pdf = PDF()
     pdf.add_page()
     return pdf
