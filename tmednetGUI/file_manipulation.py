@@ -206,7 +206,11 @@ def report(args, textbox):
         textbox.insert("end", "=========\n")
     with open('../src/output_files/report.txt', 'w') as fr:
         text = textbox.get('1.0', 'end').splitlines()
+        n = 0
         for line in text:
+            if n == 0:
+                pdf.text('Loaded Files:\n', True)
+                n = 1
             fr.write(line + "\n")
             pdf.text(line + "\n")
         pdf.output('test2.pdf', 'F')

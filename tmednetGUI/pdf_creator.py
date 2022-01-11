@@ -22,8 +22,9 @@ class PDF(FPDF):
         self.cell(w=210.0, h=20.0, align='C', txt="WATASHIWA PDF DESU", border=0)
 
     # Method to set text
-    def text(self, text):
-        self.set_y(self.get_y() + 14)
+    def text(self, text, afterTitle=False):
+        if afterTitle:
+            self.set_y(self.get_y() + 14)
         self.set_font('Arial', '', 12)
         self.set_text_color(0, 0, 0)
         self.write(10, text)
