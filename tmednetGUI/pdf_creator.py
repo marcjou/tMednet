@@ -29,17 +29,22 @@ class PDF(FPDF):
         self.write(10, text)
 
 
-# PDF dimensions on A4
-pdf_w=210
-pdf_h=297
+def pdf_starter():
 
-pdf = PDF()
+    # PDF dimensions on A4
+    pdf_w=210
+    pdf_h=297
+    pdf = PDF()
+    pdf.add_page()
+    return pdf
 
-pdf.add_page()
+
 #pdf.lines()
 #pdf.imagex(40.0, 25.0)
+'''
 pdf.titles()
 pdf.text('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dapibus mi auctor egestas aliquet. Aliquam erat volutpat. Donec luctus, arcu posuere commodo iaculis, tortor dui rhoncus velit, at ultricies augue dolor vitae risus. Curabitur pellentesque, quam fermentum luctus pulvinar, nisl massa vestibulum libero, id lacinia elit urna nec purus. Proin ut dignissim nunc. Duis vitae eleifend diam. Quisque vel mi nec orci lacinia accumsan at sed justo. Pellentesque ac ligula sed quam pretium mattis. Cras a euismod purus, et ultricies nunc. Nunc sit amet dolor neque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nunc consectetur facilisis est a pretium. Donec nec finibus ligula. Curabitur eu neque vitae velit tempus tempor sed ac sapien. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. ')
 pdf.text('\ncacatua 27')
 pdf.set_author('Marc Jou')
 pdf.output('test.pdf', 'F')
+'''

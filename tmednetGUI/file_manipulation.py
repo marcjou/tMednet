@@ -11,6 +11,7 @@ from scipy.ndimage.filters import uniform_filter1d
 import json
 import user_interaction
 from fpdf import FPDF
+import pdf_creator
 
 
 def load_coordinates(region):
@@ -184,6 +185,10 @@ def report(args, textbox):
     Version: 01/2021, EGL: Documentation
     """
     textbox.delete(1.0, "end")
+
+    # Creating the same report as a PDF
+    pdf = pdf_creator.pdf_starter()
+
     for item in args.mdata:
         daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
         cadena = "=========\n"
@@ -203,6 +208,11 @@ def report(args, textbox):
         text = textbox.get('1.0', 'end').splitlines()
         for line in text:
             fr.write(line + "\n")
+            pdf.text(line + "\n")
+        pdf.output('test2.pdf', 'F')
+
+
+
 
 
 def openfile(args, files, consolescreen):
