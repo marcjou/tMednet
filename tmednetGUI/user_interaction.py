@@ -983,6 +983,7 @@ class tmednet(tk.Frame):
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if file:
                 self.fig.savefig(file)
+                self.mdata[0]['images'].append(file) #Stores the path of the created images to print them on the report
                 self.console_writer('Saving plot in: ', 'action', file, True)
         except (AttributeError, UnboundLocalError, IndexError):
             self.console_writer('Error, couldn\'t find a plot to save', 'warning')

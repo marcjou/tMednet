@@ -49,7 +49,7 @@ def load_data(args, consolescreen):
                      "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
                      "latitude": lat, "longitude": lon,
                      "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
-                     "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H')}
+                     "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H'), 'images': []}
 
             print("file", filein)
             consolescreen.insert("end", "file ")
@@ -185,8 +185,8 @@ def report(args, textbox):
     Version: 01/2021, EGL: Documentation
     """
     textbox.delete(1.0, "end")
-
-    # Creating the same report as a PDF
+    #TODO find a way to send the name of the image files generated to the PDF creator
+    #Creating the same report as a PDF
     pdf = pdf_creator.pdf_starter()
     #Dict to store the PDF metadata
     PDF_DATA = {'Date Data Upload': 0, 'Date data ingestion report': datetime.strftime(datetime.today(), '%Y-%m-%d'),
@@ -223,6 +223,8 @@ def report(args, textbox):
             pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n', True)
             n = 1
         pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n')
+    for images in args.mdata[0]['images']:
+        pdf.imagex(images)
     pdf.output('test2.pdf', 'F')
 
 

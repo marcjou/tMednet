@@ -14,9 +14,9 @@ class PDF(FPDF):
         self.line(0, pdf_h / 2, 210, pdf_h / 2)
 
     # Method to add images to the pdf
-    def imagex(self, x, y):
-        self.set_xy(x, y)
-        self.image('../src/output_images/5_20210730-15_20211017-14 Hovmoller.png', link='', type='', w=170.0, h=95.5)
+    def imagex(self, image):
+        self.set_xy(self.get_x(), self.get_y() + 5)
+        self.image(image, link='', type='', w=170.0, h=95.5)
 
     # Method to set titles
     def titles(self):
