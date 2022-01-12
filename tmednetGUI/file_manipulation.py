@@ -189,10 +189,11 @@ def report(args, textbox):
     # Creating the same report as a PDF
     pdf = pdf_creator.pdf_starter()
     #Dict to store the PDF metadata
-    PDF_DATA = {'date_upload': 0, 'date_process': datetime.strftime(datetime.today(), '%Y-%m-%d'), 'site': 0,
-                'depth': [], 'interval': '1:00:00', 'parameter': 'Seawater Temperature in ºC',
-                'initial': args.mdata[0]["datainici"].isoformat(), 'final': args.mdata[0]["datafin"].isoformat(),
-                'GMT': args.mdata[0]["GMT"], 'sensor': 0, 'data': 0}
+    PDF_DATA = {'Date Data Upload': 0, 'Date data ingestion report': datetime.strftime(datetime.today(), '%Y-%m-%d'),
+                'Site': args.mdata[0]['region'], 'Sampling depth (m)': [], 'Sampling interval': '1:00:00',
+                'Parameter': 'Seawater Temperature in ºC', 'Recording Start Date': args.mdata[0]["datainici"].isoformat(),
+                'Recording End Date': args.mdata[0]["datafin"].isoformat(), 'GMT': args.mdata[0]["GMT"], 'Sensors': [],
+                'Data': []}
 
     for item in args.mdata:
         daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
@@ -205,6 +206,9 @@ def report(args, textbox):
         cadena += "DInit: " + item["timegmt"][0].isoformat() + "\n"
         cadena += "DEnd: " + item["timegmt"][-1].isoformat() + "\n"
         textbox.insert("end", cadena)
+        PDF_DATA['Sampling depth (m)'].append(item['depth'])
+        PDF_DATA['Sensors'].append(item['S/N'])
+        PDF_DATA['Data'].append(sum(map(lambda x : x != 999, item['temp'])))
     textbox.insert("end", "=========\n")
     for text in args.reportlogger:
         textbox.insert("end", text + "\n")
