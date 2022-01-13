@@ -185,7 +185,7 @@ def report(args, textbox):
     Version: 01/2021, EGL: Documentation
     """
     textbox.delete(1.0, "end")
-    #TODO find a way to send the name of the image files generated to the PDF creator
+    #TODO format the PDF file to make it more "elegant"
     #Creating the same report as a PDF
     pdf = pdf_creator.pdf_starter()
     #Dict to store the PDF metadata
@@ -218,13 +218,23 @@ def report(args, textbox):
         for line in text:
             fr.write(line + "\n")
     n = 0
+    pdf.titles('Metadata')
     for key in PDF_DATA:
         if n == 0:
             pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n', True)
             n = 1
-        pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n')
-    for images in args.mdata[0]['images']:
-        pdf.imagex(images)
+        else:
+            pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n')
+    if args.mdata[0]['images'] != []:
+        pdf.titles('Images results')
+        pdf.text('Invisible', color='White')
+        n = 0
+        for images in args.mdata[0]['images']:
+            if n == 0:
+                pdf.imagex(images, True)
+                n = 1
+            else:
+                pdf.imagex(images)
     pdf.output('test2.pdf', 'F')
 
 

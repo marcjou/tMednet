@@ -14,23 +14,29 @@ class PDF(FPDF):
         self.line(0, pdf_h / 2, 210, pdf_h / 2)
 
     # Method to add images to the pdf
-    def imagex(self, image):
-        self.set_xy(self.get_x(), self.get_y() + 5)
+    def imagex(self, image, afterTitle=False):
+        if afterTitle:
+            self.set_xy(self.get_x(), self.get_y() + 14)
+        else:
+            self.set_xy(self.get_x(), self.get_y() + 5)
         self.image(image, link='', type='', w=170.0, h=95.5)
 
     # Method to set titles
-    def titles(self):
-        self.set_xy(0.0, 0.0)
+    def titles(self, title):
+        self.set_xy(self.get_x(), self.get_y() + 5)
         self.set_font('Arial', 'B', 16)
         self.set_text_color(220, 50, 50)
-        self.cell(w=210.0, h=20.0, align='C', txt="WATASHIWA PDF DESU", border=0)
+        self.cell(w=210.0, h=20.0, align='C', txt=title, border=0)
 
     # Method to set text
-    def text(self, text, afterTitle=False):
+    def text(self, text, afterTitle=False, color='Black'):
         if afterTitle:
             self.set_y(self.get_y() + 14)
         self.set_font('Arial', '', 12)
-        self.set_text_color(0, 0, 0)
+        if color == 'Black':
+            self.set_text_color(0, 0, 0)
+        elif color == 'White':
+            self.set_text_color(250,250,250)
         self.write(10, text)
 
 
