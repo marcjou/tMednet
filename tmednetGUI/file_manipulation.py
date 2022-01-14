@@ -235,6 +235,13 @@ def report(args, textbox):
                 n = 1
             else:
                 pdf.imagex(images)
+    pdf.titles('Other info')
+    n = 0
+    for text in args.reportlogger:
+        if n == 0:
+            pdf.text(text, afterTitle=True)
+        else:
+            pdf.text(text)
     pdf.output('test2.pdf', 'F')
 
 
