@@ -349,13 +349,13 @@ class tmednet(tk.Frame):
                                                         np.array(self.mdata[index]['temp']))
         if self.plot.axes:
             # self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['timegmt'], masked_ending_temperatures,
+            self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
                           title='Multiple depths at Region: ' + str(self.mdata[index]['region']))
         else:
             self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['timegmt'], masked_ending_temperatures,
+            self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
                           title=self.files[index] + "\n" + 'Depth:' + str(
@@ -633,6 +633,7 @@ class tmednet(tk.Frame):
         historical = self.openfileinput.get()
         self.newwindow.destroy()
         self.clear_plots()
+        self.counter.append("Cycles")
 
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
@@ -722,6 +723,7 @@ class tmednet(tk.Frame):
         region = self.regioninput.get()
         self.newwindow.destroy()
         self.clear_plots()
+        self.counter.append("Thresholds")
         excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
         df = excel_object.mydf3
 
@@ -969,6 +971,10 @@ class tmednet(tk.Frame):
             if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
                 if self.counter[0] == "Hovmoller":
                     filename = str(self.value[:-7]) + " Hovmoller"
+                elif self.counter[0] == 'Cycles':
+                    filename = str(self.value[:-7]) + " Annual T-Cycles"
+                elif self.counter[0] == 'Thresholds':
+                    filename = str(self.value[:-7]) + " Thresholds"
                 else:
                     filename = self.value[:-4]
             if len(self.counter) > 1:

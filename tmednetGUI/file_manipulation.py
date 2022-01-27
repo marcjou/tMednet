@@ -26,7 +26,8 @@ def load_coordinates(region):
         data = json.load(f)
     lat = float(data['stations'][str(region)]['lat'])
     lon = float(data['stations'][str(region)]['long'])
-    return lat, lon
+    name = data['stations'][str(region)]['site_name']
+    return lat, lon, name
 
 
 def load_data(args, consolescreen):
@@ -43,11 +44,11 @@ def load_data(args, consolescreen):
                      len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
             filein = args.path + ifile
 
-            lat, lon = load_coordinates(int(ifile.split('_')[0]))
+            lat, lon, site_name = load_coordinates(int(ifile.split('_')[0]))
             # Extraemos campos del nombre del fichero
             datos = {"timegmt": [], "time": [], "temp": [], "S/N": "", "GMT": "",
                      "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
-                     "latitude": lat, "longitude": lon,
+                     'region_name': site_name, "latitude": lat, "longitude": lon,
                      "datainici": datetime.strptime(ifile.split("_")[1], '%Y%m%d-%H'),
                      "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H'), 'images': []}
 
@@ -78,7 +79,7 @@ def load_data(args, consolescreen):
             igm = '_'.join(good[0]).find("GMT")
             gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
-            datos['S/N'] = good[0][good[0].index('S/N:') + 1]
+            datos['S/N'] = int(re.sub('\D', '', good[0][good[0].index('S/N:') + 1]))
             args.mdata.append(datos)
             args.tempdataold.append(datos.copy())
         # check_hour_interval(args.mdata)
@@ -190,10 +191,15 @@ def report(args, textbox):
     pdf = pdf_creator.pdf_starter()
     #Dict to store the PDF metadata
     PDF_DATA = {'Date Data Upload': 0, 'Date data ingestion report': datetime.strftime(datetime.today(), '%Y-%m-%d'),
-                'Site': args.mdata[0]['region'], 'Sampling depth (m)': [], 'Sampling interval': '1:00:00',
-                'Parameter': 'Seawater Temperature in ºC', 'Recording Start Date': args.mdata[0]["datainici"].isoformat(),
-                'Recording End Date': args.mdata[0]["datafin"].isoformat(), 'GMT': args.mdata[0]["GMT"], 'Sensors': [],
-                'Data': []}
+                'Site code': args.mdata[0]['region'], 'Site name': args.mdata[0]['region_name'],
+                'Sampling depth (m)': [], 'Sampling interval (hh:mm:ss)': '1:00:00',
+                'Parameter': 'Seawater Temperature in ºC',
+                'Recording Start Date': datetime.strftime(args.mdata[0]["timegmt"][0], '%Y-%m-%d %H:%M:%S'),
+                'Recording End Date': datetime.strftime(args.mdata[0]["timegmt"][-1], '%Y-%m-%d %H:%M:%S'),
+                'Underwater Start Date': datetime.strftime(args.mdata[0]["datainici"], '%Y-%m-%d %H:%M:%S'),
+                'Underwater End Date': datetime.strftime(args.mdata[0]['datafin'], '%Y-%m-%d %H:%M:%S'),
+                'GMT': args.mdata[0]["GMT"], 'Sensors': [],
+                'NData': []}
 
     for item in args.mdata:
         daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
@@ -208,7 +214,7 @@ def report(args, textbox):
         textbox.insert("end", cadena)
         PDF_DATA['Sampling depth (m)'].append(item['depth'])
         PDF_DATA['Sensors'].append(item['S/N'])
-        PDF_DATA['Data'].append(sum(map(lambda x : x != 999, item['temp'])))
+        PDF_DATA['NData'].append(sum(map(lambda x : x != 999, item['temp'])))
     textbox.insert("end", "=========\n")
     for text in args.reportlogger:
         textbox.insert("end", text + "\n")
