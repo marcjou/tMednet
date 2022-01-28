@@ -609,10 +609,19 @@ class tmednet(tk.Frame):
             # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
             cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
-            cb = plt.colorbar(cf, ax=self.plot, label='temperature', ticks=levels)
+            cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
             self.plot.set(ylabel='Depth (m)',
-                          title='Hovmoller Diagram')
+                          title='Stratification Site: ' + self.mdata[0]['region_name'])
+
+            # Sets the X axis as the initials of the months
+            locator = mdates.MonthLocator()
+            self.plot.xaxis.set_major_locator(locator)
+            fmt = mdates.DateFormatter('%b')
+            self.plot.xaxis.set_major_formatter(fmt)
+            #Sets the x axis on the top
+            self.plot.xaxis.tick_top()
+
             self.canvas.draw()
 
             self.console_writer('Plotting the HOVMOLLER DIAGRAM at region: ', 'action', self.mdata[0]['region'], True)
@@ -695,20 +704,23 @@ class tmednet(tk.Frame):
             oldepth = depth
 
         for depth in histdf['depth'].unique():
-            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white', legend=False)
+            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
+                                                      label='_nolegend-', legend=False)
 
 
         newdf.plot(ax=self.plot)
-        self.plot.set(ylabel='Temperature (DEG C)',
+        self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title='Annual T Cycles')
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
-        # self.plot.legend()
+        self.plot.legend(title='Depth (m)')
 
         #Sets the X axis as the initials of the months
         locator = mdates.MonthLocator()
         self.plot.xaxis.set_major_locator(locator)
         fmt = mdates.DateFormatter('%b')
         self.plot.xaxis.set_major_formatter(fmt)
+
+        self.plot.xaxis.set_label_text('foo').set_visible(False)
                 # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
@@ -742,7 +754,7 @@ class tmednet(tk.Frame):
         lines = ['solid', 'dotted', 'solid', 'dotted']
 
         # Loop to decide each year which style has
-
+        #TODO check code in 2030 to change this method
         # We get all the years on the dataset
         years = df['year'].unique()
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
@@ -761,27 +773,39 @@ class tmednet(tk.Frame):
                     maxdays = np.max(yearly_plot[:, 0])
                 temperatures[i] = np.copy(yearly_plot)
             year_dict[year] = temperatures.copy()
-            self.plot.set(ylim=(0, maxdepth))
-            self.plot.set(xlim=(0, maxdays))
+            self.plot.set(ylim=(0, maxdepth + 2))
+            self.plot.set(xlim=(-2, maxdays + 2))
             if int(year) < 2000:
+                color = colors[0]
+                if year == years[-1]:
+                    color = 'tab:orange'
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
-                               , color=colors[0], linestyle=lines[0])
+                               , color=color, linestyle=lines[0])
             elif int(year) >= 2000 and int(year) < 2010:
+                color = colors[1]
+                if year == years[-1]:
+                    color = 'tab:orange'
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2000],
-                               color=colors[1], linestyle=lines[1])
+                               color=color, linestyle=lines[1])
             elif int(year) >= 2010 and int(year) < 2020:
+                color = colors[2]
+                if year == years[-1]:
+                    color = 'tab:orange'
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2010],
-                               color=colors[2], linestyle=lines[2])
+                               color=color, linestyle=lines[2])
             elif int(year) >= 2020 and int(year) < 2030:
+                color = colors[3]
+                if year == years[-1]:
+                    color = 'tab:orange'
                 self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
-                               color=colors[3], linestyle=lines[3])
+                               color=color, linestyle=lines[3])
 
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
 
         # Draws the legend for the different years
-        self.plot.legend(years)
+        self.plot.legend(years, title='Year')
         self.plot.set(ylabel='Depth (m)',
                       title=region + ' Summer days ≥ 23ºC')
         self.canvas.draw()
@@ -823,21 +847,33 @@ class tmednet(tk.Frame):
             self.plot.set(xlim=(0, maxdays))
             for year in years:
                 if int(year) < 2000:
+                    color = colors[0]
+                    if year == years[-1]:
+                        color = 'tab:orange'
                     self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 1990]
-                                   , color=colors[0], linestyle=lines[0])
+                                   , color=color, linestyle=lines[0])
                 elif int(year) >= 2000 and int(year) < 2010:
+                    color = colors[1]
+                    if year == years[-1]:
+                        color = 'tab:orange'
                     self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2000],
-                                   color=colors[1], linestyle=lines[1])
+                                   color=color, linestyle=lines[1])
                 elif int(year) >= 2010 and int(year) < 2020:
+                    color = colors[2]
+                    if year == years[-1]:
+                        color = 'tab:orange'
                     self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2010],
-                                   color=colors[2], linestyle=lines[2])
+                                   color=color, linestyle=lines[2])
                 elif int(year) >= 2020 and int(year) < 2030:
+                    color = colors[3]
+                    if year == years[-1]:
+                        color = 'tab:orange'
                     self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2020],
-                                   color=colors[3], linestyle=lines[3])
+                                   color=color, linestyle=lines[3])
 
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
-            self.plot.legend(years)
+            self.plot.legend(years, title='Year')
             self.plot.set(ylabel='Depth (m)',
                           title=region + ' Summer days ≥ ' + str(i) + 'ºC')
             self.canvas.draw()
