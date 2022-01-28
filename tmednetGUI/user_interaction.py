@@ -352,17 +352,17 @@ class tmednet(tk.Frame):
             self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
-                          title='Multiple depths at Region: ' + str(self.mdata[index]['region']))
+                          title='Multiple depths Site: ' + str(self.mdata[index]['region_name']))
         else:
             self.plot = self.fig.add_subplot(111)
             self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(self.mdata[index]['depth']))
             self.plot.set(ylabel='Temperature (DEG C)',
                           title=self.files[index] + "\n" + 'Depth:' + str(
-                              self.mdata[index]['depth']) + " - Region: " + str(
-                              self.mdata[index]['region']))
+                              self.mdata[index]['depth']) + " - Site: " + str(
+                              self.mdata[index]['region_name']))
 
-        self.plot.legend()
+        self.plot.legend(title='Depth (m)')
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
