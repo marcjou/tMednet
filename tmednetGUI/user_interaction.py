@@ -522,7 +522,7 @@ class tmednet(tk.Frame):
         depths = ""
         try:
             dfdelta, _ = fm.temp_difference(self.mdata)
-
+            self.counter.append('Difference')
             # Creates the subplots and deletes the old plot
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
@@ -554,7 +554,7 @@ class tmednet(tk.Frame):
         depths = ""
         try:
             dfdelta = fm.apply_uniform_filter(self.mdata)
-
+            self.counter.append("Filter")
             # Creates the subplots and deletes the old plot
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
@@ -1011,6 +1011,10 @@ class tmednet(tk.Frame):
                     filename = str(self.value[:-7]) + " Annual T-Cycles"
                 elif self.counter[0] == 'Thresholds':
                     filename = str(self.value[:-7]) + " Thresholds"
+                elif self.counter[0] == 'Filter':
+                    filename = str(self.value[:-7]) + " filtered differences"
+                elif self.counter[0] == 'Difference':
+                    filename = str(self.value[:-7]) + " differences"
                 else:
                     filename = self.value[:-4]
             if len(self.counter) > 1:
