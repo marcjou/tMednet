@@ -481,6 +481,11 @@ class tmednet(tk.Frame):
         """
         self.clear_plots()
         index = self.list.curselection()
+
+        for item in index:
+            self.counter.append(item)
+        self.counter.append('Zoom')
+
         depths = ""
         # Creates the subplots and deletes the old plot
         if not self.plot1.axes:
