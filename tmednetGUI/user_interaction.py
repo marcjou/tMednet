@@ -258,6 +258,10 @@ class tmednet(tk.Frame):
                 print(index, self.value)
                 self.console_writer('Plotting: ', 'action', self.value, True)
                 self.index.append(index)
+                #Checks if the last plot was a Zoom to delete the data
+                if self.counter:
+                    if self.counter[-1] == 'Zoom':
+                        self.clear_plots()
                 self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
                 # dibuixem un cop seleccionat
                 self.plot_ts(index)
@@ -378,6 +382,9 @@ class tmednet(tk.Frame):
         self.clear_plots()
         index = int(self.list.curselection()[0])
         time_series, temperatures, indexes, start_index = fm.zoom_data(self.mdata[index], self.consolescreen)
+
+        self.counter.append(index)
+        self.counter.append('Zoom')
 
         # Creates the subplots and deletes the old plot
         if not self.plot1.axes:
@@ -1004,6 +1011,11 @@ class tmednet(tk.Frame):
         """
         try:  # If there is no plot, it shows an error message
 
+            if self.counter[-1] == 'Zoom':
+                zoom = self.counter.pop()
+            else:
+                zoom = ''
+
             if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
                 if self.counter[0] == "Hovmoller":
                     filename = str(self.value[:-7]) + " Hovmoller"
@@ -1016,17 +1028,20 @@ class tmednet(tk.Frame):
                 elif self.counter[0] == 'Difference':
                     filename = str(self.value[:-7]) + " differences"
                 else:
-                    filename = self.value[:-4]
+                    filename = self.value[:-4] + ' ' + zoom
             if len(self.counter) > 1:
+
                 filename = ""
                 for n in self.counter:
                     filename = filename + "_" + self.files[n][-6:-4]
                 filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
-                           + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename
+                           + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename + ' ' + zoom
 
             file = asksaveasfilename(initialdir='../src/output_images',
                                      filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
                                      defaultextension='.png', initialfile=filename, title="Save as")
+            if zoom == 'Zoom':
+                self.counter.append(zoom)
             if file:
                 self.fig.savefig(file)
                 self.mdata[0]['images'].append(file) #Stores the path of the created images to print them on the report
