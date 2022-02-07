@@ -343,7 +343,18 @@ class tmednet(tk.Frame):
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
-        if self.cbexists:
+        #if self.cbexists:
+         #   self.clear_plots()
+
+        if self.counter[0] == "Hovmoller":
+            self.clear_plots()
+        elif self.counter[0] == 'Cycles':
+            self.clear_plots()
+        elif self.counter[0] == 'Thresholds':
+            self.clear_plots()
+        elif self.counter[0] == 'Filter':
+            self.clear_plots()
+        elif self.counter[0] == 'Difference':
             self.clear_plots()
 
         # if self.plotcb.axes:
@@ -744,7 +755,8 @@ class tmednet(tk.Frame):
        Version: 11/2021, MJB: Documentation
        """
         historical = self.openfileinput.get()
-        region = self.regioninput.get()
+        #Deprecating region input as it can be gotten automatically from the filename (self.mdata[0]['region_name'])
+        #region = self.regioninput.get()
         self.newwindow.destroy()
         self.clear_plots()
         self.counter.append("Thresholds")
@@ -815,18 +827,20 @@ class tmednet(tk.Frame):
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
-
+        #Shrink the axis a bit to fit the legend outside of it
+        box = self.plot.get_position()
+        self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
-        self.plot.legend(years, title='Year')
+        self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
-                      title=region + ' Summer days ≥ 23ºC')
+                      title=self.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
             tab = {}
             btn = tk.Button(self.toolbar, text=i,
                             command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth, year_dict, markers,
-                                                                                 colors, lines, years, region, maxdays))
+                                                                                 colors, lines, years, maxdays))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -834,7 +848,7 @@ class tmednet(tk.Frame):
         self.curtab = 23
         print('Ayo')
 
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region, maxdays):
+    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays):
         """
            Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
            Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
@@ -854,6 +868,7 @@ class tmednet(tk.Frame):
         if self.curtab != None and self.curtab != i and len(self.tabs) > 1:
             # Plot the Thresholds here and clean the last one
             self.clear_plots(clear_thresholds=False)
+            self.counter.append('Thresholds')
             self.plot = self.fig.add_subplot(111)
             self.plot.set(ylim=(0, maxdepth))
             self.plot.set(xlim=(0, maxdays))
@@ -887,7 +902,7 @@ class tmednet(tk.Frame):
             self.plot.xaxis.tick_top()
             self.plot.legend(years, title='Year')
             self.plot.set(ylabel='Depth (m)',
-                          title=region + ' Summer days ≥ ' + str(i) + 'ºC')
+                          title=self.mdata[0]['region_name'] + ' Summer days ≥ ' + str(i) + 'ºC')
             self.canvas.draw()
 
         self.curtab = i
@@ -907,10 +922,10 @@ class tmednet(tk.Frame):
         self.openfileinput = Entry(self.newwindow, width=20)
         self.openfileinput.grid(row=0, column=1)
         openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        regionLabel = Label(self.newwindow, text='Region:').grid(row=1, pady=10)
-        self.regioninput = Entry(self.newwindow, width=20)
-        self.regioninput.grid(row=1, column=1)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=2, column=1)
+        #regionLabel = Label(self.newwindow, text='Region:').grid(row=1, pady=10)
+        #self.regioninput = Entry(self.newwindow, width=20)
+        #self.regioninput.grid(row=1, column=1)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=1, column=1)
 
     def annualcycle_browser(self):
         """
