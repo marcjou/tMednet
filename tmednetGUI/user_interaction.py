@@ -900,7 +900,10 @@ class tmednet(tk.Frame):
 
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
-            self.plot.legend(years, title='Year')
+            # Shrink the axis a bit to fit the legend outside of it
+            box = self.plot.get_position()
+            self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+            self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.plot.set(ylabel='Depth (m)',
                           title=self.mdata[0]['region_name'] + ' Summer days ≥ ' + str(i) + 'ºC')
             self.canvas.draw()
