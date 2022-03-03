@@ -503,7 +503,31 @@
             "start_year": "2020",
             "end_year": "2021",
             "institution": "Institut de Ciencies del Mar"
-        }
+        },
+        "156": {
+            "lat": "44.9247",
+            "long": "13.7348",
+            "site_number": "",
+            "site_name": "Sv_Marko_Brijuni National Park",
+            "site_code": "156",
+            "eco_region": "ADR",
+            "sub_basin": "N-Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Brijuni National Park - Zagreb University - PMF"
+            },
+        "157": {
+            "lat": "44.9095",
+            "long": "13.7448",
+            "site_number": "",
+            "site_name": "Grunj_Brijuni National Park",
+            "site_code": "157",
+            "eco_region": "ADR",
+            "sub_basin": "N-Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "Brijuni National Park - Zagreb University - PMF"
+            }
     },
     "regions": {
         "W-MED": {
