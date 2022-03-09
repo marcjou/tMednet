@@ -369,7 +369,7 @@ def df_to_txt(df, data, SN):
         f.write('\n# Site: ' + str(data['region']))
         f.write('\n# Start time: ' + data['datainici'].strftime('%Y-%m-%d, %H:%M:%S'))
         f.write('\n# End time: ' + data['datafin'].strftime('%Y-%m-%d, %H:%M:%S'))
-        f.write('\n# Serial Numbers: ' + ''.join(SN) + '\n')
+        f.write('\n# Serial Numbers: ' + '.join(SN)' + '\n')
         f.write(('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16) + '\n\n\n'))
         df.to_string(f, col_space=10)
     print('txt written')

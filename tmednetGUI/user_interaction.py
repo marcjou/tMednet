@@ -25,8 +25,8 @@ import matplotlib.dates as dates
 
 from datetime import timedelta
 
-version = "0.5"
-build = "April 2021"
+version = "0.8"
+build = "Mars 2022"
 
 
 class tmednet(tk.Frame):
