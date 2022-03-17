@@ -1,6 +1,7 @@
 import sys, getopt, os
 import file_manipulation as fm
 import user_interaction as ui
+import numpy as np
 
 #Gets the parameters from the command line to execute the publication script
 #TODO it uses fm-load_data properly, keep working
@@ -55,5 +56,21 @@ def main(argv):
     args.newfiles = len(files)
 
     fm.load_data(args)
+    cut_endings(args)
+
+def cut_endings(args):
+    if args.mdata:
+        # self.tempdataold = []
+        for data in args.mdata:
+            # self.tempdataold.append(data['temp'].copy())
+            _, temperatures, indexes, start_index = fm.zoom_data(data)
+            for i in indexes:
+                data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+            for i in range(0, int(start_index)):
+                data['temp'][int(i)] = 999
+        print('Endings of all the files cut')
+    else:
+        print('Error could not cut')
+
 if __name__ == '__main__':
     main(sys.argv[1:])

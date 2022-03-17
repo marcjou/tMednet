@@ -415,7 +415,7 @@ def df_to_geojson(df, properties, SN, lat, lon):
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-def zoom_data(data, consolescreen):
+def zoom_data(data, consolescreen=False):
     """
     Method: zoom_data(data)
     Purpose: Gets the first and last day of operation data
@@ -448,10 +448,13 @@ def zoom_data(data, consolescreen):
             # start_index = np.array(range(int(start_index), len(temperatures[0])))
             return time_series, temperatures, indexes, start_index
     except TypeError:
-        consolescreen.insert("end", "WARNING, day of end of operation "
-                             + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.\n",
-                             'warning')
-        consolescreen.insert("end", "=============\n")
+        if consolescreen == False:
+            print('WARNING, day of end of operation')
+        else:
+            consolescreen.insert("end", "WARNING, day of end of operation "
+                                 + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.\n",
+                                 'warning')
+            consolescreen.insert("end", "=============\n")
         indexes = np.array(range(0, len(temperatures[0])))
         start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
