@@ -30,7 +30,7 @@ def load_coordinates(region):
     return lat, lon, name
 
 
-def load_data(args, consolescreen):
+def load_data(args, consolescreen=False):
     """
     Method: load_data(args, consolescreen)
     Purpose: read tmednet *.txt data files
@@ -53,8 +53,11 @@ def load_data(args, consolescreen):
                      "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H'), 'images': []}
 
             print("file", filein)
-            consolescreen.insert("end", "file ")
-            consolescreen.insert("end", filein + "\n =============\n")
+            if consolescreen == False:
+                print(filein + '\n')
+            else:
+                consolescreen.insert("end", "file ")
+                consolescreen.insert("end", filein + "\n =============\n")
 
             f = open(filein, "r")
             a = f.readlines()
@@ -90,8 +93,11 @@ def load_data(args, consolescreen):
         interpolate_hours(args.mdata)  # Interpolates the temperature between different not round hours
 
     except ValueError:
-        consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
-        consolescreen.insert("end", "=============\n")
+        if consolescreen == False:
+            print('Error, file extension not suported, load a txt')
+        else:
+            consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
+            consolescreen.insert("end", "=============\n")
 
 def check_start(data, consolescreen):
     """
