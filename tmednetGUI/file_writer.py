@@ -1,7 +1,7 @@
 import math
 from datetime import datetime
 from statistics import stdev
-
+import publication as publi
 import numpy as np
 import pandas as pd
 from pandas import ExcelWriter
@@ -153,6 +153,7 @@ class Excel:
                 self.seasonalmeans[column] = []
 
     def main(self):
+        publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50)
         for i in range(len(self.df)):
 
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -212,7 +213,8 @@ class Excel:
                 self.excel_setter2()
                 self.excel_setter3()
 
-            print(str(i) + ' de ' + str(len(self.df)))
+            #print(str(i) + ' de ' + str(len(self.df)))
+            publi.printProgressBar(i, len(self.df), prefix='Progress:', suffix='Complete', length=50)
 
     def excel_writer(self, path):
         writer = ExcelWriter(path)
@@ -259,6 +261,7 @@ class Excel:
                     self.total3[column].append(self.df[column][i])
 
     def only_seasonal(self):
+        publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50)
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
                 pass
@@ -287,7 +290,9 @@ class Excel:
             if i == len(self.df) - 1:
                 self.calculate_seasonal()
 
-            print(str(i) + ' de ' + str(len(self.df)))
+            #print(str(i) + ' de ' + str(len(self.df)))
+            publi.printProgressBar(i, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+
 
     def monthly_getter(self, year, month, i):
         for column in self.df:
@@ -322,6 +327,7 @@ class Excel:
                 self.total2[column] = []
 
     def multiyear_mean_calculator(self):
+        publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50)
         #Calculates the multiyear mean for the annual t-cycles plot
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -354,7 +360,9 @@ class Excel:
             if i == len(self.df) - 1:
                 self.monthly_setter()
 
-            print(str(i) + ' de ' + str(len(self.df)))
+            #print(str(i) + ' de ' + str(len(self.df)))
+            publi.printProgressBar(i, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+
         self.monthlymeandf = pd.DataFrame(columns=['month', 'depth', 'mean'])
         monthlydict = {'month':0, 'depth':0, 'mean':0}
         self.mydf2.replace(0, np.nan, inplace=True)
