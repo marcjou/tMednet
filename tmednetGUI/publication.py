@@ -68,12 +68,13 @@ def main(argv):
 
     fm.load_data(args)
     cut_endings(args)
-    plot_hovmoller(args)
+    #plot_hovmoller(args)
     print('Stratification Plot Done')
-    plot_annualTCycle(args, historical)
+    #plot_annualTCycle(args, historical)
     print('TCycles Plot Done')
-    plot_thresholds(args, historical)
+    #plot_thresholds(args, historical)
     print('Thresholds Plot Done')
+    merge(args)
 
 
 def cut_endings(args):
@@ -284,6 +285,23 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end= printEnd)
     if iteration == total:
         print()
+
+
+def merge(args):
+    try:
+        if not args.mdata[0]['time']:
+            print('First select \'To UTC\' option')
+        else:
+
+            df, depths, SN, merging = fm.merge(args)
+            if merging is False:
+                print('Load more than a file for merging, creating an output of only a file instead')
+
+            fm.df_to_geojson(df, depths, SN, args.mdata[0]['latitude'], args.mdata[0]['longitude'])
+            fm.df_to_txt(df, args.mdata[0], SN)
+            print('File merged')
+    except IndexError:
+        print('Please, load a file first',)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
