@@ -69,7 +69,11 @@ def main(argv):
     fm.load_data(args)
     cut_endings(args)
     plot_hovmoller(args)
+    print('Stratification Plot Done')
     plot_annualTCycle(args, historical)
+    print('TCycles Plot Done')
+    plot_thresholds(args, historical)
+    print('Thresholds Plot Done')
 
 
 def cut_endings(args):
@@ -200,6 +204,77 @@ def plot_annualTCycle(args, historical):
             # fig.set_size_inches(14.5, 10.5, forward=True)
     plot.figure.savefig('Cositas al canal.png')
 
+def plot_thresholds(args, historical):
+    excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
+    df = excel_object.mydf3
+
+    # Creates the subplots and deletes the old plot
+    plt.rc('legend', fontsize='medium')
+    fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
+    plot = fig.add_subplot(111)
+
+    # Setting the properties of the line as lists to be used on a for loop depending on the year
+    markers = ['+', 'o', 'x', 's', 'd', '^', 'v', 'p', 'h', '*']
+    colors = ['b', 'b', 'k', 'k']
+    lines = ['solid', 'dotted', 'solid', 'dotted']
+
+    # Loop to decide each year which style has
+    years = df['year'].unique()
+    # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
+    maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
+    maxdays = 0   # Used to set the maximum number of days to point in the X axis
+    temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
+    year_dict = {}
+    for year in years:
+        for i in range(23, 29):
+            yearly_plot = np.column_stack(
+                (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
+            yearly_plot = yearly_plot.astype(int)
+            if yearly_plot[-1, -1] > maxdepth:
+                maxdepth = yearly_plot[-1, -1]
+            if np.max(yearly_plot[:, 0]) > maxdays:
+                maxdays = np.max(yearly_plot[:, 0])
+            temperatures[i] = np.copy(yearly_plot)
+        year_dict[year] = temperatures.copy()
+        plot.set(ylim=(0, maxdepth + 2))
+        plot.set(xlim=(-2, maxdays + 2))
+        if int(year) < 2000:
+            color = colors[0]
+            if year == years[-1]:
+                color = 'tab:orange'
+            plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
+                           , color=color, linestyle=lines[0])
+        elif int(year) >= 2000 and int(year) < 2010:
+            color = colors[1]
+            if year == years[-1]:
+                color = 'tab:orange'
+            plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2000],
+                           color=color, linestyle=lines[1])
+        elif int(year) >= 2010 and int(year) < 2020:
+            color = colors[2]
+            if year == years[-1]:
+                color = 'tab:orange'
+            plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2010],
+                           color=color, linestyle=lines[2])
+        elif int(year) >= 2020 and int(year) < 2030:
+            color = colors[3]
+            if year == years[-1]:
+                color = 'tab:orange'
+            plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
+                           color=color, linestyle=lines[3])
+
+        plot.invert_yaxis()
+        plot.xaxis.tick_top()
+
+    #Shrink the axis a bit to fit the legend outside of it
+    box = plot.get_position()
+    plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+    # Draws the legend for the different years
+    plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+    plot.set(ylabel='Depth (m)',
+                  title=args.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
+    plot.figure.savefig('thisonesgood.png')
+    
 
 #TODO this works wonders, add it to the console onscreen on the GUI
 def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd=''):
