@@ -370,7 +370,8 @@ def df_to_txt(df, data, SN):
     Version: 05/2021, MJB: Documentation
     """
     print('writing txt')
-    with open('../src/output_files/' + str(data['region']) + '_' + data['datainici'].strftime('%Y-%m-%d') + '_' + data['datafin'].strftime('%Y-%m-%d')+'_merged.txt', 'w') as f:
+    output = '../src/output_files/' + str(data['region']) + '_' + data['datainici'].strftime('%Y-%m-%d') + '_' + data['datafin'].strftime('%Y-%m-%d')+'_merged.txt'
+    with open(output, 'w') as f:
         f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
         f.write('\n# Site: ' + str(data['region']))
         f.write('\n# Start time: ' + data['datainici'].strftime('%Y-%m-%d, %H:%M:%S'))
@@ -379,7 +380,7 @@ def df_to_txt(df, data, SN):
         f.write(('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16) + '\n\n\n'))
         df.to_string(f, col_space=10)
     print('txt written')
-
+    return output
 
 def df_to_geojson(df, properties, SN, lat, lon):
     """

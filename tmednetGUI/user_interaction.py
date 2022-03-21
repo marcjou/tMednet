@@ -1080,6 +1080,8 @@ class tmednet(tk.Frame):
         Version:
         05/2021, MJB: Documentation
         """
+
+
         try:
             if not self.mdata[0]['time']:
                 self.console_writer('First select \'To UTC\' option', 'warning')

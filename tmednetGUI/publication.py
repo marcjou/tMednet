@@ -68,13 +68,14 @@ def main(argv):
 
     fm.load_data(args)
     cut_endings(args)
-    #plot_hovmoller(args)
+    plot_hovmoller(args)
     print('Stratification Plot Done')
-    #plot_annualTCycle(args, historical)
+    plot_annualTCycle(args, historical)
     print('TCycles Plot Done')
-    #plot_thresholds(args, historical)
+    plot_thresholds(args, historical)
     print('Thresholds Plot Done')
-    merge(args)
+    fw.big_merge(historical, merge(args), 'historical_updated')
+    print('Historical merge created')
 
 
 def cut_endings(args):
@@ -298,8 +299,9 @@ def merge(args):
                 print('Load more than a file for merging, creating an output of only a file instead')
 
             fm.df_to_geojson(df, depths, SN, args.mdata[0]['latitude'], args.mdata[0]['longitude'])
-            fm.df_to_txt(df, args.mdata[0], SN)
+            output = fm.df_to_txt(df, args.mdata[0], SN)
             print('File merged')
+            return output
     except IndexError:
         print('Please, load a file first',)
 
