@@ -76,6 +76,7 @@ def main(argv):
     print('Thresholds Plot Done')
     fw.big_merge(historical, merge(args), 'historical_updated')
     print('Historical merge created')
+    fw.Excel('../src/output_files/historical_updated.txt', '../src/output_files/outs.xlsx')
 
 
 def cut_endings(args):
@@ -130,8 +131,6 @@ def plot_hovmoller(args):
 
 def plot_annualTCycle(args, historical):
     # Gets the historical data to calculate the multi-year mean and deletes the old plots
-
-
     excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
     histdf = excel_object.monthlymeandf
 
@@ -204,7 +203,7 @@ def plot_annualTCycle(args, historical):
 
     plot.xaxis.set_label_text('foo').set_visible(False)
             # fig.set_size_inches(14.5, 10.5, forward=True)
-    plot.figure.savefig('Cositas al canal.png')
+    plot.figure.savefig('Annual T Cycles_' + args.files[0][:-7] + '.png')
 
 def plot_thresholds(args, historical):
     excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
@@ -275,17 +274,26 @@ def plot_thresholds(args, historical):
     plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
     plot.set(ylabel='Depth (m)',
                   title=args.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
-    plot.figure.savefig('thisonesgood.png')
+    plot.figure.savefig('Thresholds_' + args.files[0][:-7] + '.png')
     
 
-#TODO this works wonders, add it to the console onscreen on the GUI
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd=''):
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='', console=False):
     percent = ('{0:.' + str(decimals) + 'f}').format(100* (iteration/float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end= printEnd)
-    if iteration == total:
-        print()
+    #TODO it freezes the console and it only updates after the loop which isn't useful at all, maybe raise a label?
+    if console:
+        console.delete('insert linestart', 'insert lineend')
+        consolelen = int(length/2)
+        consolefillen = int(consolelen * iteration // total)
+        consolebar = fill * consolefillen + '-' * (consolelen - consolefillen)
+        console.insert("end", f'\r{prefix} |{consolebar}| {percent}% {suffix}')
+        if iteration == total:
+            console.insert("end", '\n')
+    else:
+        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+        if iteration == total:
+            print()
 
 
 def merge(args):

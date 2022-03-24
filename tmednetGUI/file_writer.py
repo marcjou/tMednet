@@ -9,7 +9,7 @@ from pandas import ExcelWriter
 
 class Excel:
 
-    def __init__(self, input_path, output_path='', write_excel=True, seasonal=True):
+    def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, console=False):
         self.df = pd.read_csv(input_path, '\t')
         self.n = 0
         self.total = {}
@@ -17,6 +17,8 @@ class Excel:
         self.total3 = {}
         self.firstdate = self.df['Date'][0]
         self.lastdate = self.df['Date'][len(self.df) - 1]
+
+        self.console = console
 
         self.mydf = pd.DataFrame(columns=['date', 'depth(m)', 'N', 'mean', 'std', 'max', 'min'])
 
@@ -154,6 +156,8 @@ class Excel:
 
     def main(self):
         publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        if self.console:
+            publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50, console=True)
         for i in range(len(self.df)):
 
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -215,6 +219,8 @@ class Excel:
 
             #print(str(i) + ' de ' + str(len(self.df)))
             publi.printProgressBar(i, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+            if self.console:
+                publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50, console=True)
 
     def excel_writer(self, path):
         writer = ExcelWriter(path)
@@ -262,6 +268,8 @@ class Excel:
 
     def only_seasonal(self):
         publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        if self.console:
+            publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50, console=self.console)
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
                 pass
@@ -292,6 +300,8 @@ class Excel:
 
             #print(str(i) + ' de ' + str(len(self.df)))
             publi.printProgressBar(i, len(self.df), prefix='Progress:', suffix='Complete', length=50)
+            if self.console:
+                publi.printProgressBar(0, len(self.df), prefix='Progress:', suffix='Complete', length=50, console=self.console)
 
 
     def monthly_getter(self, year, month, i):

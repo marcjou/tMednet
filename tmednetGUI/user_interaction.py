@@ -760,7 +760,7 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         self.clear_plots()
         self.counter.append("Thresholds")
-        excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
+        excel_object = fw.Excel(historical, write_excel=False, console=self.consolescreen)  # returns an excel object
         df = excel_object.mydf3
 
         # Creates the subplots and deletes the old plot
