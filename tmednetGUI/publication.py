@@ -91,10 +91,19 @@ class Arguments:
         # Gets the historical data to calculate the multi-year mean and deletes the old plots
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
-
         dfdelta = fm.running_average(self.mdata, running=360)
+        newdf, dfdelta = self.transform_hourly2daily(dfdelta)
+        monthDict = self.create_month_datetime_dict(dfdelta)
 
-        # All this block serves only to transform the data from hourly to daily. It should be inside its own method
+        plot = self.plot_starter()
+
+        self.plot_multiyear_mean(histdf, monthDict, plot)
+
+        newdf.plot(ax=plot)
+        self.set_plot_axes_and_save(plot)
+
+    @staticmethod
+    def transform_hourly2daily(dfdelta):
         daylist = []
         for time in dfdelta.index:
             old = datetime.strftime(time, '%Y-%m-%d')
@@ -108,9 +117,10 @@ class Arguments:
                     newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
                 else:
                     newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
+        return newdf, dfdelta
 
-        # BLOCK ENDS HERE!!!!!!!
-
+    @staticmethod
+    def create_month_datetime_dict(dfdelta):
         # Dict to change from string months to datetime
         monthDict = {}
         for i in range(1, 13):
@@ -122,13 +132,10 @@ class Arguments:
                 monthDict[str(i)] = datetime.strptime(
                     datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
                     '%Y-%m-%d')
+        return monthDict
 
-        # Creates the subplots and deletes the old plot
-
-        plt.rc('legend', fontsize='medium')
-        fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-        plot = fig.add_subplot(111)
-
+    @staticmethod
+    def plot_multiyear_mean(histdf, monthDict, plot):
         for month in histdf['month'].unique():
             histdf['month'].replace(month, monthDict[month], inplace=True)
         usedf = histdf.copy()
@@ -145,7 +152,7 @@ class Arguments:
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=plot, color='white',
                                                       label='_nolegend-', legend=False)
 
-        newdf.plot(ax=plot)
+    def set_plot_axes_and_save(self, plot):
         plot.set(ylabel='Temperature (ºC) smoothed',
                  title='Annual T Cycles')
         plot.set_ylim([10, 28])  # Sets the limits for the Y axis
@@ -160,7 +167,6 @@ class Arguments:
         plot.xaxis.set_label_text('foo').set_visible(False)
         # fig.set_size_inches(14.5, 10.5, forward=True)
         plot.figure.savefig('Annual T Cycles_' + self.files[0][:-7] + '.png')
-
 
 def main(argv):
     inputdir = ''
@@ -204,85 +210,6 @@ def main(argv):
     print('Historical merge created')
     fw.Excel('../src/output_files/historical_updated.txt', '../src/output_files/outs.xlsx')
     '''
-
-
-
-
-
-
-def plot_annualTCycle(args, historical):
-    # Gets the historical data to calculate the multi-year mean and deletes the old plots
-    excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
-    histdf = excel_object.monthlymeandf
-
-    dfdelta = fm.running_average(args.mdata, running=360)
-
-    # All this block serves only to transform the data from hourly to daily. It should be inside its own method
-    daylist = []
-    for time in dfdelta.index:
-        old = datetime.strftime(time, '%Y-%m-%d')
-        new = datetime.strptime(old, '%Y-%m-%d')
-        daylist.append(new)
-    dfdelta['day'] = daylist
-    newdf = None
-    for depth in dfdelta.columns:
-        if depth != 'day':
-            if newdf is not None:
-                newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
-            else:
-                newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
-
-    # BLOCK ENDS HERE!!!!!!!
-
-    # Dict to change from string months to datetime
-    monthDict = {}
-    for i in range(1, 13):
-        if i < 10:
-            monthDict['0' + str(i)] = datetime.strptime(
-                datetime.strftime(dfdelta.index[0], '%Y') + '-0' + str(i) + '-01',
-                '%Y-%m-%d')
-        else:
-            monthDict[str(i)] = datetime.strptime(
-                datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
-                '%Y-%m-%d')
-
-    # Creates the subplots and deletes the old plot
-
-    plt.rc('legend', fontsize='medium')
-    fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-    plot = fig.add_subplot(111)
-
-    for month in histdf['month'].unique():
-        histdf['month'].replace(month, monthDict[month], inplace=True)
-    usedf = histdf.copy()
-    usedf.set_index('month', inplace=True)
-    usedf.sort_index(inplace=True)
-    oldepth = 0
-    for depth in usedf['depth'].unique():
-        if oldepth != 0:
-            plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
-                              usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
-        oldepth = depth
-
-    for depth in histdf['depth'].unique():
-        histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=plot, color='white',
-                                                  label='_nolegend-', legend=False)
-
-    newdf.plot(ax=plot)
-    plot.set(ylabel='Temperature (ºC) smoothed',
-             title='Annual T Cycles')
-    plot.set_ylim([10, 28])  # Sets the limits for the Y axis
-    plot.legend(title='Depth (m)')
-
-    # Sets the X axis as the initials of the months
-    locator = mdates.MonthLocator()
-    plot.xaxis.set_major_locator(locator)
-    fmt = mdates.DateFormatter('%b')
-    plot.xaxis.set_major_formatter(fmt)
-
-    plot.xaxis.set_label_text('foo').set_visible(False)
-    # fig.set_size_inches(14.5, 10.5, forward=True)
-    plot.figure.savefig('Annual T Cycles_' + args.files[0][:-7] + '.png')
 
 
 def plot_thresholds(args, historical):
