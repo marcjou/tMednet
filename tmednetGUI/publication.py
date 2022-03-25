@@ -3,11 +3,9 @@ import sys, getopt, os
 from datetime import datetime
 import pandas as pd
 from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import file_manipulation as fm
 import file_writer as fw
-import user_interaction as ui
 import numpy as np
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
@@ -18,18 +16,150 @@ from matplotlib.figure import Figure
 
 class Arguments:
 
-    def __init__(self):
-        self.path = ""
-        self.files = []
+    def __init__(self, path, files, newfiles):
+        self.path = path
+        self.files = files
         self.mdata = []
         self.index = []
-        self.newfiles = 0
+        self.newfiles = newfiles
         self.counter = []
         self.recoverindex = None
         self.recoverindexpos = None
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
+
+        fm.load_data(self)
+        self.cut_data_endings_after_sensor_removal()
+
+    def cut_data_endings_after_sensor_removal(self):
+        if self.mdata:
+            for data in self.mdata:
+                _, temperatures, indexes, start_index = fm.zoom_data(data)
+                for i in indexes:
+                    data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
+                for i in range(0, int(start_index)):
+                    data['temp'][int(i)] = 999
+            print('Endings of all the files cut')
+        else:
+            print('Error could not cut')
+
+    def plot_hovmoller(self):
+        try:
+            # Starts the ColorBar and plot
+            global cb
+            plot = self.plot_starter()
+            plot = self.colorbar_creator(plot)
+            self.plot_axes_setter(plot)
+            print('Plotting the HOVMOLLER DIAGRAM at region: ' + str(self.mdata[0]['region']))
+        except IndexError:
+            print('Load several files before creating a diagram')
+        except TypeError:
+            print('Load more than a file for the Hovmoller Diagram')
+
+    @staticmethod
+    def plot_starter():
+        plt.rc('legend', fontsize='medium')
+        fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
+        plot = fig.add_subplot(111)
+        return plot
+
+    def colorbar_creator(self, plot):
+        # Gets the data needed for the plot and sets the ColorBar and countour
+        fm.to_utc(self.mdata)
+        df, depths, _ = fm.list_to_df(self.mdata)
+        depths = np.array(depths)
+        levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
+        cf = plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+        cb = plt.colorbar(cf, ax=plot, label='Temperature (ºC)', ticks=levels)
+        return plot
+
+    def plot_axes_setter(self, plot):
+        plot.set(ylabel='Depth (m)',
+                 title='Stratification Site: ' + self.mdata[0]['region_name'])
+        # Sets the X axis as the initials of the months
+        locator = mdates.MonthLocator()
+        plot.xaxis.set_major_locator(locator)
+        fmt = mdates.DateFormatter('%b')
+        plot.xaxis.set_major_formatter(fmt)
+        # Sets the x axis on the top
+        plot.xaxis.tick_top()
+        # Saves the plot
+        plot.figure.savefig('Stratification_' + self.files[0][:-7] + '.png')
+
+    def plot_annualTCycle(self, historical):
+        # Gets the historical data to calculate the multi-year mean and deletes the old plots
+        excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
+        histdf = excel_object.monthlymeandf
+
+        dfdelta = fm.running_average(self.mdata, running=360)
+
+        # All this block serves only to transform the data from hourly to daily. It should be inside its own method
+        daylist = []
+        for time in dfdelta.index:
+            old = datetime.strftime(time, '%Y-%m-%d')
+            new = datetime.strptime(old, '%Y-%m-%d')
+            daylist.append(new)
+        dfdelta['day'] = daylist
+        newdf = None
+        for depth in dfdelta.columns:
+            if depth != 'day':
+                if newdf is not None:
+                    newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
+                else:
+                    newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
+
+        # BLOCK ENDS HERE!!!!!!!
+
+        # Dict to change from string months to datetime
+        monthDict = {}
+        for i in range(1, 13):
+            if i < 10:
+                monthDict['0' + str(i)] = datetime.strptime(
+                    datetime.strftime(dfdelta.index[0], '%Y') + '-0' + str(i) + '-01',
+                    '%Y-%m-%d')
+            else:
+                monthDict[str(i)] = datetime.strptime(
+                    datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
+                    '%Y-%m-%d')
+
+        # Creates the subplots and deletes the old plot
+
+        plt.rc('legend', fontsize='medium')
+        fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
+        plot = fig.add_subplot(111)
+
+        for month in histdf['month'].unique():
+            histdf['month'].replace(month, monthDict[month], inplace=True)
+        usedf = histdf.copy()
+        usedf.set_index('month', inplace=True)
+        usedf.sort_index(inplace=True)
+        oldepth = 0
+        for depth in usedf['depth'].unique():
+            if oldepth != 0:
+                plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
+                                  usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
+            oldepth = depth
+
+        for depth in histdf['depth'].unique():
+            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=plot, color='white',
+                                                      label='_nolegend-', legend=False)
+
+        newdf.plot(ax=plot)
+        plot.set(ylabel='Temperature (ºC) smoothed',
+                 title='Annual T Cycles')
+        plot.set_ylim([10, 28])  # Sets the limits for the Y axis
+        plot.legend(title='Depth (m)')
+
+        # Sets the X axis as the initials of the months
+        locator = mdates.MonthLocator()
+        plot.xaxis.set_major_locator(locator)
+        fmt = mdates.DateFormatter('%b')
+        plot.xaxis.set_major_formatter(fmt)
+
+        plot.xaxis.set_label_text('foo').set_visible(False)
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+        plot.figure.savefig('Annual T Cycles_' + self.files[0][:-7] + '.png')
 
 
 def main(argv):
@@ -61,72 +191,23 @@ def main(argv):
     filepath.sort()
     print(files)
 
-    args = Arguments()
-    args.path = inputdir + '/'
-    args.files = files
-    args.newfiles = len(files)
-
-    fm.load_data(args)
-    cut_endings(args)
-    plot_hovmoller(args)
+    args = Arguments(inputdir + '/', files, len(files))
+    args.plot_hovmoller()
     print('Stratification Plot Done')
-    plot_annualTCycle(args, historical)
+
+    args.plot_annualTCycle(historical)
     print('TCycles Plot Done')
+    '''
     plot_thresholds(args, historical)
     print('Thresholds Plot Done')
     fw.big_merge(historical, merge(args), 'historical_updated')
     print('Historical merge created')
     fw.Excel('../src/output_files/historical_updated.txt', '../src/output_files/outs.xlsx')
+    '''
 
 
-def cut_endings(args):
-    if args.mdata:
-        # self.tempdataold = []
-        for data in args.mdata:
-            # self.tempdataold.append(data['temp'].copy())
-            _, temperatures, indexes, start_index = fm.zoom_data(data)
-            for i in indexes:
-                data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
-            for i in range(0, int(start_index)):
-                data['temp'][int(i)] = 999
-        print('Endings of all the files cut')
-    else:
-        print('Error could not cut')
 
 
-def plot_hovmoller(args):
-    try:
-
-        plt.rc('legend', fontsize='medium')
-        fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-        plot = fig.add_subplot(111)
-        fm.to_utc(args.mdata)
-        global cb
-        df, depths, _ = fm.list_to_df(args.mdata)
-        depths = np.array(depths)
-
-        levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
-        cf = plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
-
-        cb = plt.colorbar(cf, ax=plot, label='Temperature (ºC)', ticks=levels)
-
-        plot.set(ylabel='Depth (m)',
-                 title='Stratification Site: ' + args.mdata[0]['region_name'])
-
-        # Sets the X axis as the initials of the months
-        locator = mdates.MonthLocator()
-        plot.xaxis.set_major_locator(locator)
-        fmt = mdates.DateFormatter('%b')
-        plot.xaxis.set_major_formatter(fmt)
-        # Sets the x axis on the top
-        plot.xaxis.tick_top()
-
-        plot.figure.savefig('Stratification_' + args.files[0][:-7] + '.png')
-        print('Plotting the HOVMOLLER DIAGRAM at region: ' + str(args.mdata[0]['region']))
-    except IndexError:
-        print('Load several files before creating a diagram')
-    except TypeError:
-        print('Load more than a file for the Hovmoller Diagram')
 
 
 def plot_annualTCycle(args, historical):
@@ -157,20 +238,19 @@ def plot_annualTCycle(args, historical):
     monthDict = {}
     for i in range(1, 13):
         if i < 10:
-            monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',
-                                                      '%Y-%m-%d')
+            monthDict['0' + str(i)] = datetime.strptime(
+                datetime.strftime(dfdelta.index[0], '%Y') + '-0' + str(i) + '-01',
+                '%Y-%m-%d')
         else:
             monthDict[str(i)] = datetime.strptime(
                 datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
-            '%Y-%m-%d')
-
+                '%Y-%m-%d')
 
     # Creates the subplots and deletes the old plot
 
     plt.rc('legend', fontsize='medium')
     fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
     plot = fig.add_subplot(111)
-
 
     for month in histdf['month'].unique():
         histdf['month'].replace(month, monthDict[month], inplace=True)
@@ -181,29 +261,29 @@ def plot_annualTCycle(args, historical):
     for depth in usedf['depth'].unique():
         if oldepth != 0:
             plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
-                                   usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
+                              usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
         oldepth = depth
 
     for depth in histdf['depth'].unique():
         histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=plot, color='white',
                                                   label='_nolegend-', legend=False)
 
-
     newdf.plot(ax=plot)
     plot.set(ylabel='Temperature (ºC) smoothed',
-                  title='Annual T Cycles')
-    plot.set_ylim([10, 28]) #Sets the limits for the Y axis
+             title='Annual T Cycles')
+    plot.set_ylim([10, 28])  # Sets the limits for the Y axis
     plot.legend(title='Depth (m)')
 
-    #Sets the X axis as the initials of the months
+    # Sets the X axis as the initials of the months
     locator = mdates.MonthLocator()
     plot.xaxis.set_major_locator(locator)
     fmt = mdates.DateFormatter('%b')
     plot.xaxis.set_major_formatter(fmt)
 
     plot.xaxis.set_label_text('foo').set_visible(False)
-            # fig.set_size_inches(14.5, 10.5, forward=True)
+    # fig.set_size_inches(14.5, 10.5, forward=True)
     plot.figure.savefig('Annual T Cycles_' + args.files[0][:-7] + '.png')
+
 
 def plot_thresholds(args, historical):
     excel_object = fw.Excel(historical, write_excel=False)  # returns an excel object
@@ -223,7 +303,7 @@ def plot_thresholds(args, historical):
     years = df['year'].unique()
     # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
     maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
-    maxdays = 0   # Used to set the maximum number of days to point in the X axis
+    maxdays = 0  # Used to set the maximum number of days to point in the X axis
     temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
     year_dict = {}
     for year in years:
@@ -244,47 +324,48 @@ def plot_thresholds(args, historical):
             if year == years[-1]:
                 color = 'tab:orange'
             plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
-                           , color=color, linestyle=lines[0])
+                      , color=color, linestyle=lines[0])
         elif int(year) >= 2000 and int(year) < 2010:
             color = colors[1]
             if year == years[-1]:
                 color = 'tab:orange'
             plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2000],
-                           color=color, linestyle=lines[1])
+                      color=color, linestyle=lines[1])
         elif int(year) >= 2010 and int(year) < 2020:
             color = colors[2]
             if year == years[-1]:
                 color = 'tab:orange'
             plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2010],
-                           color=color, linestyle=lines[2])
+                      color=color, linestyle=lines[2])
         elif int(year) >= 2020 and int(year) < 2030:
             color = colors[3]
             if year == years[-1]:
                 color = 'tab:orange'
             plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
-                           color=color, linestyle=lines[3])
+                      color=color, linestyle=lines[3])
 
         plot.invert_yaxis()
         plot.xaxis.tick_top()
 
-    #Shrink the axis a bit to fit the legend outside of it
+    # Shrink the axis a bit to fit the legend outside of it
     box = plot.get_position()
     plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
     # Draws the legend for the different years
     plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
     plot.set(ylabel='Depth (m)',
-                  title=args.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
+             title=args.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
     plot.figure.savefig('Thresholds_' + args.files[0][:-7] + '.png')
-    
 
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='', console=False):
-    percent = ('{0:.' + str(decimals) + 'f}').format(100* (iteration/float(total)))
+
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='',
+                     console=False):
+    percent = ('{0:.' + str(decimals) + 'f}').format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    #TODO it freezes the console and it only updates after the loop which isn't useful at all, maybe raise a label?
+    # TODO it freezes the console and it only updates after the loop which isn't useful at all, maybe raise a label?
     if console:
         console.delete('insert linestart', 'insert lineend')
-        consolelen = int(length/2)
+        consolelen = int(length / 2)
         consolefillen = int(consolelen * iteration // total)
         consolebar = fill * consolefillen + '-' * (consolelen - consolefillen)
         console.insert("end", f'\r{prefix} |{consolebar}| {percent}% {suffix}')
@@ -311,7 +392,8 @@ def merge(args):
             print('File merged')
             return output
     except IndexError:
-        print('Please, load a file first',)
+        print('Please, load a file first', )
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])
