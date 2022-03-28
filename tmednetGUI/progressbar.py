@@ -1,5 +1,4 @@
-
-class Progress_bar:
+class progressBar:
 
     def __init__(self, total, prefix='', suffix='', decimals=1, length=100, fill='█', print_end='', console=False):
         self.total = total

@@ -1,12 +1,10 @@
 import math
-from datetime import datetime
-from statistics import stdev
-import publication as publi
 import numpy as np
 import pandas as pd
-from pandas import ExcelWriter
 import progressbar as pb
-
+from statistics import stdev
+from datetime import datetime
+from pandas import ExcelWriter
 
 class Excel:
 
@@ -156,9 +154,9 @@ class Excel:
                 self.seasonalmeans[column] = []
 
     def main(self):
-        progress_bar = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
-            console_progress = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50, console=self.console)
+            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50, console=self.console)
         for i in range(len(self.df)):
 
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -268,9 +266,9 @@ class Excel:
                     self.total3[column].append(self.df[column][i])
 
     def only_seasonal(self):
-        progress_bar = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
-            console_progress = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
+            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
                                                console=self.console)
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -339,9 +337,9 @@ class Excel:
                 self.total2[column] = []
 
     def multiyear_mean_calculator(self):
-        progress_bar = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
-            console_progress = pb.Progress_bar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
+            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
                                                console=self.console)
         #Calculates the multiyear mean for the annual t-cycles plot
         for i in range(len(self.df)):
