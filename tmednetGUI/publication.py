@@ -1,21 +1,11 @@
 import sys, getopt, os
-
-from datetime import datetime
-import pandas as pd
-from matplotlib import pyplot as plt
-
-import file_manipulation as fm
 import file_writer as fw
-import numpy as np
-import matplotlib.dates as mdates
-from matplotlib.figure import Figure
-
+import file_manipulation as fm
 import arguments_class as arguments
 
 
-# Gets the parameters from the command line to execute the publication script
-
 def main(argv):
+    # Gets the parameters from the command line to execute the publication script
     inputdir = ''
     historical = ''
     try:
@@ -56,12 +46,12 @@ def main(argv):
 
     fw.big_merge(historical, merge(args), 'historical_updated')
     print('Historical merge created')
+
     fw.Excel('../src/output_files/historical_updated.txt', '../src/output_files/outs.xlsx')
+    print('Excel created')
 
 
-
-
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='',
+def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='',
                      console=False):
     percent = ('{0:.' + str(decimals) + 'f}').format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
