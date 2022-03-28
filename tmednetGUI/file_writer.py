@@ -17,9 +17,25 @@ class Excel:
         self.total3 = {}
         self.firstdate = self.df['Date'][0]
         self.lastdate = self.df['Date'][len(self.df) - 1]
-
         self.console = console
+        self.start_data_frames()
+        self.appendict = {}
+        self.appendict2 = {}
+        self.appendict3 = {}
+        self.df = self.df.fillna(0)
+        self.dailymeans = {}
+        self.seasonalmeans = {}
+        self.fill_dictionaries()
+        self.firstmonth = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%m')
+        self.firstyear = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%Y')
+        if write_excel:
+            self.excel_writer(output_path)
+        elif seasonal:
+            self.only_seasonal()
+        else:
+            self.multiyear_mean_calculator()
 
+    def start_data_frames(self):
         self.mydf = pd.DataFrame(columns=['date', 'depth(m)', 'N', 'mean', 'std', 'max', 'min'])
 
         self.mydf2 = pd.DataFrame(
@@ -29,14 +45,7 @@ class Excel:
             columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
                      'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
 
-        self.appendict = {}
-        self.appendict2 = {}
-        self.appendict3 = {}
-        self.df = self.df.fillna(0)
-
-        self.dailymeans = {}
-        self.seasonalmeans = {}
-
+    def fill_dictionaries(self):
         for column in self.df:
             if column != 'Date' and column != 'Time':
                 self.dailymeans[column] = []
@@ -53,15 +62,6 @@ class Excel:
                                            'Ndays>=23': 0, 'Ndays>=24': 0, 'Ndays>=25': 0, 'Ndays>=26': 0,
                                            'Ndays>=27': 0,
                                            'Ndays>=28': 0}
-
-        self.firstmonth = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%m')
-        self.firstyear = datetime.strftime(datetime.strptime(self.df['Date'][0], '%d/%m/%Y'), '%Y')
-        if write_excel:
-            self.excel_writer(output_path)
-        elif seasonal:
-            self.only_seasonal()
-        else:
-            self.multiyear_mean_calculator()
 
     def txt_getter(self, year, month, i):
         for column in self.df:
@@ -419,5 +419,3 @@ def big_merge(filename1, filename2, output):
     dfconc.replace(np.nan, '', regex=True, inplace=True)
 
     dfconc.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)
-
-# prova = Excel("../src/output_files/mergo.txt", 'example2.xlsx')
