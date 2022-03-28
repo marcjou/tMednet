@@ -6,6 +6,7 @@ from statistics import stdev
 from datetime import datetime
 from pandas import ExcelWriter
 
+
 class Excel:
 
     def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, console=False):
@@ -121,9 +122,12 @@ class Excel:
                     self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
                     self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
                     self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
-                    self.appendict2[column]['Ndays>=24'] = round(len([days for days in self.total2[column] if days >= 24])/24)
-                    self.appendict2[column]['Ndays>=25'] = round(len([days for days in self.total2[column] if days >= 25])/24)
-                    self.appendict2[column]['Ndays>=26'] = round(len([days for days in self.total2[column] if days >= 26])/24)
+                    self.appendict2[column]['Ndays>=24'] = round(
+                        len([days for days in self.total2[column] if days >= 24]) / 24)
+                    self.appendict2[column]['Ndays>=25'] = round(
+                        len([days for days in self.total2[column] if days >= 25]) / 24)
+                    self.appendict2[column]['Ndays>=26'] = round(
+                        len([days for days in self.total2[column] if days >= 26]) / 24)
                 self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
                 self.appendict2[column]['N'] = 0
                 self.total2[column] = []
@@ -142,12 +146,18 @@ class Excel:
                     self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
-                    self.appendict3[column]['Ndays>=23'] = round(len([days for days in self.total3[column] if days >= 23])/24)
-                    self.appendict3[column]['Ndays>=24'] = round(len([days for days in self.total3[column] if days >= 24])/24)
-                    self.appendict3[column]['Ndays>=25'] = round(len([days for days in self.total3[column] if days >= 25])/24)
-                    self.appendict3[column]['Ndays>=26'] = round(len([days for days in self.total3[column] if days >= 26])/24)
-                    self.appendict3[column]['Ndays>=27'] = round(len([days for days in self.total3[column] if days >= 27])/24)
-                    self.appendict3[column]['Ndays>=28'] = round(len([days for days in self.total3[column] if days >= 28])/24)
+                    self.appendict3[column]['Ndays>=23'] = round(
+                        len([days for days in self.total3[column] if days >= 23]) / 24)
+                    self.appendict3[column]['Ndays>=24'] = round(
+                        len([days for days in self.total3[column] if days >= 24]) / 24)
+                    self.appendict3[column]['Ndays>=25'] = round(
+                        len([days for days in self.total3[column] if days >= 25]) / 24)
+                    self.appendict3[column]['Ndays>=26'] = round(
+                        len([days for days in self.total3[column] if days >= 26]) / 24)
+                    self.appendict3[column]['Ndays>=27'] = round(
+                        len([days for days in self.total3[column] if days >= 27]) / 24)
+                    self.appendict3[column]['Ndays>=28'] = round(
+                        len([days for days in self.total3[column] if days >= 28]) / 24)
                 self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
@@ -156,7 +166,8 @@ class Excel:
     def main(self):
         progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
-            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50, console=self.console)
+            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
+                                              console=self.console)
         for i in range(len(self.df)):
 
             if type(self.df['Date'][i]) != type('27/12/1995'):
@@ -216,7 +227,7 @@ class Excel:
                 self.excel_setter2()
                 self.excel_setter3()
 
-            #print(str(i) + ' de ' + str(len(self.df)))
+            # print(str(i) + ' de ' + str(len(self.df)))
             progress_bar.print_progress_bar(i)
             if self.console:
                 console_progress.print_progress_bar(i)
@@ -242,12 +253,18 @@ class Excel:
                     self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
-                    self.appendict3[column]['Ndays>=23'] = round(len([days for days in self.total3[column] if days >= 23])/24)
-                    self.appendict3[column]['Ndays>=24'] = round(len([days for days in self.total3[column] if days >= 24])/24)
-                    self.appendict3[column]['Ndays>=25'] = round(len([days for days in self.total3[column] if days >= 25])/24)
-                    self.appendict3[column]['Ndays>=26'] = round(len([days for days in self.total3[column] if days >= 26])/24)
-                    self.appendict3[column]['Ndays>=27'] = round(len([days for days in self.total3[column] if days >= 27])/24)
-                    self.appendict3[column]['Ndays>=28'] = round(len([days for days in self.total3[column] if days >= 28])/24)
+                    self.appendict3[column]['Ndays>=23'] = round(
+                        len([days for days in self.total3[column] if days >= 23]) / 24)
+                    self.appendict3[column]['Ndays>=24'] = round(
+                        len([days for days in self.total3[column] if days >= 24]) / 24)
+                    self.appendict3[column]['Ndays>=25'] = round(
+                        len([days for days in self.total3[column] if days >= 25]) / 24)
+                    self.appendict3[column]['Ndays>=26'] = round(
+                        len([days for days in self.total3[column] if days >= 26]) / 24)
+                    self.appendict3[column]['Ndays>=27'] = round(
+                        len([days for days in self.total3[column] if days >= 27]) / 24)
+                    self.appendict3[column]['Ndays>=28'] = round(
+                        len([days for days in self.total3[column] if days >= 28]) / 24)
                 self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
@@ -269,7 +286,7 @@ class Excel:
         progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
             console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
-                                               console=self.console)
+                                              console=self.console)
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
                 pass
@@ -298,11 +315,10 @@ class Excel:
             if i == len(self.df) - 1:
                 self.calculate_seasonal()
 
-            #print(str(i) + ' de ' + str(len(self.df)))
+            # print(str(i) + ' de ' + str(len(self.df)))
             progress_bar.print_progress_bar(i)
             if self.console:
                 console_progress.print_progress_bar(i)
-
 
     def monthly_getter(self, year, month, i):
         for column in self.df:
@@ -340,8 +356,8 @@ class Excel:
         progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
         if self.console:
             console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
-                                               console=self.console)
-        #Calculates the multiyear mean for the annual t-cycles plot
+                                              console=self.console)
+        # Calculates the multiyear mean for the annual t-cycles plot
         for i in range(len(self.df)):
             if type(self.df['Date'][i]) != type('27/12/1995'):
                 pass
@@ -373,20 +389,22 @@ class Excel:
             if i == len(self.df) - 1:
                 self.monthly_setter()
 
-            #print(str(i) + ' de ' + str(len(self.df)))
+            # print(str(i) + ' de ' + str(len(self.df)))
             progress_bar.print_progress_bar(i)
             if self.console:
                 console_progress.print_progress_bar(i)
 
         self.monthlymeandf = pd.DataFrame(columns=['month', 'depth', 'mean'])
-        monthlydict = {'month':0, 'depth':0, 'mean':0}
+        monthlydict = {'month': 0, 'depth': 0, 'mean': 0}
         self.mydf2.replace(0, np.nan, inplace=True)
         for month in self.mydf2['month'].unique():
             for depth in self.mydf2['depth(m)'].unique():
                 monthlydict['month'] = month
                 monthlydict['depth'] = depth
-                monthlydict['mean'] = np.nanmean(self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
+                monthlydict['mean'] = np.nanmean(
+                    self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
                 self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)
+
 
 def big_merge(filename1, filename2, output):
     df1 = pd.read_csv(filename1, '\t')
@@ -400,7 +418,6 @@ def big_merge(filename1, filename2, output):
     dfconc = pd.concat([df1, df2])
     dfconc.replace(np.nan, '', regex=True, inplace=True)
 
-    dfconc.to_csv('../src/output_files/'+ output + '.txt', sep='\t', index=False)
+    dfconc.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)
 
 # prova = Excel("../src/output_files/mergo.txt", 'example2.xlsx')
-

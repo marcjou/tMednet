@@ -1,32 +1,28 @@
 import sys
-from datetime import datetime
 import time
-import tkinter as tk
-import tkinter.font as tkFont
-from tkinter import *
-from tkinter import messagebox, Button
-from tkinter import ttk
-from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
-
-import pandas as pd
 import matplotlib
-import matplotlib.dates as mdates
 import numpy as np
-from PIL import Image, ImageTk
-
-import file_manipulation as fm
+import pandas as pd
+import tkinter as tk
+from tkinter import *
+from tkinter import ttk
 import file_writer as fw
-
-matplotlib.use("TkAgg")
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.figure import Figure
-import matplotlib.dates as dates
-
+from datetime import datetime
+import tkinter.font as tkFont
+from PIL import Image, ImageTk
+import file_manipulation as fm
 from datetime import timedelta
+import matplotlib.pyplot as plt
+import matplotlib.dates as dates
+import matplotlib.dates as mdates
+from matplotlib.figure import Figure
+from tkinter import messagebox, Button
+from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 version = "0.8"
 build = "Mars 2022"
+matplotlib.use("TkAgg")
 
 
 class tmednet(tk.Frame):

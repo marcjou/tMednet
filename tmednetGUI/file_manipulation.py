@@ -1,17 +1,14 @@
-from datetime import datetime, timedelta
-import re
-import user_interaction as ui
-import pandas as pd
-from geojson import Point, Feature, dump
-import time
 import os
-from numpy import diff
-import numpy as np
-from scipy.ndimage.filters import uniform_filter1d
+import re
+import time
 import json
-import user_interaction
-from fpdf import FPDF
+import numpy as np
 import pdf_creator
+import pandas as pd
+from numpy import diff
+from geojson import Point, Feature, dump
+from datetime import datetime, timedelta
+from scipy.ndimage.filters import uniform_filter1d
 
 
 def load_coordinates(region):
@@ -99,6 +96,7 @@ def load_data(args, consolescreen=False):
             consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
             consolescreen.insert("end", "=============\n")
 
+
 def check_start(data, consolescreen):
     """
         Method: check_start(data)
@@ -113,6 +111,8 @@ def check_start(data, consolescreen):
         if titlestart < filestart:
             consolescreen.insert("end", "Error, start date on the title of the file set before the start date of the file in depth " + str(dat['depth']) + "\n", 'warning')
             consolescreen.insert("end", "=============\n")
+
+
 def interpolate_hours(data):
     """
     Method: interpolate_hours(data)
@@ -257,9 +257,6 @@ def report(args, textbox):
     pdf.output('test2.pdf', 'F')
 
 
-
-
-
 def openfile(args, files, consolescreen):
     """
     Method: openfile(args, files, consolescreen)
@@ -381,6 +378,7 @@ def df_to_txt(df, data, SN):
         df.to_string(f, col_space=10)
     print('txt written')
     return output
+
 
 def df_to_geojson(df, properties, SN, lat, lon):
     """

@@ -1,12 +1,12 @@
-from datetime import datetime
-import pandas as pd
-from matplotlib import pyplot as plt
-
-import file_manipulation as fm
-import file_writer as fw
 import numpy as np
+import pandas as pd
+import file_writer as fw
+from datetime import datetime
+import file_manipulation as fm
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
+from matplotlib import pyplot as plt
+
 
 class Arguments:
 
