@@ -435,7 +435,7 @@ def zoom_data(data, consolescreen=False):
     temperatures = [data['temp'][:72], data['temp'][-72:]]
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1]) / diff(ftimestamp)
-    indexes = np.argwhere(finaldydx > 0.0002) + 1  # Gets the indexes in which the variation is too big (removing)
+    indexes = np.argwhere(finaldydx > 0.0006) + 1  # Gets the indexes in which the variation is too big (removing)
     # Checks whether if the error values begin before the declarated time of removal or later.
     # If later, the time of removal is the marked time to be removed
 
@@ -453,6 +453,10 @@ def zoom_data(data, consolescreen=False):
             start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
             # start_index = np.array(range(int(start_index), len(temperatures[0])))
             return time_series, temperatures, indexes, start_index
+        indexes = np.array(range(0, len(temperatures[0])))
+        start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
+        # start_index = np.array(range(int(start_index), len(temperatures[0])))
+        return time_series, temperatures, indexes, start_index
     except TypeError:
         if consolescreen == False:
             print('WARNING, day of end of operation')
