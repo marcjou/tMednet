@@ -282,8 +282,9 @@ class tmednet(tk.Frame):
             for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
                 self.files.append(file)
             fm.load_data(self, self.consolescreen)  # Llegim els fitxers
-        except TypeError:
+        except TypeError as e:
             self.console_writer('Unable to read file', 'warning')
+            print(str(e))
         return
 
     def report(self):
@@ -611,7 +612,7 @@ class tmednet(tk.Frame):
         """
         try:
 
-            fm.to_utc(self.mdata)
+            # fm.to_utc(self.mdata)
             global cb
             self.clear_plots()
             self.counter.append("Hovmoller")
@@ -681,7 +682,7 @@ class tmednet(tk.Frame):
                 if newdf is not None:
                     newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
                 else:
-                    newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
+                    newdf = pd.DataFrame(dfdelta.groupby('day')[depth].mean())
 
         # BLOCK ENDS HERE!!!!!!!
 

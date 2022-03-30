@@ -110,7 +110,7 @@ class Arguments:
                 if newdf is not None:
                     newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
                 else:
-                    newdf = pd.DataFrame(dfdelta.groupby('day')['5'].mean())
+                    newdf = pd.DataFrame(dfdelta.groupby('day')[depth].mean())
         return newdf, dfdelta
 
     @staticmethod

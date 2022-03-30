@@ -37,8 +37,8 @@ def load_data(args, consolescreen=False):
     Version: 05/2021, MJB: Documentation
     """
     try:
-        for ifile in args.files[
-                     len(args.files) - args.newfiles:]:  # Iterates based on the last entry on args.files to not overwrite
+        # Iterates based on the last entry on args.files to not overwrite
+        for ifile in args.files[len(args.files) - args.newfiles:]:
             filein = args.path + ifile
 
             lat, lon, site_name = load_coordinates(int(ifile.split('_')[0]))
@@ -50,7 +50,7 @@ def load_data(args, consolescreen=False):
                      "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H'), 'images': []}
 
             print("file", filein)
-            if consolescreen == False:
+            if not consolescreen:
                 print(filein + '\n')
             else:
                 consolescreen.insert("end", "file ")
@@ -64,26 +64,24 @@ def load_data(args, consolescreen=False):
             bad = []
             good = []
             for i in range(len(a)):
-                if a[i][3] == "Enregistré" or a[i][3] == "Registrado":
+                if len(a[i]) >= 5:
+                    if a[i][4] == "Enregistré" or a[i][4] == "Registrado":
+                        bad.append(i)
+                    else:
+                        good.append(a[i])
+                elif a[i][3] == 'Enregistré' or a[i][3] == 'Registrado':
                     bad.append(i)
                 else:
                     good.append(a[i])  # Only uses the data without the "Enregistré" string to avoid errors
-            # Deprecated nl = len(a) - len(bad) + 1
-            # Deprecated datos["timegmt"] = [datetime.strptime(a[i][1] + ' ' + a[i][2], "%d/%m/%y %H:%M:%S") for i in
-            #                    range(1, nl)]
             datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
                                 range(1, len(good))]
-            # Deprecated datos["temp"] = [float(a[i][3]) for i in range(1, nl)]
             datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
-            # UPDATE: Changed all a[] to good[]
             igm = '_'.join(good[0]).find("GMT")
             gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
             datos['S/N'] = int(re.sub('\D', '', good[0][good[0].index('S/N:') + 1]))
             args.mdata.append(datos)
             args.tempdataold.append(datos.copy())
-        # check_hour_interval(args.mdata)
-        # convert_round_hour(args.mdata)
         args.mdata = sorted(args.mdata, key=lambda k: k['depth'])
         args.tempdataold = sorted(args.tempdataold, key=lambda k: k['depth'])
         check_start(args.mdata, consolescreen)
@@ -109,7 +107,8 @@ def check_start(data, consolescreen):
         titlestart = dat['datainici'].timestamp()
         filestart= dat['timegmt'][0].timestamp()
         if titlestart < filestart:
-            consolescreen.insert("end", "Error, start date on the title of the file set before the start date of the file in depth " + str(dat['depth']) + "\n", 'warning')
+            consolescreen.insert("end", "Error, start date on the title of the file set before the start date of the "
+                                        "file in depth " + str(dat['depth']) + "\n", 'warning')
             consolescreen.insert("end", "=============\n")
 
 
@@ -136,6 +135,7 @@ def interpolate_hours(data):
                 dfinter = dfmerge.drop(columns='0_y')
                 sinter = dfinter['0_x'].round(3)
                 dat['temp'] = sinter[daterange].values.tolist()
+                dat['time'] = daterange.to_pydatetime().tolist()
                 break
 
 
@@ -206,21 +206,8 @@ def report(args, textbox):
                 'Underwater End Date': datetime.strftime(args.mdata[0]['datafin'], '%Y-%m-%d %H:%M:%S'),
                 'GMT': args.mdata[0]["GMT"], 'Sensors': [],
                 'NData': []}
-
-    for item in args.mdata:
-        daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
-        cadena = "=========\n"
-        cadena += "Depth: " + str(item["depth"]) + "\n"
-        cadena += "Init: " + item["datainici"].isoformat() + "\n"
-        cadena += "End: " + item["datafin"].isoformat() + "\n"
-        cadena += "Ndays: " + str(daysinsitu) + "\n"
-        cadena += "GMT: " + item["GMT"] + "\n"
-        cadena += "DInit: " + item["timegmt"][0].isoformat() + "\n"
-        cadena += "DEnd: " + item["timegmt"][-1].isoformat() + "\n"
-        textbox.insert("end", cadena)
-        PDF_DATA['Sampling depth (m)'].append(item['depth'])
-        PDF_DATA['Sensors'].append(item['S/N'])
-        PDF_DATA['NData'].append(sum(map(lambda x : x != 999, item['temp'])))
+    # ATTENTION THIS HAS BEEN MODIFIED CHECK
+    textbox, args, PDF_DATA = metadata_string_creator()
     textbox.insert("end", "=========\n")
     for text in args.reportlogger:
         textbox.insert("end", text + "\n")
@@ -255,6 +242,24 @@ def report(args, textbox):
         else:
             pdf.text(text)
     pdf.output('test2.pdf', 'F')
+
+def metadata_string_creator(textbox, args, PDF_DATA):
+    for item in args.mdata:
+        daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
+        cadena = "=========\n"
+        cadena += "Depth: " + str(item["depth"]) + "\n"
+        cadena += "Init: " + item["datainici"].isoformat() + "\n"
+        cadena += "End: " + item["datafin"].isoformat() + "\n"
+        cadena += "Ndays: " + str(daysinsitu) + "\n"
+        cadena += "GMT: " + item["GMT"] + "\n"
+        cadena += "DInit: " + item["timegmt"][0].isoformat() + "\n"
+        cadena += "DEnd: " + item["timegmt"][-1].isoformat() + "\n"
+        textbox.insert("end", cadena)
+        PDF_DATA['Sampling depth (m)'].append(item['depth'])
+        PDF_DATA['Sensors'].append(item['S/N'])
+        PDF_DATA['NData'].append(sum(map(lambda x : x != 999, item['temp'])))
+
+        return textbox, args, PDF_DATA
 
 
 def openfile(args, files, consolescreen):
@@ -313,6 +318,8 @@ def to_utc(data):
         # Mirar timedelta
         data[i]["time"] = [data[i]["timegmt"][n] - timedelta(hours=gmthshift) for n in
                            range(len(data[i]["timegmt"]))]
+        data[i]['datainici'] = data[i]['datainici'] - timedelta(hours=gmthshift)
+        data[i]['datafin'] = data[i]['datafin'] - timedelta(hours=gmthshift)
         print(data[i]["time"][10], data[i]["timegmt"][10])
 
 
@@ -432,8 +439,8 @@ def zoom_data(data, consolescreen=False):
     # Checks whether if the error values begin before the declarated time of removal or later.
     # If later, the time of removal is the marked time to be removed
 
-    enddate = data["datafin"] - timedelta(hours=int(data["GMT"][1:]))
-    startdate = data["datainici"] - timedelta(hours=int(data["GMT"][1:]))
+    enddate = data["datafin"] # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
+    startdate = data["datainici"] # - timedelta(hours=int(data["GMT"][1:]))
     # If the removal time is way earlier than 72h from the last registered data, a warning is raised
     try:
 
@@ -468,7 +475,7 @@ def temp_difference(data):
         data: The mdata dictionary
     Version: 05/2021, MJB: Documentation
     """
-    to_utc(data)
+    # to_utc(data)      Applying it only at the beggining interpolate_hours
     df, depths, _ = list_to_df(data)
     i = 1
     for depth in depths[:-1]:
