@@ -453,7 +453,6 @@ def zoom_data(data, consolescreen=False):
             start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
             # start_index = np.array(range(int(start_index), len(temperatures[0])))
             return time_series, temperatures, indexes, start_index
-        indexes = np.array(range(0, len(temperatures[0])))
         start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
         return time_series, temperatures, indexes, start_index

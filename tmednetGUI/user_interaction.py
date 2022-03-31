@@ -413,9 +413,14 @@ class tmednet(tk.Frame):
                            self.mdata[index]['depth']) + " - Region: " + str(
                            self.mdata[index]['region']))
         if indexes.size != 0:
-            self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
-                            masked_temperatures[-len(time_series[0]):(int(indexes[0]) - len(time_series[0]) + 1)],
-                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            if indexes[0] + 1 == len(time_series[0]):
+                self.plot2.plot(time_series[1][:int(indexes[0])],
+                                masked_temperatures[-len(time_series[0]):(int(indexes[0]) - len(time_series[0]))],
+                                '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
+            else:
+                self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
+                                masked_temperatures[-len(time_series[0]):(int(indexes[0]) - len(time_series[0]) + 1)],
+                                '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
             self.plot2.legend()
             # Plots in the same graph the last part which represents the errors in the data from removing the sensors
             self.plot2.plot(time_series[1][int(indexes[0]):],
