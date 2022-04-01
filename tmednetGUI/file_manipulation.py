@@ -441,6 +441,8 @@ def zoom_data(data, consolescreen=False):
 
     enddate = data["datafin"] # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
     startdate = data["datainici"] # - timedelta(hours=int(data["GMT"][1:]))
+    if (time_series[0][0] - startdate).total_seconds() > 0 and (time_series[0][0] - startdate).total_seconds() < 7200:
+        startdate = time_series[0][0]
     # If the removal time is way earlier than 72h from the last registered data, a warning is raised
     try:
 

@@ -728,6 +728,8 @@ class tmednet(tk.Frame):
                                        usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
             oldepth = depth
 
+        # temporal = newdf.plot(ax=self.plot, label='_nolegend-', legend=False)
+
         for depth in histdf['depth'].unique():
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
                                                       label='_nolegend-', legend=False)
