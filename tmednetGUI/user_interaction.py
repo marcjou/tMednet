@@ -804,17 +804,17 @@ class tmednet(tk.Frame):
         for depth in usedf['depth'].unique():
             if oldepth != 0:
                 self.plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
-                                       usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey')
+                                       usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
             oldepth = depth
 
-        # temporal = newdf.plot(ax=self.plot, label='_nolegend-', legend=False)
+        newdf.plot(ax=self.plot, zorder=10)
 
         for depth in histdf['depth'].unique():
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
-                                                      label='_nolegend-', legend=False)
+                                                      label='_nolegend_', legend=False, zorder=5)
 
 
-        newdf.plot(ax=self.plot)
+
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title='Annual T Cycles')
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
