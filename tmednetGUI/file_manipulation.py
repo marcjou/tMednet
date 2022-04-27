@@ -363,6 +363,26 @@ def list_to_df(data):
     return masked_df, depths, SN
 
 
+def historic_to_df(historic, year):
+    start_time = year + '-05-01 00:00:00'
+    end_time = year + '-12-01 00:00:00'
+    df = pd.read_csv(historic, sep='\t')
+    df['added'] = df['Date'] + ' ' + df['Time']
+    for i in range(0, len(df['Date'])):
+        if str(df['added'][i]) == 'nan':
+            pass
+        else:
+            df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
+                                                   '%Y-%m-%d %H:%M:%S')
+    df.set_index('added', inplace=True)
+    df.index.name = None
+    del df['Date']
+    del df['Time']
+    filtered_df = df[start_time: end_time]
+    return filtered_df
+
+
+
 def df_to_txt(df, data, SN):
     """
     Method: df_to_txt(df, data, SN)

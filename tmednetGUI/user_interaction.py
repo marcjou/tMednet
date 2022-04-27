@@ -164,6 +164,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
+        self.right_menu.add_command(label="Plot Stratification", command=self.stratification_browse)
         self.right_menu.add_command(label="Plot Annual T Cycles", command=self.annualcycle_browser)
         self.right_menu.add_command(label="Plot Thresholds", command=self.thresholds_browser)
 
@@ -617,7 +618,8 @@ class tmednet(tk.Frame):
         """
         try:
 
-            # fm.to_utc(self.mdata)
+
+
             global cb
             self.clear_plots()
             self.counter.append("Hovmoller")
@@ -654,6 +656,83 @@ class tmednet(tk.Frame):
             self.console_writer('Load several files before creating a diagram', 'warning')
         except TypeError:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
+
+    def stratification_browse(self):
+        """
+        Method: stratification_browse(self)
+        Purpose: Plots the stratification plot from May to December of a given year with the historical file
+        Require:
+        Version: 04/2022, MJB: Documentation
+        """
+        self.newwindow = Toplevel()
+        self.newwindow.title('Select historical file')
+
+
+
+        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        yearLabel = Label(self.newwindow, text='Year:').grid(row=1, pady=10)
+        self.yearInput = Entry(self.newwindow, width=20)
+        self.yearInput.grid(row=1, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_stratification).grid(row=2, column=1)
+
+    def plot_stratification(self):
+        """
+        Method: plot_stratification(self)
+        Purpose: Plots the stratification plot from May to December of a given year with the historical file
+        Require:
+        Version: 04/2022, MJB: Documentation
+        """
+        historical = self.openfileinput.get()
+        year = self.yearInput.get()
+        self.newwindow.destroy()
+
+        df = fm.historic_to_df(historical, year)
+        #TODO Find a way to filter the df only for the stratification year wanted
+        try:
+            global cb
+            self.clear_plots()
+            self.counter.append("Hovmoller")
+            depths = np.array(list(map(int, list(df.columns))))
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+            self.plot = self.fig.add_subplot(111)
+
+
+            self.plot.set_ylim(0, -depths[-1]+1)
+            self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
+            self.plot.invert_yaxis()
+            levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
+
+            # Draws a contourn line.
+            # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+            cf = self.plot.contourf(pd.to_datetime(df.index), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+
+            cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
+            self.cbexists = True
+            self.plot.set(ylabel='Depth (m)',
+                          title='Stratification Site: ' + historical.split('_')[3])
+
+            # Sets the X axis as the initials of the months
+            locator = mdates.MonthLocator()
+            self.plot.xaxis.set_major_locator(locator)
+            fmt = mdates.DateFormatter('%b')
+            self.plot.xaxis.set_major_formatter(fmt)
+            #Sets the x axis on the top
+            self.plot.xaxis.tick_top()
+
+            self.canvas.draw()
+
+            self.console_writer('Plotting the HOVMOLLER DIAGRAM at region: ', 'action', historical.split('_')[3], True)
+        except IndexError:
+            self.console_writer('Load several files before creating a diagram', 'warning')
+        except TypeError:
+            self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
+
+
 
     def plot_annualTCycle(self):
         """

@@ -9,7 +9,7 @@ from pandas import ExcelWriter
 
 class Excel:
 
-    def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, console=False):
+    def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, lastyear=False, console=False):
         self.df = pd.read_csv(input_path, '\t')
         self.n = 0
         self.total = {}
@@ -32,6 +32,8 @@ class Excel:
             self.excel_writer(output_path)
         elif seasonal:
             self.only_seasonal()
+        elif lastyear:
+            self.calculate_lastyear()
         else:
             self.multiyear_mean_calculator()
 
@@ -239,6 +241,69 @@ class Excel:
         self.mydf2.to_excel(writer, 'Monthly')
         self.mydf3.to_excel(writer, 'Seasonal')
         writer.save()
+
+    def calculate_lastyear(self):
+        #Here calculates only from May to December of the last Year of Data
+        progress_bar = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50)
+        if self.console:
+            console_progress = pb.progressBar(len(self.df), prefix='Progress:', suffix='Complete', length=50,
+                                              console=self.console)
+        for i in range(len(self.df)):
+
+            if type(self.df['Date'][i]) != type('27/12/1995'):
+                pass
+            elif i >= 1 and type(self.df['Date'][i - 1]) != type('27/12/1995'):
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+                if year == self.firstyear or year == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 2], '%d/%m/%Y'),
+                        '%Y'):
+
+                    if month == self.firstmonth or month == datetime.strftime(
+                            datetime.strptime(self.df['Date'][i - 2], '%d/%m/%Y'), '%m'):
+
+                        if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 2]:
+                            self.txt_getter(year, month, i)
+                        else:
+                            self.excel_setter(month)
+                            self.txt_getter(year, month, i)
+                    else:
+                        self.firstmonth = '00'
+                        self.excel_setter(month)
+                        self.txt_getter(year, month, i)
+                else:
+                    self.excel_setter(month)
+                    self.excel_setter()
+                    self.txt_getter(year, month, i)
+            else:
+                year = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%Y')
+                month = datetime.strftime(datetime.strptime(self.df['Date'][i], '%d/%m/%Y'), '%m')
+                if year == self.firstyear or year == datetime.strftime(
+                        datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
+                        '%Y'):
+
+                    if month == self.firstmonth or month == datetime.strftime(
+                            datetime.strptime(self.df['Date'][i - 1], '%d/%m/%Y'),
+                            '%m'):
+                        if self.df['Date'][i] == self.firstdate or self.df['Date'][i] == self.df['Date'][i - 1]:
+                            self.txt_getter(year, month, i)
+                        else:
+                            self.excel_setter(month)
+                            self.txt_getter(year, month, i)
+                    else:
+                        self.firstmonth = '00'
+                        self.excel_setter(month)
+                        self.txt_getter(year, month, i)
+                else:
+                    self.excel_setter(month)
+                    self.txt_getter(year, month, i)
+            if i == len(self.df) - 1:
+                self.excel_setter(month)
+
+            # print(str(i) + ' de ' + str(len(self.df)))
+            progress_bar.print_progress_bar(i)
+            if self.console:
+                console_progress.print_progress_bar(i)
 
     def calculate_seasonal(self):
         for column in self.df:
