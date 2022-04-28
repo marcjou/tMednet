@@ -667,8 +667,6 @@ class tmednet(tk.Frame):
         self.newwindow = Toplevel()
         self.newwindow.title('Select historical file')
 
-
-
         openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
         self.openfileinput = Entry(self.newwindow, width=20)
         self.openfileinput.grid(row=0, column=1)
@@ -690,7 +688,6 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
 
         df = fm.historic_to_df(historical, year)
-        #TODO Find a way to filter the df only for the stratification year wanted
         try:
             global cb
             self.clear_plots()
@@ -702,7 +699,8 @@ class tmednet(tk.Frame):
             self.plot = self.fig.add_subplot(111)
 
 
-            self.plot.set_ylim(0, -depths[-1]+1)
+            self.plot.set_ylim(0, -depths[-1])
+            self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
             self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
