@@ -388,7 +388,21 @@ def historic_to_df(historic, year):
         filtered_df = df[start_time: end_time]
     if filtered_df.columns[0] == '5':
         filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
-    return filtered_df
+
+    return filtered_df.interpolate(axis=1)
+
+
+def check_for_interpolation(df):
+    """
+    Method: check_for_interpolation(df)
+    Purpose: Checks for data gaps in order to interpolate them
+    Requires:
+        df: The Dataframe to be read
+        data: List mdata
+        SN: The serial number list
+    Version: 05/2021, MJB: Documentation
+    """
+    # Not necessary???
 
 
 
