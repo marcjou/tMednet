@@ -202,6 +202,7 @@ class tmednet(tk.Frame):
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
+        self.savefilename = ''
 
     def console_writer(self, msg, mod, var=False, liner=False):
         """
@@ -691,7 +692,7 @@ class tmednet(tk.Frame):
         try:
             global cb
             self.clear_plots()
-            self.counter.append("Hovmoller")
+            self.counter.append("Stratification")
             depths = np.array(list(map(int, list(df.columns))))
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
@@ -700,8 +701,10 @@ class tmednet(tk.Frame):
 
 
             self.plot.set_ylim(0, -depths[-1])
-            self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
-            self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
+            self.plot.set_xlim(datetime.strptime('01/05/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'), datetime.strptime('01/12/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'))
+            #self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
+            self.plot.set_yticks(-np.insert(depths, 0, 0))
+            #self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
 
@@ -712,8 +715,8 @@ class tmednet(tk.Frame):
             cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
             self.plot.set(ylabel='Depth (m)',
-                          title='Stratification Site: ' + historical.split('_')[3])
-
+                          title=historical.split('_')[4] + ' year ' + year)
+            self.savefilename = historical.split('_')[3] + '_1_' + year + '_' + historical.split('_')[4]
             # Sets the X axis as the initials of the months
             locator = mdates.MonthLocator()
             self.plot.xaxis.set_major_locator(locator)
@@ -748,6 +751,8 @@ class tmednet(tk.Frame):
 
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
+
+        year_df =fm.historic_to_df(historical, '2020', start_month='01', end_month='01')
 
         dfdelta = fm.running_average(self.mdata, running=360)
 
@@ -1131,6 +1136,8 @@ class tmednet(tk.Frame):
                     filename = str(self.value[:-7]) + " filtered differences"
                 elif self.counter[0] == 'Difference':
                     filename = str(self.value[:-7]) + " differences"
+                elif self.counter[0] == 'Stratification':
+                    filename = self.savefilename
                 else:
                     filename = self.value[:-4] + ' ' + zoom
             if len(self.counter) > 1:

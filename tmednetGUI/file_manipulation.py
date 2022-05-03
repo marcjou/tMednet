@@ -363,9 +363,12 @@ def list_to_df(data):
     return masked_df, depths, SN
 
 
-def historic_to_df(historic, year):
-    start_time = year + '-05-01 00:00:00'
-    end_time = year + '-12-01 00:00:00'
+def historic_to_df(historic, year, start_month='05', end_month='12'):
+    start_time = year + '-' + start_month +'-01 00:00:00'
+    if end_month == '01':
+        end_time = str(int(year)+1) + '-' + end_month + '-01 00:00:00'
+    else:
+        end_time = year + '-' + end_month + '-01 00:00:00'
 
     df = pd.read_csv(historic, sep='\t')
     df['added'] = df['Date'] + ' ' + df['Time']
