@@ -599,3 +599,27 @@ def running_average(data, running=240):
             dfdelta = pd.DataFrame(series1)
 
     return dfdelta
+
+def running_average_special(year_df, running=240):
+    """
+    Method: running_average_special(data)
+    Purpose: Applies the 10 running day filter to the data
+    Require:
+        data: The mdata dictionary
+    Version: 05/2021, MJB: Documentation
+    """
+    i = 1
+    longest = 0
+    indi = len(year_df)
+    depths = list(year_df.columns)
+    for depth in depths:
+        # Cambiado entre otros index del data al dropna
+        series1 = pd.DataFrame(uniform_filter1d(year_df[str(depth)].dropna(), size=running),
+                               index=year_df[str(depth)].dropna().index, columns=[str(depth)]).reindex(year_df.index)
+        i += 1
+        if 'dfdelta' in locals():
+            dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
+        else:
+            dfdelta = pd.DataFrame(series1)
+
+    return dfdelta

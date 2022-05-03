@@ -745,6 +745,8 @@ class tmednet(tk.Frame):
 
         # Gets the historical data to calculate the multi-year mean and deletes the old plots
         historical = self.openfileinput.get()
+        year = self.yearInput.get()
+
         self.newwindow.destroy()
         self.clear_plots()
         self.counter.append("Cycles")
@@ -752,24 +754,40 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        year_df =fm.historic_to_df(historical, '2020', start_month='01', end_month='01')
+        year_df =fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
-        dfdelta = fm.running_average(self.mdata, running=360)
+        year_df = fm.running_average_special(year_df, running=360)
+        #dfdelta = fm.running_average(self.mdata, running=360)
 
         # All this block serves only to transform the data from hourly to daily. It should be inside its own method
         daylist = []
-        for time in dfdelta.index:
+        # Converts the index from timestamp to string
+        '''
+        for time in year_df.index:
             old = datetime.strftime(time, '%Y-%m-%d')
             new = datetime.strptime(old, '%Y-%m-%d')
+            
             daylist.append(new)
         dfdelta['day'] = daylist
+        '''
+        daylist = []
+        for time in year_df.index:
+            if str(time) == 'nan':
+                pass
+            else:
+                old = datetime.strftime(datetime.strptime(time, '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d')
+                new = datetime.strptime(old, '%Y-%m-%d')
+            daylist.append(new)
+        year_df['day'] = daylist
+
         newdf = None
-        for depth in dfdelta.columns:
+        # Changed dfdelta here for year_df, if wrong, revert
+        for depth in year_df.columns:
             if depth != 'day':
                 if newdf is not None:
-                    newdf = pd.merge(newdf, dfdelta.groupby('day')[depth].mean(), right_index=True, left_index=True)
+                    newdf = pd.merge(newdf, year_df.groupby('day')[depth].mean(), right_index=True, left_index=True)
                 else:
-                    newdf = pd.DataFrame(dfdelta.groupby('day')[depth].mean())
+                    newdf = pd.DataFrame(year_df.groupby('day')[depth].mean())
 
         # BLOCK ENDS HERE!!!!!!!
 
@@ -781,12 +799,13 @@ class tmednet(tk.Frame):
         monthDict = {}
         for i in range(1, 13):
             if i < 10:
-                monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',
-                                                          '%Y-%m-%d')
+                monthDict['0' + str(i)] = datetime.strptime(year + '-0' + str(i) + '-01',
+                    '%Y-%m-%d')
+                #monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',                                                          '%Y-%m-%d')
             else:
-                monthDict[str(i)] = datetime.strptime(
-                    datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01',
-                '%Y-%m-%d')
+                monthDict[str(i)] = datetime.strptime(year + '-' + str(i) + '-01',
+                                                      '%Y-%m-%d')
+                #monthDict[str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01', '%Y-%m-%d')
 
 
         # Creates the subplots and deletes the old plot
@@ -795,8 +814,6 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
 
         self.plot = self.fig.add_subplot(111)
-
-
 
         for month in histdf['month'].unique():
             histdf['month'].replace(month, monthDict[month], inplace=True)
@@ -1029,8 +1046,11 @@ class tmednet(tk.Frame):
         openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
         self.openfileinput = Entry(self.newwindow, width=20)
         self.openfileinput.grid(row=0, column=1)
+        yearLabel = Label(self.newwindow, text='Year:').grid(row=1, pady=10)
+        self.yearInput = Entry(self.newwindow, width=20)
+        self.yearInput.grid(row=1, column=1)
         openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_annualTCycle).grid(row=1, column=1)
+        actionButton = Button(self.newwindow, text='Select', command=self.plot_annualTCycle).grid(row=2, column=1)
 
     def go_back(self):
         """
