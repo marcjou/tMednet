@@ -827,7 +827,9 @@ class tmednet(tk.Frame):
                                        usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
             oldepth = depth
 
-        newdf.plot(ax=self.plot, zorder=10)
+        color_dict = {'5':'#d4261d', '10':'#f58e6e', '15':'#fca95a', '20':'#fde5a3', '25':'#e4f4f8', '30':'#a7d6e7',
+                      '35':'#9ec6de', '40':'#3a6daf', '45':'#214f8a', '50':'#0a3164'}
+        newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
 
         for depth in histdf['depth'].unique():
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
@@ -836,9 +838,10 @@ class tmednet(tk.Frame):
 
 
         self.plot.set(ylabel='Temperature (ºC) smoothed',
-                      title='Annual T Cycles')
+                      title=historical.split('_')[4] + ' year ' + year)
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
-        self.plot.legend(title='Depth (m)')
+        leg = self.plot.legend(title='Depth (m)')
+        self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
 
         #Sets the X axis as the initials of the months
         locator = mdates.MonthLocator()
@@ -848,7 +851,11 @@ class tmednet(tk.Frame):
 
         self.plot.xaxis.set_label_text('foo').set_visible(False)
                 # fig.set_size_inches(14.5, 10.5, forward=True)
+
+        self.plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
         self.canvas.draw()
+
+
 
     def plot_thresholds(self):
         """
@@ -936,22 +943,23 @@ class tmednet(tk.Frame):
         # Draws the legend for the different years
         self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
-                      title=self.mdata[0]['region_name'] + ' Summer days ≥ 23ºC')
+                      title=historical.split('_')[4] + ' Summer days ≥ 23ºC')
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
             tab = {}
             btn = tk.Button(self.toolbar, text=i,
                             command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth, year_dict, markers,
-                                                                                 colors, lines, years, maxdays))
+                                                                                 colors, lines, years, maxdays, historical))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
             self.tabs[i] = tab
         self.curtab = 23
         print('Ayo')
+        self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
 
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays):
+    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical):
         """
            Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
            Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
@@ -973,8 +981,8 @@ class tmednet(tk.Frame):
             self.clear_plots(clear_thresholds=False)
             self.counter.append('Thresholds')
             self.plot = self.fig.add_subplot(111)
-            self.plot.set(ylim=(0, maxdepth))
-            self.plot.set(xlim=(0, maxdays))
+            self.plot.set(ylim=(0, maxdepth + 2))
+            self.plot.set(xlim=(-2, maxdays + 2))
             for year in years:
                 if int(year) < 2000:
                     color = colors[0]
@@ -1008,7 +1016,8 @@ class tmednet(tk.Frame):
             self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
             self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.plot.set(ylabel='Depth (m)',
-                          title=self.mdata[0]['region_name'] + ' Summer days ≥ ' + str(i) + 'ºC')
+                          title=historical.split('_')[4] + ' Summer days ≥ ' + str(i) + 'ºC')
+            self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
             self.canvas.draw()
 
         self.curtab = i
@@ -1149,9 +1158,9 @@ class tmednet(tk.Frame):
                 if self.counter[0] == "Hovmoller":
                     filename = str(self.value[:-7]) + " Hovmoller"
                 elif self.counter[0] == 'Cycles':
-                    filename = str(self.value[:-7]) + " Annual T-Cycles"
+                    filename = self.savefilename
                 elif self.counter[0] == 'Thresholds':
-                    filename = str(self.value[:-7]) + " Thresholds"
+                    filename = self.savefilename
                 elif self.counter[0] == 'Filter':
                     filename = str(self.value[:-7]) + " filtered differences"
                 elif self.counter[0] == 'Difference':
