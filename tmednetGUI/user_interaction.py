@@ -700,10 +700,16 @@ class tmednet(tk.Frame):
             self.plot = self.fig.add_subplot(111)
 
 
-            self.plot.set_ylim(0, -depths[-1])
+            if depths[-1] < 40:
+                self.plot.set_ylim(0, -40)
+                self.plot.set_yticks(-np.insert(depths, [0, -1], [0, 40]))
+            else:
+                self.plot.set_ylim(0, -depths[-1])
+                self.plot.set_yticks(-np.insert(depths, 0, 0))
+
             self.plot.set_xlim(datetime.strptime('01/05/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'), datetime.strptime('01/12/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'))
             #self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
-            self.plot.set_yticks(-np.insert(depths, 0, 0))
+
             #self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)

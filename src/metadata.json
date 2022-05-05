@@ -499,8 +499,8 @@
             "site_name": "Ullastres",
             "site_code": "150",
             "eco_region": "W-MED",
-            "sub_basin": "Balearic",
-            "start_year": "2020",
+            "sub_basin": "Provence",
+            "start_year": "2012",
             "end_year": "2021",
             "institution": "Institut de Ciencies del Mar"
         },
@@ -527,7 +527,19 @@
             "start_year": "2015",
             "end_year": "2018",
             "institution": "Brijuni National Park - Zagreb University - PMF"
-            }
+            },
+        "52": {
+            "lat": "43.2055",
+            "long": "5.44617",
+            "site_number": "",
+            "site_name": "Marseille_Figuier",
+            "site_code": "52",
+            "eco_region": "W-Med",
+            "sub_basin": "N-Adriatic",
+            "start_year": "2015",
+            "end_year": "2018",
+            "institution": "OSU Institut Pytheas"
+        }
     },
     "regions": {
         "W-MED": {
