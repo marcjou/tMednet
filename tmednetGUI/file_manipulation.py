@@ -385,14 +385,17 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     if start_time not in df.index:
         n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
         start_time = datetime.strftime(min(n, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
-    if datetime.strptime(df.last_valid_index(), '%Y-%m-%d %H:%M:%S') < datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S'):
-        filtered_df = df[start_time: df.last_valid_index()]
+    if end_time not in df.index:
+        n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
+        end_time = datetime.strftime(min(n, key=lambda x: abs(x - datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S'))),
+                                     '%Y-%m-%d %H:%M:%S')
+        filtered_df = df[start_time: end_time]
     else:
         filtered_df = df[start_time: end_time]
     if filtered_df.columns[0] == '5':
         filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
 
-    return filtered_df.interpolate(axis=1)
+    return filtered_df.interpolate(axis=1), np.nanmin(df.values), np.nanmax(df.values)
 
 
 def check_for_interpolation(df):

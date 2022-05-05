@@ -688,7 +688,7 @@ class tmednet(tk.Frame):
         year = self.yearInput.get()
         self.newwindow.destroy()
 
-        df = fm.historic_to_df(historical, year)
+        df, hismintemp, hismaxtemp = fm.historic_to_df(historical, year)
         try:
             global cb
             self.clear_plots()
@@ -712,7 +712,8 @@ class tmednet(tk.Frame):
 
             #self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
-            levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
+            # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
+            levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
 
             # Draws a contourn line.
             # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
@@ -760,7 +761,7 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        year_df =fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, foo, bar =fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
         year_df = fm.running_average_special(year_df, running=360)
         #dfdelta = fm.running_average(self.mdata, running=360)
