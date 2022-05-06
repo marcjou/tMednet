@@ -9,6 +9,7 @@ from numpy import diff
 from geojson import Point, Feature, dump
 from datetime import datetime, timedelta
 from scipy.ndimage.filters import uniform_filter1d
+import progressbar as pb
 
 
 def load_coordinates(region):
@@ -364,6 +365,7 @@ def list_to_df(data):
 
 
 def historic_to_df(historic, year, start_month='05', end_month='12'):
+
     start_time = year + '-' + start_month +'-01 00:00:00'
     if end_month == '01':
         end_time = str(int(year)+1) + '-' + end_month + '-01 00:00:00'
@@ -371,6 +373,8 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         end_time = year + '-' + end_month + '-01 00:00:00'
 
     df = pd.read_csv(historic, sep='\t')
+    print('Historic to df:\n')
+    progress_bar = pb.progressBar(len(df['Date']), prefix='Progress:', suffix='Complete', length=50)
     df['added'] = df['Date'] + ' ' + df['Time']
     for i in range(0, len(df['Date'])):
         if str(df['added'][i]) == 'nan':
@@ -378,6 +382,7 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         else:
             df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
                                                    '%Y-%m-%d %H:%M:%S')
+        progress_bar.print_progress_bar(i)
     df.set_index('added', inplace=True)
     df.index.name = None
     del df['Date']
@@ -615,6 +620,11 @@ def running_average_special(year_df, running=240):
     longest = 0
     indi = len(year_df)
     depths = list(year_df.columns)
+    arr = []
+    for depth in depths:
+        arr.append(uniform_filter1d(year_df[str(depth)].dropna(), size=running))
+    dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.index)
+    '''
     for depth in depths:
         # Cambiado entre otros index del data al dropna
         series1 = pd.DataFrame(uniform_filter1d(year_df[str(depth)].dropna(), size=running),
@@ -624,5 +634,6 @@ def running_average_special(year_df, running=240):
             dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
         else:
             dfdelta = pd.DataFrame(series1)
+    '''
 
     return dfdelta
