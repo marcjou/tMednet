@@ -623,7 +623,7 @@ def running_average_special(year_df, running=240):
     arr = []
     for depth in depths:
         arr.append(uniform_filter1d(year_df[str(depth)].dropna(), size=running))
-    dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.index)
+    dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.dropna().index)
     '''
     for depth in depths:
         # Cambiado entre otros index del data al dropna

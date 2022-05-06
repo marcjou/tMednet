@@ -763,6 +763,8 @@ class tmednet(tk.Frame):
 
         year_df, foo, bar =fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
+        year_df.drop('0', axis=1, inplace=True)
+
         year_df = fm.running_average_special(year_df, running=360)
         #dfdelta = fm.running_average(self.mdata, running=360)
 
@@ -847,6 +849,7 @@ class tmednet(tk.Frame):
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
         self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
+        self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
         leg = self.plot.legend(title='Depth (m)')
         self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
 
