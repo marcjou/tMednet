@@ -684,6 +684,7 @@ class tmednet(tk.Frame):
         Require:
         Version: 04/2022, MJB: Documentation
         """
+        #TODO make the both stratification plots share one unique colorbar
         historical = self.openfileinput.get()
         year = self.yearInput.get()
         self.newwindow.destroy()
@@ -717,9 +718,26 @@ class tmednet(tk.Frame):
 
             # Draws a contourn line.
             # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-            cf = self.plot.contourf(pd.to_datetime(df.index), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+            df_datetime = pd.to_datetime(df.index)
+            old = df_datetime[0]
+            for i in df_datetime[1:]:
+                new = i
+                diff = new - old
+                old = new
+                if diff.days > 0:
+                    index_cut = df_datetime.get_loc(i)
+                    df_first = df[:index_cut]
+                    df_second = df[index_cut:]
+            if index_cut:
+                cf1 = self.plot.contourf(df_datetime[:index_cut], -depths, df_first.values.T, 256, extend='both',
+                                        cmap='RdYlBu_r')
+                cf2 = self.plot.contourf(df_datetime[index_cut:], -depths, df_second.values.T, 256, extend='both',
+                                        cmap='RdYlBu_r')
+                cb = plt.colorbar(cf1, ax=self.plot, label='Temperature (ºC)', ticks=levels)
+            else:
+                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
-            cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
+                cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
             self.plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' year ' + year)
