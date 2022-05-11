@@ -715,27 +715,35 @@ class tmednet(tk.Frame):
             self.plot.invert_yaxis()
             # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
+            levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
 
             # Draws a contourn line.
             # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
             df_datetime = pd.to_datetime(df.index)
             old = df_datetime[0]
+            index_cut = None
+            df_cuts = []
             for i in df_datetime[1:]:
                 new = i
                 diff = new - old
                 old = new
                 if diff.days > 0:
+                    index_old = 0
                     index_cut = df_datetime.get_loc(i)
-                    df_first = df[:index_cut]
-                    df_second = df[index_cut:]
+                    df_cuts.append(df[index_old:index_cut])
+                    index_old = index_cut
+                    # df_second = df[index_cut:]
+
             if index_cut:
-                cf1 = self.plot.contourf(df_datetime[:index_cut], -depths, df_first.values.T, 256, extend='both',
-                                        cmap='RdYlBu_r')
-                cf2 = self.plot.contourf(df_datetime[index_cut:], -depths, df_second.values.T, 256, extend='both',
-                                        cmap='RdYlBu_r')
-                cb = plt.colorbar(cf1, ax=self.plot, label='Temperature (ºC)', ticks=levels)
+                df_cuts.append(df[index_cut:])
+                cf = []
+                for i in range(0, len(df_cuts)):
+
+                    cf.append(self.plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256, extend='both',
+                                            cmap='RdYlBu_r', levels=levels2))
+                cb = plt.colorbar(cf[0], ax=self.plot, label='Temperature (ºC)', ticks=levels)
             else:
-                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r', levels=levels2)
 
                 cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
