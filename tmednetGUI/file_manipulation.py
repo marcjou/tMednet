@@ -640,6 +640,10 @@ def running_average_special(year_df, running=240):
 
     return dfdelta
 
+
 def convert_to_netCDF(filename, df):
-    xarray.Dataset(df.to_xarray()).to_netcdf('./output_files/' + filename + '.nc4')
+    try:
+        xarray.Dataset(df.to_xarray()).to_netcdf('../src/output_files/' + filename + '.nc4')
+    except Exception as e:
+        print(str(e))
 

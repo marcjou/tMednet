@@ -85,6 +85,7 @@ class tmednet(tk.Frame):
         toolsmenu = Menu(menubar, tearoff=0)
         toolsmenu.add_command(label='Historical Merge', command=self.bigmerger)
         toolsmenu.add_command(label='Create Excel', command=self.create_excel)
+        toolsmenu.add_command(label='Create netCDF', command=self.create_netCDF)
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1348,6 +1349,24 @@ class tmednet(tk.Frame):
             self.openfileinput.delete(0, END)
             file = askopenfilename(initialdir='../src/')
             self.openfileinput.insert(0, file)
+
+    def create_netCDF(self):
+        self.newwindow = Toplevel()
+        self.newwindow.title('Select file to convert to netCDF')
+
+        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        self.openfileinput = Entry(self.newwindow, width=20)
+        self.openfileinput.grid(row=0, column=1)
+        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
+        actionButton = Button(self.newwindow, text='Select', command=self.really_convert).grid(row=1, column=1)
+
+
+    def really_convert(self):
+        #TODO make a lambda function to run this instead of a method and destroy the window at the same time
+        filename = self.openfileinput.get()
+        self.newwindow.destroy()
+        df = pd.read_csv(filename, sep='\t')
+        fm.convert_to_netCDF('finalCDM', df)
 
     @staticmethod
     def help():
