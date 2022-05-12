@@ -2,10 +2,12 @@ import os
 import re
 import time
 import json
+import xarray
 import numpy as np
 import pdf_creator
 import pandas as pd
 from numpy import diff
+from netCDF4 import Dataset
 from geojson import Point, Feature, dump
 from datetime import datetime, timedelta
 from scipy.ndimage.filters import uniform_filter1d
@@ -637,3 +639,7 @@ def running_average_special(year_df, running=240):
     '''
 
     return dfdelta
+
+def convert_to_netCDF(filename, df):
+    xarray.Dataset(df.to_xarray()).to_netcdf('./output_files/' + filename + '.nc4')
+

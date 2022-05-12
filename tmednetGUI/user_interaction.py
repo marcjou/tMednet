@@ -684,7 +684,7 @@ class tmednet(tk.Frame):
         Require:
         Version: 04/2022, MJB: Documentation
         """
-        #TODO make the both stratification plots share one unique colorbar
+
         historical = self.openfileinput.get()
         year = self.yearInput.get()
         self.newwindow.destroy()
