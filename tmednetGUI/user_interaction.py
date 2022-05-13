@@ -84,8 +84,13 @@ class tmednet(tk.Frame):
 
         toolsmenu = Menu(menubar, tearoff=0)
         toolsmenu.add_command(label='Historical Merge', command=self.bigmerger)
-        toolsmenu.add_command(label='Create Excel', command=self.create_excel)
-        toolsmenu.add_command(label='Create netCDF', command=self.create_netCDF)
+        toolsmenu.add_command(label='Create Excel',
+                              command=lambda: self.window_browser('Select file and output file name',
+                                                                  self.write_excel, 'Input: ',
+                                                                  'Output: '))
+        toolsmenu.add_command(label='Create netCDF',
+                              command=lambda: self.window_browser('Select historical file',
+                                                                  self.generate_netCDF, 'Historical: '))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -165,9 +170,17 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
-        self.right_menu.add_command(label="Plot Stratification", command=self.stratification_browse)
-        self.right_menu.add_command(label="Plot Annual T Cycles", command=self.annualcycle_browser)
-        self.right_menu.add_command(label="Plot Thresholds", command=self.thresholds_browser)
+        self.right_menu.add_command(label="Plot Stratification",
+                                    command=lambda: self.window_browser('Select historical file and year',
+                                                                        self.plot_stratification, 'Historical: ',
+                                                                        'Year: '))
+        self.right_menu.add_command(label="Plot Annual T Cycles",
+                                    command=lambda: self.window_browser('Select historical file and year',
+                                                                        self.plot_annualTCycle, 'Historical: ',
+                                                                        'Year: '))
+        self.right_menu.add_command(label="Plot Thresholds",
+                                    command=lambda: self.window_browser('Select historical file',
+                                                                        self.plot_thresholds, 'Historical: '))
 
         self.list.bind("<Button-3>", self.do_popup)
         cscrollb = tk.Scrollbar(frame2, width=20)
@@ -257,7 +270,7 @@ class tmednet(tk.Frame):
                 print(index, self.value)
                 self.console_writer('Plotting: ', 'action', self.value, True)
                 self.index.append(index)
-                #Checks if the last plot was a Zoom to delete the data
+                # Checks if the last plot was a Zoom to delete the data
                 if self.counter:
                     if self.counter[-1] == 'Zoom':
                         self.clear_plots()
@@ -343,8 +356,8 @@ class tmednet(tk.Frame):
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
-        #if self.cbexists:
-         #   self.clear_plots()
+        # if self.cbexists:
+        #   self.clear_plots()
 
         if self.counter[0] == "Hovmoller":
             self.clear_plots()
@@ -620,8 +633,6 @@ class tmednet(tk.Frame):
         """
         try:
 
-
-
             global cb
             self.clear_plots()
             self.counter.append("Hovmoller")
@@ -648,7 +659,7 @@ class tmednet(tk.Frame):
             self.plot.xaxis.set_major_locator(locator)
             fmt = mdates.DateFormatter('%b')
             self.plot.xaxis.set_major_formatter(fmt)
-            #Sets the x axis on the top
+            # Sets the x axis on the top
             self.plot.xaxis.tick_top()
 
             self.canvas.draw()
@@ -659,25 +670,6 @@ class tmednet(tk.Frame):
         except TypeError:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
-    def stratification_browse(self):
-        """
-        Method: stratification_browse(self)
-        Purpose: Plots the stratification plot from May to December of a given year with the historical file
-        Require:
-        Version: 04/2022, MJB: Documentation
-        """
-        self.newwindow = Toplevel()
-        self.newwindow.title('Select historical file')
-
-        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
-        self.openfileinput = Entry(self.newwindow, width=20)
-        self.openfileinput.grid(row=0, column=1)
-        yearLabel = Label(self.newwindow, text='Year:').grid(row=1, pady=10)
-        self.yearInput = Entry(self.newwindow, width=20)
-        self.yearInput.grid(row=1, column=1)
-        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_stratification).grid(row=2, column=1)
-
     def plot_stratification(self):
         """
         Method: plot_stratification(self)
@@ -687,7 +679,7 @@ class tmednet(tk.Frame):
         """
 
         historical = self.openfileinput.get()
-        year = self.yearInput.get()
+        year = self.secondInput.get()
         self.newwindow.destroy()
 
         df, hismintemp, hismaxtemp = fm.historic_to_df(historical, year)
@@ -701,7 +693,6 @@ class tmednet(tk.Frame):
                 plt.Axes.remove(self.plot2)
             self.plot = self.fig.add_subplot(111)
 
-
             if depths[-1] < 40:
                 self.plot.set_ylim(0, -40)
                 self.plot.set_yticks(-np.insert(depths, [0, -1], [0, 40]))
@@ -709,10 +700,11 @@ class tmednet(tk.Frame):
                 self.plot.set_ylim(0, -depths[-1])
                 self.plot.set_yticks(-np.insert(depths, 0, 0))
 
-            self.plot.set_xlim(datetime.strptime('01/05/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'), datetime.strptime('01/12/'+year+' 00:00:00', '%d/%m/%Y %H:%M:%S'))
-            #self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
+            self.plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
+                               datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
+            # self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
 
-            #self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
+            # self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
             # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
@@ -739,12 +731,13 @@ class tmednet(tk.Frame):
                 df_cuts.append(df[index_cut:])
                 cf = []
                 for i in range(0, len(df_cuts)):
-
-                    cf.append(self.plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256, extend='both',
-                                            cmap='RdYlBu_r', levels=levels2))
+                    cf.append(self.plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
+                                                 extend='both',
+                                                 cmap='RdYlBu_r', levels=levels2))
                 cb = plt.colorbar(cf[0], ax=self.plot, label='Temperature (ºC)', ticks=levels)
             else:
-                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r', levels=levels2)
+                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
+                                        levels=levels2)
 
                 cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
@@ -756,7 +749,7 @@ class tmednet(tk.Frame):
             self.plot.xaxis.set_major_locator(locator)
             fmt = mdates.DateFormatter('%b')
             self.plot.xaxis.set_major_formatter(fmt)
-            #Sets the x axis on the top
+            # Sets the x axis on the top
             self.plot.xaxis.tick_top()
 
             self.canvas.draw()
@@ -766,8 +759,6 @@ class tmednet(tk.Frame):
             self.console_writer('Load several files before creating a diagram', 'warning')
         except TypeError:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
-
-
 
     def plot_annualTCycle(self):
         """
@@ -779,7 +770,7 @@ class tmednet(tk.Frame):
 
         # Gets the historical data to calculate the multi-year mean and deletes the old plots
         historical = self.openfileinput.get()
-        year = self.yearInput.get()
+        year = self.secondInput.get()
 
         self.newwindow.destroy()
         self.clear_plots()
@@ -788,12 +779,12 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        year_df, foo, bar =fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, foo, bar = fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
         year_df.drop('0', axis=1, inplace=True)
 
         year_df = fm.running_average_special(year_df, running=360)
-        #dfdelta = fm.running_average(self.mdata, running=360)
+        # dfdelta = fm.running_average(self.mdata, running=360)
 
         # All this block serves only to transform the data from hourly to daily. It should be inside its own method
         daylist = []
@@ -827,8 +818,8 @@ class tmednet(tk.Frame):
 
         # BLOCK ENDS HERE!!!!!!!
 
-        #TODO Why the filter does not look the same? ASk Nathaniel
-        #TODO change the x axis to reflect the name of the month
+        # TODO Why the filter does not look the same? ASk Nathaniel
+        # TODO change the x axis to reflect the name of the month
 
         # Dict to change from string months to datetime
 
@@ -836,13 +827,12 @@ class tmednet(tk.Frame):
         for i in range(1, 13):
             if i < 10:
                 monthDict['0' + str(i)] = datetime.strptime(year + '-0' + str(i) + '-01',
-                    '%Y-%m-%d')
-                #monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',                                                          '%Y-%m-%d')
+                                                            '%Y-%m-%d')
+                # monthDict['0'+str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y')+'-0' + str(i) + '-01',                                                          '%Y-%m-%d')
             else:
                 monthDict[str(i)] = datetime.strptime(year + '-' + str(i) + '-01',
                                                       '%Y-%m-%d')
-                #monthDict[str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01', '%Y-%m-%d')
-
+                # monthDict[str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01', '%Y-%m-%d')
 
         # Creates the subplots and deletes the old plot
         if self.plot1.axes:
@@ -863,36 +853,33 @@ class tmednet(tk.Frame):
                                        usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
             oldepth = depth
 
-        color_dict = {'5':'#d4261d', '10':'#f58e6e', '15':'#fca95a', '20':'#fde5a3', '25':'#e4f4f8', '30':'#a7d6e7',
-                      '35':'#9ec6de', '40':'#3a6daf', '45':'#214f8a', '50':'#0a3164'}
+        color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
+                      '30': '#a7d6e7',
+                      '35': '#9ec6de', '40': '#3a6daf', '45': '#214f8a', '50': '#0a3164'}
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
 
         for depth in histdf['depth'].unique():
             histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
                                                       label='_nolegend_', legend=False, zorder=5)
 
-
-
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
-        self.plot.set_ylim([10, 28]) #Sets the limits for the Y axis
+        self.plot.set_ylim([10, 28])  # Sets the limits for the Y axis
         self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
         leg = self.plot.legend(title='Depth (m)')
         self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
 
-        #Sets the X axis as the initials of the months
+        # Sets the X axis as the initials of the months
         locator = mdates.MonthLocator()
         self.plot.xaxis.set_major_locator(locator)
         fmt = mdates.DateFormatter('%b')
         self.plot.xaxis.set_major_formatter(fmt)
 
         self.plot.xaxis.set_label_text('foo').set_visible(False)
-                # fig.set_size_inches(14.5, 10.5, forward=True)
+        # fig.set_size_inches(14.5, 10.5, forward=True)
 
         self.plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
         self.canvas.draw()
-
-
 
     def plot_thresholds(self):
         """
@@ -902,8 +889,8 @@ class tmednet(tk.Frame):
        Version: 11/2021, MJB: Documentation
        """
         historical = self.openfileinput.get()
-        #Deprecating region input as it can be gotten automatically from the filename (self.mdata[0]['region_name'])
-        #region = self.regioninput.get()
+        # Deprecating region input as it can be gotten automatically from the filename (self.mdata[0]['region_name'])
+        # region = self.regioninput.get()
         self.newwindow.destroy()
         self.clear_plots()
         self.counter.append("Thresholds")
@@ -916,7 +903,6 @@ class tmednet(tk.Frame):
             plt.Axes.remove(self.plot2)
         self.plot = self.fig.add_subplot(111)
 
-
         # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
         # Setting the properties of the line as lists to be used on a for loop depending on the year
@@ -925,12 +911,12 @@ class tmednet(tk.Frame):
         lines = ['solid', 'dotted', 'solid', 'dotted']
 
         # Loop to decide each year which style has
-        #TODO check code in 2030 to change this method
+        # TODO check code in 2030 to change this method
         # We get all the years on the dataset
         years = df['year'].unique()
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
-        maxdays = 0   # Used to set the maximum number of days to point in the X axis
+        maxdays = 0  # Used to set the maximum number of days to point in the X axis
         temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
         year_dict = {}
         for year in years:
@@ -974,7 +960,7 @@ class tmednet(tk.Frame):
             self.plot.invert_yaxis()
             self.plot.xaxis.tick_top()
             self.canvas.draw()
-        #Shrink the axis a bit to fit the legend outside of it
+        # Shrink the axis a bit to fit the legend outside of it
         box = self.plot.get_position()
         self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
@@ -986,8 +972,10 @@ class tmednet(tk.Frame):
         for i in range(23, 29):
             tab = {}
             btn = tk.Button(self.toolbar, text=i,
-                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth, year_dict, markers,
-                                                                                 colors, lines, years, maxdays, historical))
+                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth,
+                                                                                                  year_dict, markers,
+                                                                                                  colors, lines, years,
+                                                                                                  maxdays, historical))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -1059,44 +1047,6 @@ class tmednet(tk.Frame):
 
         self.curtab = i
         self.console_writer("Plotting for over " + str(i) + " degrees", "action")
-
-    def thresholds_browser(self):
-        """
-            Method: thresholds_browser(self)
-            Purpose: Opens a new window to select the file to be opened as well as to write the name of the region
-            Require:
-            Version: 11/2021, MJB: Documentation
-          """
-        self.newwindow = Toplevel()
-        self.newwindow.title('Select historical file')
-
-        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
-        self.openfileinput = Entry(self.newwindow, width=20)
-        self.openfileinput.grid(row=0, column=1)
-        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        #regionLabel = Label(self.newwindow, text='Region:').grid(row=1, pady=10)
-        #self.regioninput = Entry(self.newwindow, width=20)
-        #self.regioninput.grid(row=1, column=1)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_thresholds).grid(row=1, column=1)
-
-    def annualcycle_browser(self):
-        """
-            Method: annualcycle_browser(self)
-            Purpose: Opens a new window to select the file to be opened
-            Require:
-            Version: 11/2021, MJB: Documentation
-          """
-        self.newwindow = Toplevel()
-        self.newwindow.title('Select historical file')
-
-        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
-        self.openfileinput = Entry(self.newwindow, width=20)
-        self.openfileinput.grid(row=0, column=1)
-        yearLabel = Label(self.newwindow, text='Year:').grid(row=1, pady=10)
-        self.yearInput = Entry(self.newwindow, width=20)
-        self.yearInput.grid(row=1, column=1)
-        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        actionButton = Button(self.newwindow, text='Select', command=self.plot_annualTCycle).grid(row=2, column=1)
 
     def go_back(self):
         """
@@ -1221,7 +1171,8 @@ class tmednet(tk.Frame):
                 self.counter.append(zoom)
             if file:
                 self.fig.savefig(file)
-                self.mdata[0]['images'].append(file) #Stores the path of the created images to print them on the report
+                self.mdata[0]['images'].append(
+                    file)  # Stores the path of the created images to print them on the report
                 self.console_writer('Saving plot in: ', 'action', file, True)
         except (AttributeError, UnboundLocalError, IndexError):
             self.console_writer('Error, couldn\'t find a plot to save', 'warning')
@@ -1234,7 +1185,6 @@ class tmednet(tk.Frame):
         Version:
         05/2021, MJB: Documentation
         """
-
 
         try:
             if not self.mdata[0]['time']:
@@ -1253,27 +1203,6 @@ class tmednet(tk.Frame):
                 self.reportlogger.append('Geojson and CSV file created')
         except IndexError:
             self.console_writer('Please, load a file first', 'warning')
-
-    def create_excel(self):
-        """
-        Method: create_excel(self)
-        Purpose: Loads a new window with the options to select the file from which the new excel will be created and
-                the name of the Excel file
-        Require:
-        Version:
-        11/2021, MJB: Documentation
-        """
-        self.newwindow = Toplevel()
-        self.newwindow.title('Create Excel')
-
-        openfileLabel = Label(self.newwindow, text='Input:').grid(row=0, pady=10)
-        self.openfileinput = Entry(self.newwindow, width=20)
-        self.openfileinput.grid(row=0, column=1)
-        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        writefileLabel = Label(self.newwindow, text='Output file name:').grid(row=1, pady=10)
-        self.writefileinput = Entry(self.newwindow, width=20)
-        self.writefileinput.grid(row=1, column=1)
-        writefile = Button(self.newwindow, text='Write', command=self.write_excel).grid(row=1, column=2)
 
     def bigmerger(self):
         """
@@ -1328,7 +1257,7 @@ class tmednet(tk.Frame):
         """
         self.console_writer('Writing the Excel file, please wait this could take some minutes...', 'action')
         input = self.openfileinput.get()
-        output = self.writefileinput.get()
+        output = self.secondInput.get()
         self.newwindow.destroy()
         fw.Excel(input, '../src/output_files/' + output + '.xlsx')
         self.console_writer('Excel file successfully created!', 'action')
@@ -1350,19 +1279,24 @@ class tmednet(tk.Frame):
             file = askopenfilename(initialdir='../src/')
             self.openfileinput.insert(0, file)
 
-    def create_netCDF(self):
+    def window_browser(self, title, cmd, label1, label2=None):
         self.newwindow = Toplevel()
-        self.newwindow.title('Select file to convert to netCDF')
+        self.newwindow.title(title)
 
-        openfileLabel = Label(self.newwindow, text='Historical:').grid(row=0, pady=10)
+        Label(self.newwindow, text=label1).grid(row=0, pady=10)
         self.openfileinput = Entry(self.newwindow, width=20)
         self.openfileinput.grid(row=0, column=1)
-        openfileBrowse = Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
-        actionButton = Button(self.newwindow, text='Select', command=self.really_convert).grid(row=1, column=1)
+        Button(self.newwindow, text='Browse', command=self.browse_file).grid(row=0, column=2)
 
+        if label2:
+            Label(self.newwindow, text=label2).grid(row=1, pady=10)
+            self.secondInput = Entry(self.newwindow, width=20)
+            self.secondInput.grid(row=1, column=1)
+            Button(self.newwindow, text='Select', command=cmd).grid(row=2, column=1)
+        else:
+            Button(self.newwindow, text='Select', command=cmd).grid(row=1, column=1)
 
-    def really_convert(self):
-        #TODO make a lambda function to run this instead of a method and destroy the window at the same time
+    def generate_netCDF(self):
         filename = self.openfileinput.get()
         self.newwindow.destroy()
         df = pd.read_csv(filename, sep='\t')
