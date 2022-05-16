@@ -641,10 +641,12 @@ def running_average_special(year_df, running=240):
     return dfdelta
 
 
-def convert_to_netCDF(filename, df):
-    #TODO print on console when the netCDF has been created
+def convert_to_netCDF(filename, df, consolescreen):
+    #TODO print on console when the netCDF has been create
     try:
         xarray.Dataset(df.to_xarray()).to_netcdf('../src/output_files/' + filename + '.nc4')
+        consolescreen.insert("end", "netCDF file created \n")
+        consolescreen.insert("end", "=============\n")
     except Exception as e:
         print(str(e))
 

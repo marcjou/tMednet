@@ -1300,7 +1300,7 @@ class tmednet(tk.Frame):
         filename = self.openfileinput.get()
         self.newwindow.destroy()
         df = pd.read_csv(filename, sep='\t')
-        fm.convert_to_netCDF('finalCDM', df)
+        fm.convert_to_netCDF('finalCDM', df, self.consolescreen)
 
     @staticmethod
     def help():
