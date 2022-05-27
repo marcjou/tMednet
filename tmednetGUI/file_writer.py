@@ -485,6 +485,10 @@ def big_merge(filename1, filename2, output):
     else:
         df1 = pd.read_csv(filename1, '\t')
         dfconc = pd.concat([df1, df2])
+
+
         dfconc.replace(np.nan, '', regex=True, inplace=True)
+
+
 
         dfconc.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)

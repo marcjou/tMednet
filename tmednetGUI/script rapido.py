@@ -4,21 +4,32 @@ import numpy as np
 from datetime import datetime
 import progressbar as pb
 import time
+
 start = time.time()
-file = pd.read_csv('../src/Tobs_05_Cap de Creus-S_200705-202110.txt', sep='\t')
+file = pd.read_csv('../src/Tobs_150_Ullastres_202010-202110.txt', sep='\t')
 file2 = file.rename(columns={'NaN': 'Date', 'NaN.1': 'Time'})
 datime = []
 nanline = []
 i = 0
 
-#progress_bar = pb.progressBar(len(file2['Date']), prefix='Progress:', suffix='Complete', length=50)
+# progress_bar = pb.progressBar(len(file2['Date']), prefix='Progress:', suffix='Complete', length=50)
 
+
+# TODO Should I conserve nan lines between time periods?
 # TESTS
-file2.dropna(how='all', inplace=True) #Drops all the lines that are pure NaN
+file2.dropna(how='all', inplace=True)  # Drops all the lines that are pure NaN
 file2['Date'] = file2['Date'].astype(int)
-file2['Date'] = file2['Date'].map(lambda x: datetime.strftime(datetime.fromordinal(datetime(1900, 1, 1).toordinal() + int(x) - 2), '%d/%m/%Y'))
-file2['Time'] = file2['Time'].map(lambda x: str(int(float(x) * 24)) + ':0' + str(int(((float(x) * 24) % 1) * 60)) + ':0' + str(int(((((float(x) * 24) % 1) * 60) % 1)* 60)) if len(str(int(((float(x) * 24) % 1) * 60))) == 1 else str(int(float(x) * 24) + 1) + ':00:00')
+file2['Date'] = file2['Date'].map(lambda x: datetime.strftime(datetime.fromordinal(datetime(1900, 1, 1).toordinal()
+                                                                                   + int(x) - 2), '%d/%m/%Y'))
+file2['Time'] = file2['Time'].map(lambda x: str(int(float(x) * 24)) + ':0' + str(int(((float(x) * 24) % 1) * 60)) + ':0'
+                                            + str(int(((((float(x) * 24) % 1) * 60) % 1) * 60)) if len(str(int(((float(x) * 24) % 1) * 60))) == 1 else str(int(float(x) * 24) + 1) + ':00:00')
 file2['Time'] = file2['Time'].map(lambda x: '0' + x if len(x) == 7 else x)
+
+for key in file2:
+    if key != 'Date' and key != 'Time':
+        file2[key] = file2[key].round(decimals=3)
+
+file2.replace('', np.nan, regex=True, inplace=True)
 
 '''
 # Not necessary with what we have above much faster
@@ -72,7 +83,7 @@ end = time.time()
 print(end-start)
 '''
 
-file2.to_csv('../src/output_files/CPS_Try_Old.txt', sep='\t', index=False)
+file2.to_csv('../src/output_files/Ullastres_Try.txt', sep='\t', index=False)
 
 end = time.time()
-print(end-start)
+print(end - start)
