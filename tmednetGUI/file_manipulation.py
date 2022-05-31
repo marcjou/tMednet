@@ -72,17 +72,28 @@ def load_data(args, consolescreen=False):
                         bad.append(i)
                     else:
                         good.append(a[i])
-                elif a[i][3] == 'Enregistré' or a[i][3] == 'Registrado':
-                    bad.append(i)
+                elif len(a[i]) >= 4:
+                    if a[i][3] == 'Enregistré' or a[i][3] == 'Registrado':
+                        bad.append(i)
+                    else:
+                        good.append(a[i])
                 else:
                     good.append(a[i])  # Only uses the data without the "Enregistré" string to avoid errors
-            datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
-                                range(1, len(good))]
-            datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
+            if len(good[1]) == 4:
+                datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
+                                    range(1, len(good))]
+                datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
+            else:
+                datos["timegmt"] = [datetime.strptime(good[i][0] + ' ' + good[i][1], "%d/%m/%Y %H:%M:%S") for i in
+                                    range(1, len(good))]
+                datos["temp"] = [float(good[i][2]) for i in range(1, len(good))]
             igm = '_'.join(good[0]).find("GMT")
             gmtout = '_'.join(good[0])[igm + 3:igm + 6]
             datos['GMT'] = gmtout
-            datos['S/N'] = int(re.sub('\D', '', good[0][good[0].index('S/N:') + 1]))
+            try:
+                datos['S/N'] = int(re.sub('\D', '', good[0][good[0].index('S/N:') + 1]))
+            except:
+                datos['S/N'] = 'XXXXXXXX'
             args.mdata.append(datos)
             args.tempdataold.append(datos.copy())
         args.mdata = sorted(args.mdata, key=lambda k: k['depth'])

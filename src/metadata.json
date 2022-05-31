@@ -539,6 +539,30 @@
             "start_year": "2015",
             "end_year": "2018",
             "institution": "OSU Institut Pytheas"
+        },
+        "159": {
+            "lat": "40.6726",
+            "long": "14.4197",
+            "site_number": "",
+            "site_name": "Banco di Santa Croce",
+            "site_code": "159",
+            "eco_region": "W-Med",
+            "sub_basin": "S-Thyrrenian",
+            "start_year": "2016",
+            "end_year": "2021",
+            "institution": "Medsharks"
+        },
+        "161": {
+            "lat": "40.0223",
+            "long": "15.2708",
+            "site_number": "",
+            "site_name": "Capo Spartivento",
+            "site_code": "161",
+            "eco_region": "W-Med",
+            "sub_basin": "S-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2021",
+            "institution": "Medsharks"
         }
     },
     "regions": {
