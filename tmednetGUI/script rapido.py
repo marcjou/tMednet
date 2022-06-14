@@ -6,7 +6,7 @@ import progressbar as pb
 import time
 
 start = time.time()
-file = pd.read_csv('../src/Tobs_35_Foradada_201301-202107.txt', sep='\t')
+file = pd.read_csv('../src/Tobs_06_Medes_200207-202110.txt', sep='\t')
 file2 = file.rename(columns={'NaN': 'Date', 'NaN.1': 'Time'})
 datime = []
 nanline = []
@@ -83,7 +83,7 @@ end = time.time()
 print(end-start)
 '''
 
-file2.to_csv('../src/output_files/Foradeitor.txt', sep='\t', index=False)
+file2.to_csv('../src/output_files/Database_T_06_Medes_200207-202110.txt', sep='\t', index=False)
 
 end = time.time()
 print(end - start)
