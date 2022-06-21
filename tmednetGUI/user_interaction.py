@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import file_writer as fw
+import excel_writer as ew
 from datetime import datetime
 import marineHeatWaves as mhw
 import tkinter.font as tkFont
@@ -92,9 +93,6 @@ class tmednet(tk.Frame):
         toolsmenu.add_command(label='Create netCDF',
                               command=lambda: self.window_browser('Select historical file',
                                                                   self.generate_netCDF, 'Historical: '))
-        toolsmenu.add_command(label='MHW Excel',
-                              command=lambda: self.window_browser('Select historical file with more than 10 years',
-                                                                  self.generate_mhw, 'Historical: '))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1263,7 +1261,8 @@ class tmednet(tk.Frame):
         input = self.openfileinput.get()
         output = self.secondInput.get()
         self.newwindow.destroy()
-        fw.Excel(input, '../src/output_files/' + output + '.xlsx')
+        # fw.Excel(input, '../src/output_files/' + output + '.xlsx')
+        ew.excel_writer(input, output)
         self.console_writer('Excel file successfully created!', 'action')
 
     def browse_file(self, merge=False):
@@ -1305,20 +1304,6 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         df = pd.read_csv(filename, sep='\t')
         fm.convert_to_netCDF('finalCDM', df, self.consolescreen)
-
-
-    def generate_mhw(self):
-        filename = self.openfileinput.get()
-        self.newwindow.destroy()
-        file = pd.read_csv(filename, sep='\t')
-        del file['Time']
-        file['Date'] = pd.to_datetime(file['Date'], format='%d/%m/%Y')
-        nufile = file.groupby('Date').mean()
-        dates = [x.date() for x in nufile.index]
-        t = [x.toordinal() for x in dates]
-        t = np.array(t)
-        sst5 = nufile['5'].values
-        mhws, clim = mhw.detect(t, sst5)
 
     @staticmethod
     def help():
