@@ -4,6 +4,7 @@ import time
 from pandas import ExcelWriter
 import marineHeatWaves as mhw
 
+# This method uses the mhw library to return the mhw of a given historic file.
 def create_mhw(mhwdf):
     del mhwdf['Time']
     mhwdf['Date'] = pd.to_datetime(mhwdf['Date'], format='%d/%m/%Y')
@@ -34,38 +35,55 @@ def create_mhw(mhwdf):
 
     return diff
 
-
+# Converts the data from the historic file to a DataFrame and selects the needed data to create the Excel
 def excel_writer(filein, fileout):
     start = time.time()
+    # Reads the historic file and converts it to a DataFrame. Loads all the DataFrames to make the calculations
+    dfexcel, dfmonthly, dfseasonal, mhwdf = read_and_setup(filein)
+    # Sorts the final DataFrames that will compose the sheets of the Excel file
+    dfexcel['depth(m)'] = dfexcel['depth(m)'].astype(int)
+    dfmonthly['depth(m)'] = dfmonthly['depth(m)'].astype(int)
+    dfexcel = dfexcel.sort_values(by=['date', 'depth(m)'])
+    dfmonthly = dfmonthly.sort_values(by=['year', 'month', 'depth(m)'])
+    dfseasonal['depth(m)'] = dfseasonal['depth(m)'].astype(int)
+    dfseasonal = dfseasonal.sort_values(by=['year', 'depth(m)'])
+    dfexcel['date'] = dfexcel['date'].dt.date
+    # Write the Excel file with the given DataFrames as sheets
+    writer = ExcelWriter('../src/output_files/' + fileout + '.xlsx')
+    mhwdf = create_mhw(mhwdf)
+    dfexcel.to_excel(writer, 'Daily', index=False)
+    dfmonthly.to_excel(writer, 'Monthly', index=False)
+    dfseasonal.to_excel(writer, 'Seasonal', index=False)
+    mhwdf.to_excel(writer, 'MHW', index=False)
+    writer.save()
+    end = time.time()
+    print(end-start)
 
+def read_and_setup(filein):
     df = pd.read_csv(filein, sep='\t')
     mhwdf = df.copy()
     depths = df.columns.tolist()
     del depths[0]
     del depths[0]
-
-
     df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
     df['year'] = df['Date'].dt.year
     df['month'] = df['Date'].dt.month
-
     dfinter = pd.DataFrame(columns=['date', 'depth(m)', 'N', 'mean', 'std', 'max', 'min'])
 
     dfexcel = pd.DataFrame(columns=['date', 'depth(m)', 'N', 'mean', 'std', 'max', 'min'])
     dfmonthly = pd.DataFrame(
-                columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
-                         'Ndays>=26'])
+        columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
+                 'Ndays>=26'])
     dfintermonth = pd.DataFrame(
-                columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
-                         'Ndays>=26'])
+        columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
+                 'Ndays>=26'])
     dfseasonal = pd.DataFrame(
-                columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
-                         'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
+        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
+                 'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
     dfinterseason = pd.DataFrame(
-                columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
-                         'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
-
-
+        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
+                 'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
+    # Iterates for each depth (which is a column on the historic DataFrame) and appends to the final excel DataFrame
     for depth in depths:
         # Setting up
         dfinter = pd.DataFrame(columns=['date', 'depth(m)', 'N', 'mean', 'std', 'max', 'min'])
@@ -77,7 +95,7 @@ def excel_writer(filein, fileout):
                      'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
         temp = df.groupby('Date')[str(depth)]
         tempmonth = df.groupby(['year', 'month'])[str(depth)]
-        tempseason = df.loc[(df['month']>=7) & (df['month']<=9)].groupby(['year'])[str(depth)]
+        tempseason = df.loc[(df['month'] >= 7) & (df['month'] <= 9)].groupby(['year'])[str(depth)]
         depto = np.repeat(depth, len(temp)).tolist()
         deptomonth = np.repeat(depth, len(tempmonth)).tolist()
         deptoseason = np.repeat(depth, len(tempseason)).tolist()
@@ -123,24 +141,4 @@ def excel_writer(filein, fileout):
         dfmonthly = dfmonthly.append(dfintermonth, ignore_index=True)
         dfseasonal = dfseasonal.append(dfinterseason, ignore_index=True)
 
-    dfexcel['depth(m)'] = dfexcel['depth(m)'].astype(int)
-    dfmonthly['depth(m)'] = dfmonthly['depth(m)'].astype(int)
-    dfexcel = dfexcel.sort_values(by=['date', 'depth(m)'])
-    dfmonthly = dfmonthly.sort_values(by=['year', 'month', 'depth(m)'])
-    dfseasonal['depth(m)'] = dfseasonal['depth(m)'].astype(int)
-    dfseasonal = dfseasonal.sort_values(by=['year', 'depth(m)'])
-    dfexcel['date'] = dfexcel['date'].dt.date
-
-
-
-    writer = ExcelWriter('../src/output_files/' + fileout + '.xlsx')
-    mhwdf = create_mhw(mhwdf)
-    dfexcel.to_excel(writer, 'Daily', index=False)
-    dfmonthly.to_excel(writer, 'Monthly', index=False)
-    dfseasonal.to_excel(writer, 'Seasonal', index=False)
-    mhwdf.to_excel(writer, 'MHW', index=False)
-    writer.save()
-
-
-    end = time.time()
-    print(end-start)
+    return dfexcel, dfmonthly, dfseasonal, mhwdf
