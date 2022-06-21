@@ -24,6 +24,8 @@ tunits = nc.variables['time'].units
 tcal = nc.variables['time'].calendar
 time = num2date(time, tunits, tcal)
 realtime = [i.strftime('%Y-%m-%d') for i in time]
+dtime = [datetime.strptime(i, '%Y-%m-%d') for i in realtime]
+ordtime = [x.toordinal() for x in dtime]
 asst = nc.variables['analysed_sst'][:]
 map = Basemap(projection='merc',llcrnrlon=-9.5,llcrnrlat=28.,urcrnrlon=37.,urcrnrlat=50.,resolution='i')
 map.drawcoastlines(linewidth=0.5)
@@ -33,8 +35,10 @@ lons, lats = np.meshgrid(lon, lat)
 x, y = map(lons, lats)
 filenames = []
 levels = np.arange(math.trunc(float(np.amin(asst)) - 273.15), math.trunc(float(np.amax(asst)) - 273.15)+ 1, 1)
+
+#mhw.detect(ordtime, temp)
+
 for i in range(0, asst.shape[0]):
-    # TODO make the colorbar static and do not change it
     temp = map.contourf(x,y,asst[i,:,:] - 273.15, cmap='RdYlBu_r')
     if i == 0:
         cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
