@@ -393,8 +393,16 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         if str(df['added'][i]) == 'nan':
             pass
         else:
-            df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
-                                                   '%Y-%m-%d %H:%M:%S')
+            try:
+                df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
+                                                       '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                splt = df['added'][i].split(':')
+                splt[-1] = '00'
+                jn = ':'.join(splt)
+                df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(jn), '%d/%m/%Y %H:%M:%S'),
+                                                      '%Y-%m-%d %H:%M:%S')
+
         progress_bar.print_progress_bar(i)
     df.set_index('added', inplace=True)
     df.index.name = None

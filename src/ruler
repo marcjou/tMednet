@@ -1,0 +1,34 @@
+ncecat /home/marcjou/sat_data/2010/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2010.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2010.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2010.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2010.nc
+ ncecat /home/marcjou/sat_data/2011/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2011.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2011.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2011.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2011.nc
+ ncecat /home/marcjou/sat_data/2012/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2012.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2012.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2012.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2012.nc
+ ncecat /home/marcjou/sat_data/2013/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2013.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2013.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2013.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2013.nc
+ ncecat /home/marcjou/sat_data/2014/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2014.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2014.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2014.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2014.nc
+ ncecat /home/marcjou/sat_data/2015/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2015.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2015.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2015.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2015.nc
+ ncecat /home/marcjou/sat_data/2016/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2016.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2016.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2016.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2016.nc
+ ncecat /home/marcjou/sat_data/2017/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2017.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2017.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2017.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2017.nc
+ ncecat /home/marcjou/sat_data/2018/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2018.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2018.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2018.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2018.nc
+ ncecat /home/marcjou/sat_data/2019/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2019.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2019.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2019.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2019.nc
+ ncecat /home/marcjou/sat_data/2020/*.nc -O /home/marcjou/Escritorio/Projects/tMednet/src/merge_2020.nc
+ ncks -v analysed_sst /home/marcjou/Escritorio/Projects/tMednet/src/merge_2020.nc /home/marcjou/Escritorio/Projects/Sat_Data/reduced_2020.nc
+rm /home/marcjou/Escritorio/Projects/tMednet/src/merge_2020.nc
+ 
