@@ -9,4 +9,7 @@ __pycache__
 src/output_files/*
 /src/*.nc
 /src/*.tmp
+<<<<<<< HEAD
 /src/*.mat
+=======
+>>>>>>> 3acfc97db2832d701baec75fc5f3f32d9ee07a62
