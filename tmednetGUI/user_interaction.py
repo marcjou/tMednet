@@ -7,7 +7,9 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import file_writer as fw
+import excel_writer as ew
 from datetime import datetime
+import marineHeatWaves as mhw
 import tkinter.font as tkFont
 from PIL import Image, ImageTk
 import file_manipulation as fm
@@ -1259,7 +1261,8 @@ class tmednet(tk.Frame):
         input = self.openfileinput.get()
         output = self.secondInput.get()
         self.newwindow.destroy()
-        fw.Excel(input, '../src/output_files/' + output + '.xlsx')
+        # fw.Excel(input, '../src/output_files/' + output + '.xlsx')
+        ew.excel_writer(input, output)
         self.console_writer('Excel file successfully created!', 'action')
 
     def browse_file(self, merge=False):

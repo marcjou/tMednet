@@ -5,12 +5,15 @@ import progressbar as pb
 from statistics import stdev
 from datetime import datetime
 from pandas import ExcelWriter
+import marineHeatWaves as mhw
+import time
 
 
 class Excel:
 
     def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, lastyear=False, console=False):
         self.df = pd.read_csv(input_path, '\t')
+        self.mhwdf = self.df.copy()
         self.n = 0
         self.total = {}
         self.total2 = {}
@@ -95,11 +98,14 @@ class Excel:
             if column != 'Date' and column != 'Time':
                 self.appendict[column]['depth(m)'] = column
                 if self.appendict[column]['N'] == 0:
-                    self.appendict[column]['mean'] = 0
+                    self.appendict[column]['mean'] = ''
+                    self.appendict[column]['std'] = ''
+                    self.appendict[column]['max'] = ''
+                    self.appendict[column]['min'] = ''
                 else:
                     self.total[column] = [np.nan if tot == 0 else tot for tot in self.total[column]]
                     self.appendict[column]['mean'] = round(np.nanmean(self.total[column]), 3)
-                    self.appendict[column]['std'] = round(stdev(self.total[column]), 3)
+                    self.appendict[column]['std'] = round(stdev(self.total[column]), 3) if len(self.total[column]) >=2 else 0
                     self.appendict[column]['max'] = round(max(self.total[column]), 3)
                     self.appendict[column]['min'] = round(min(self.total[column]), 3)
 
@@ -117,11 +123,14 @@ class Excel:
                 # Appendict2 part
                 self.appendict2[column]['depth(m)'] = column
                 if self.appendict2[column]['N'] == 0:
-                    self.appendict2[column]['mean'] = 0
+                    self.appendict2[column]['mean'] = ''
+                    self.appendict2[column]['std'] = ''
+                    self.appendict2[column]['max'] = ''
+                    self.appendict2[column]['min'] = ''
                 else:
                     self.total2[column] = [np.nan if tot == 0 else tot for tot in self.total2[column]]
                     self.appendict2[column]['mean'] = round(np.nanmean(self.total2[column]), 3)
-                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
+                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3) if len(self.total2[column]) >=2 else 0
                     self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
                     self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
                     self.appendict2[column]['Ndays>=24'] = round(
@@ -141,11 +150,14 @@ class Excel:
                 # Appendict3 part
                 self.appendict3[column]['depth(m)'] = column
                 if self.appendict3[column]['N'] == 0:
-                    self.appendict3[column]['mean'] = 0
+                    self.appendict3[column]['mean'] = ''
+                    self.appendict3[column]['std'] = ''
+                    self.appendict3[column]['max'] = ''
+                    self.appendict3[column]['min'] = ''
                 else:
                     self.total3[column] = [np.nan if tot == 0 else tot for tot in self.total3[column]]
                     self.appendict3[column]['mean'] = round(np.nanmean(self.total3[column]), 3)
-                    self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
+                    self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3) if len(self.total3[column]) >=2 else 0
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
                     self.appendict3[column]['Ndays>=23'] = round(
@@ -234,13 +246,45 @@ class Excel:
             if self.console:
                 console_progress.print_progress_bar(i)
 
+
+    def create_mhw(self):
+        del self.mhwdf['Time']
+        self.mhwdf['Date'] = pd.to_datetime(self.mhwdf['Date'], format='%d/%m/%Y')
+        nufile = self.mhwdf.groupby('Date').mean()
+        dates = [x.date() for x in nufile.index]
+        t = [x.toordinal() for x in dates]
+        t = np.array(t)
+        depths = nufile.columns
+        sst5 = nufile[depths[0]].values
+        mhws, clim = mhw.detect(t, sst5)
+        diff = pd.DataFrame(
+            {'Date': mhws['date_start'], 'Depth (m)': depths[0], 'Duration (Days)': mhws['duration'], 'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
+             'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']], 'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']]})
+        for depth in depths:
+            if depth == depths[0]:
+                pass
+            else:
+                sst = nufile[depth].values
+                mhws, clim = mhw.detect(t, sst)
+                dfi = pd.DataFrame(
+                    {'Date': mhws['date_start'], 'Depth (m)': depth, 'Duration (Days)': mhws['duration'], 'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
+                     'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']], 'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']]})
+                diff = diff.append(dfi, ignore_index=True)
+
+        return diff
+
     def excel_writer(self, path):
+        start = time.time()
         writer = ExcelWriter(path)
         self.main()
+        mhwdf = self.create_mhw()
         self.mydf.to_excel(writer, 'Daily')
         self.mydf2.to_excel(writer, 'Monthly')
         self.mydf3.to_excel(writer, 'Seasonal')
+        mhwdf.to_excel(writer, 'MHW', index=False)
         writer.save()
+        end = time.time()
+        print(end-start)
 
     def calculate_lastyear(self):
         #Here calculates only from May to December of the last Year of Data
@@ -311,11 +355,14 @@ class Excel:
                 # Appendict3 part
                 self.appendict3[column]['depth(m)'] = column
                 if self.appendict3[column]['N'] == 0:
-                    self.appendict3[column]['mean'] = 0
+                    self.appendict3[column]['mean'] = ''
+                    self.appendict3[column]['std'] = ''
+                    self.appendict3[column]['max'] = ''
+                    self.appendict3[column]['min'] = ''
                 else:
                     self.total3[column] = [np.nan if tot == 0 else tot for tot in self.total3[column]]
                     self.appendict3[column]['mean'] = round(np.nanmean(self.total3[column]), 3)
-                    self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3)
+                    self.appendict3[column]['std'] = round(stdev(self.total3[column]), 3) if len(self.total3[column]) >=2 else 0
                     self.appendict3[column]['max'] = round(np.nanmax(self.total3[column]), 3)
                     self.appendict3[column]['min'] = round(np.nanmin(self.total3[column]), 3)
                     self.appendict3[column]['Ndays>=23'] = round(
@@ -403,11 +450,14 @@ class Excel:
                 # Appendict2 part
                 self.appendict2[column]['depth(m)'] = column
                 if self.appendict2[column]['N'] == 0:
-                    self.appendict2[column]['mean'] = 0
+                    self.appendict2[column]['mean'] = ''
+                    self.appendict2[column]['std'] = ''
+                    self.appendict2[column]['max'] = ''
+                    self.appendict2[column]['min'] = ''
                 else:
                     self.total2[column] = [np.nan if tot == 0 else tot for tot in self.total2[column]]
                     self.appendict2[column]['mean'] = round(np.nanmean(self.total2[column]), 3)
-                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3)
+                    self.appendict2[column]['std'] = round(stdev(self.total2[column]), 3) if len(self.total2[column]) >=2 else 0
                     self.appendict2[column]['max'] = round(np.nanmax(self.total2[column]), 3)
                     self.appendict2[column]['min'] = round(np.nanmin(self.total2[column]), 3)
                     self.appendict2[column]['Ndays>=24'] = len([days for days in self.total2[column] if days >= 24])

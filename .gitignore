@@ -4,7 +4,9 @@ exit
 venv/
 __pycache__
 .idea/
-/tmednetGUI/prova.py
 *.geojson
 14_20181116-11_20200602-08_25.txt
 src/output_files/*
+/src/*.nc
+/src/*.tmp
+/src/*.mat
