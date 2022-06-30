@@ -305,6 +305,9 @@ def detect(t, temp, climatologyPeriod=[None,None], pctile=90, windowHalfWidth=5,
         clim['missing'] = np.isnan(temp)
     else:
         clim = previousClimatology
+        if len(temp) < len(clim['seas']):
+            for i in range(len(temp), len(clim['seas'])):
+                np.append(temp, np.nan)
     # Set all remaining missing temp values equal to the climatology
     temp[np.isnan(temp)] = clim['seas'][np.isnan(temp)]
 

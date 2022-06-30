@@ -56,7 +56,7 @@ def map_temperature(lat, lon, realtime, asst):
         os.remove(filename)
 
 
-nc = NetCDFFile('../src/sat_combined.nc')
+nc = NetCDFFile('/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
 lat = nc.variables['lat'][:]
 lon = nc.variables['lon'][:]
 time = nc.variables['time'][:]
@@ -68,7 +68,7 @@ dtime = [datetime.strptime(i, '%Y-%m-%d') for i in realtime]
 ordtime = [x.toordinal() for x in dtime]
 asst = nc.variables['analysed_sst'][:]
 
-'''
+
 for i in range(0,len(lat)):
     for j in range(0,len(lon)):
         if np.ma.is_masked(asst[0,i,j]):
@@ -77,7 +77,7 @@ for i in range(0,len(lat)):
             sst=asst[:,i,j].tolist()
             mhws, clim = mhw.detect(ordtime, sst)
 
-'''
+
 
 map_temperature(lat, lon, realtime, asst)
 
