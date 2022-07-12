@@ -44,14 +44,18 @@ clim_lat = mat['mhwclim']['lat'][0,0][:, 0]
 clim_lon = mat['mhwclim']['lon'][0,0][0, :]
 
 # TODO here I talk about interpolation
+lat_grid = np.repeat(lat.reshape(len(lat), 1), repeats=len(lon), axis=1)
+lon_grid = np.repeat(lon.reshape(1, len(lon)), repeats=len(lat), axis=0)
+clim_lat_grid = np.repeat(clim_lat.reshape(len(clim_lat), 1), repeats=len(clim_lon), axis=1)
+clim_lon_grid = np.repeat(clim_lon.reshape(1, len(clim_lon)), repeats=len(clim_lat), axis=0)
 
 li = []
 for i in range(0, len(sst[:,0,0])):
-    interp = interpolate.interp2d(lon, lat, sst[i, :, :], kind='cubic') # Interpolation from the 0.01 resolution to 0.05
-    new_sst = interp(clim_lon, clim_lat)
+    coords = np.column_stack((lon_grid[~sst[i,:,:].mask], lat_grid[~sst[i,:,:].mask]))
+    new_sst = interpolate.griddata(coords, sst[i,:,:][~sst[i,:,:].mask], (clim_lon_grid, clim_lat_grid), method='nearest') # Interpolation from the 0.01 resolution to 0.05
     li.append(new_sst)
 inter_sst = np.stack(li)
-inter_sst = np.ma.masked_where(inter_sst <= -32767., inter_sst) - 273.15
+inter_sst = inter_sst - 273.15
 
 point_clim = {}
 
