@@ -68,6 +68,7 @@ for i in range(0,len(clim_lat)):
             point_clim['seas'] = clim['seas'][i, j, :]
             point_clim['thresh'] = clim['thresh'][i, j, :]
             point_clim['missing'] = clim['missing'][i, j, :]
+            print(i + ' i y la j ' + j)
             mhws = mhw.detect(ordtime, sstt, previousClimatology=point_clim)
 
 mhw = mhw.detect(ordtime, new_sst, previousClimatology=clim)
