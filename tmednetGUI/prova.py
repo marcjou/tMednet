@@ -68,9 +68,10 @@ for i in range(0,len(clim_lat)):
             point_clim['seas'] = clim['seas'][i, j, :]
             point_clim['thresh'] = clim['thresh'][i, j, :]
             point_clim['missing'] = clim['missing'][i, j, :]
-            print(i + ' i y la j ' + j)
-            mhws = mhw.detect(ordtime, sstt, previousClimatology=point_clim)
+            print(str(i) + ' i y la j ' + str(j))
+            mhws = mhw.detect(np.asarray(ordtime), sstt, previousClimatology=point_clim)
 
+#TODO check 317 i and 846j as it fails in line 313 of marineHeatwaves on the previous instance on the loop
 mhw = mhw.detect(ordtime, new_sst, previousClimatology=clim)
 
 # Desmontar el 29 de Febrero, el dia numero 60 del año (orden 59 en array)
