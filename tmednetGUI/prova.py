@@ -5,7 +5,6 @@ from pandas import ExcelWriter
 from scipy.interpolate import LinearNDInterpolator
 
 import marineHeatWaves as mhw
-import xarray as xr
 import shapefile as shp
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset as NetCDFFile
@@ -59,6 +58,9 @@ inter_sst = inter_sst - 273.15
 
 point_clim = {}
 
+duration = inter_sst.copy()
+duration[:,:,:] = 0
+
 for i in range(0,len(clim_lat)):
     for j in range(0,len(clim_lon)):
         if np.ma.is_masked(inter_sst[0,i,j]):
@@ -69,12 +71,14 @@ for i in range(0,len(clim_lat)):
             point_clim['thresh'] = clim['thresh'][i, j, :]
             point_clim['missing'] = clim['missing'][i, j, :]
             print(str(i) + ' i y la j ' + str(j))
-            mhws = mhw.detect(np.asarray(ordtime), sstt, previousClimatology=point_clim)
+            mhws, clim = mhw.detect(np.asarray(ordtime), sstt, previousClimatology=point_clim)
+            # Sets the duration of the MHW into an array to be plotted
+            if mhws['time_start'] != []:
+                start = mhws['index_start'][0]
+                for n in range(0, mhws['duration'][0]):
+                    duration[start + n, i, j]= n + 1
 
-#TODO check 317 i and 846j as it fails in line 313 of marineHeatwaves on the previous instance on the loop
-mhw = mhw.detect(ordtime, new_sst, previousClimatology=clim)
 
-# Desmontar el 29 de Febrero, el dia numero 60 del año (orden 59 en array)
-clim[:,:,59]
+# TODO check that the duration array works, create a Intensity array and plot the mhw map
 
 print('hola')

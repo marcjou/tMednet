@@ -69,13 +69,7 @@ ordtime = [x.toordinal() for x in dtime]
 asst = nc.variables['analysed_sst'][:]
 
 
-for i in range(0,len(lat)):
-    for j in range(0,len(lon)):
-        if np.ma.is_masked(asst[0,i,j]):
-            pass
-        else:
-            sst=asst[:,i,j].tolist()
-            mhws, clim = mhw.detect(ordtime, sst)
+
 
 
 
