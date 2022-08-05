@@ -71,7 +71,7 @@ for i in range(0,len(clim_lat)):
             point_clim['thresh'] = clim['thresh'][i, j, :]
             point_clim['missing'] = clim['missing'][i, j, :]
             print(str(i) + ' i y la j ' + str(j))
-            mhws, clim = mhw.detect(np.asarray(ordtime), sstt, previousClimatology=point_clim)
+            mhws, bad = mhw.detect(np.asarray(ordtime), sstt, previousClimatology=point_clim)
             # Sets the duration of the MHW into an array to be plotted
             if mhws['time_start'] != []:
                 start = mhws['index_start'][0]
