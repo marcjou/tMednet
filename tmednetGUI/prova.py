@@ -14,6 +14,82 @@ from datetime import datetime
 
 
 from scipy import io, interpolate
+
+import os
+
+os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
+
+
+import numpy as np
+import pandas as pd
+import time
+from pandas import ExcelWriter
+import marineHeatWaves as mhw
+import xarray as xr
+import shapefile as shp
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
+
+from netCDF4 import Dataset as NetCDFFile
+from netCDF4 import num2date
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.basemap import Basemap
+import imageio
+from datetime import datetime
+
+# TODO comprobar porque el mapa sale todo blanco el fondo cuando no deberia
+# This whole block here is the function able to create the map gif
+def map_temperature(lat, lon, realtime, asst, type='temperature'):
+    map = Basemap(projection='merc', llcrnrlon=-9.5, llcrnrlat=28., urcrnrlon=37., urcrnrlat=50., resolution='i')
+    map.drawcoastlines(linewidth=0.5)
+    map.drawcountries()
+    map.drawlsmask(land_color='#adc6a9', ocean_color='#608abf')  # can use HTML names or codes for colors
+    lons, lats = np.meshgrid(lon, lat)
+    x, y = map(lons, lats)
+    filenames = []
+    if type == 'temperature':
+        levels = np.arange(math.trunc(float(np.amin(asst)) - 273.15), math.trunc(float(np.amax(asst)) - 273.15) + 1, 1)
+        cmap = 'RdYlBu_r'
+        for i in range(0, asst.shape[0]):
+            temp = map.contourf(x, y, asst[i, :, :] - 273.15, cmap=cmap)
+            if i == 0:
+                cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
+            plt.title(realtime[i])
+            print('hey')
+            plt.savefig('../src/output_images/image_' + str(i) + '.png')
+            print('hoy')
+            filenames.append('../src/output_images/image_' + str(i) + '.png')
+    else:
+        levels = np.arange(5, 31, 1)
+        cmap = 'Purples'
+        for i in range(0, asst.shape[0]):
+            temp = map.contourf(x, y, asst[i, :, :], cmap=cmap)
+            if i == 0:
+                cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
+            plt.title(realtime[i])
+            print('hey')
+            plt.savefig('../src/output_images/image_' + str(i) + '.png')
+            print('hoy')
+            filenames.append('../src/output_images/image_' + str(i) + '.png')
+    # mhw.detect(ordtime, temp)
+
+
+
+    # build gif
+    with imageio.get_writer('mygif3.gif', mode='I', duration=0.7) as writer:
+        for filename in filenames:
+            image = imageio.v2.imread(filename)
+            writer.append_data(image)
+    import os
+    # Remove files
+    for filename in set(filenames):
+        os.remove(filename)
+
+
+
+
 mat = io.loadmat('../src/mhwclim_1982-2011_L4REP_MED.mat')
 
 # TODO keep on working on implementing NAT clim to our code. Needed to interpolate his resolution with ours, check how to do it, maybe solved, took too long
@@ -78,7 +154,14 @@ for i in range(0,len(clim_lat)):
                 for n in range(0, mhws['duration'][0]):
                     duration[start + n, i, j]= n + 1
 
+# For the map we use CLIM LAT AND LON and realtime
+# For duration map we use duration
 
 # TODO check that the duration array works, create a Intensity array and plot the mhw map
+# TODO plot also th egraph that QUIM wants which is a line graph of the temperature over the years (anomaly like)
+# TODO create the anomaly graphs
+
+map_temperature(clim_lat, clim_lon, realtime, duration, type='duration')
+
 
 print('hola')
