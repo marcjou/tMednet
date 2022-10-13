@@ -11,7 +11,7 @@ from netCDF4 import Dataset as NetCDFFile
 from netCDF4 import num2date
 import seaborn as sns
 from datetime import datetime
-
+import numpy.ma as ma
 
 from scipy import io, interpolate
 
@@ -39,7 +39,6 @@ from mpl_toolkits.basemap import Basemap
 import imageio
 from datetime import datetime
 
-# TODO comprobar porque el mapa sale todo blanco el fondo cuando no deberia
 # This whole block here is the function able to create the map gif
 def map_temperature(lat, lon, realtime, asst, type='temperature'):
     map = Basemap(projection='merc', llcrnrlon=-9.5, llcrnrlat=28., urcrnrlon=37., urcrnrlat=50., resolution='i')
@@ -55,19 +54,23 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
         for i in range(0, asst.shape[0]):
             temp = map.contourf(x, y, asst[i, :, :] - 273.15, cmap=cmap)
             if i == 0:
-                cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
+                cb = map.colorbar(temp,"bottom", size="5%", pad="2%", ticks=levels)
             plt.title(realtime[i])
             print('hey')
             plt.savefig('../src/output_images/image_' + str(i) + '.png')
             print('hoy')
             filenames.append('../src/output_images/image_' + str(i) + '.png')
     else:
-        levels = np.arange(5, 31, 1)
+        levels = np.arange(0, 31, 5)
         cmap = 'Purples'
+        #plt.get_cmap('Purples').set_under('#608abf')
         for i in range(0, asst.shape[0]):
             temp = map.contourf(x, y, asst[i, :, :], cmap=cmap)
             if i == 0:
-                cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
+                #Get the day where the max duration is displayed in order to create the complete colorbar
+                max_index = np.argwhere(asst == asst.max())[0][0]
+                temp_temp = map.contourf(x, y, asst[max_index, :, :], cmap=cmap)
+                cb = map.colorbar(temp_temp, "bottom", size="5%", pad="2%", ticks=levels)
             plt.title(realtime[i])
             print('hey')
             plt.savefig('../src/output_images/image_' + str(i) + '.png')
@@ -75,12 +78,10 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
             filenames.append('../src/output_images/image_' + str(i) + '.png')
     # mhw.detect(ordtime, temp)
 
-
-
     # build gif
-    with imageio.get_writer('mygif3.gif', mode='I', duration=0.7) as writer:
+    with imageio.get_writer('duration.gif', mode='I', duration=0.7) as writer:
         for filename in filenames:
-            image = imageio.v2.imread(filename)
+            image = imageio.v3.imread(filename)
             writer.append_data(image)
     import os
     # Remove files
@@ -91,8 +92,6 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
 
 
 mat = io.loadmat('../src/mhwclim_1982-2011_L4REP_MED.mat')
-
-# TODO keep on working on implementing NAT clim to our code. Needed to interpolate his resolution with ours, check how to do it, maybe solved, took too long
 
 
 nc = NetCDFFile('/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
@@ -124,10 +123,18 @@ lon_grid = np.repeat(lon.reshape(1, len(lon)), repeats=len(lat), axis=0)
 clim_lat_grid = np.repeat(clim_lat.reshape(len(clim_lat), 1), repeats=len(clim_lon), axis=1)
 clim_lon_grid = np.repeat(clim_lon.reshape(1, len(clim_lon)), repeats=len(clim_lat), axis=0)
 
+
+
+# Used to filter only the selected months, simply change the number of the months you want to get the MHW
+start_month_index = [ti.month == 5 for ti in dtime].index(True)
+end_month_index = len(dtime) - 1 - [ti.month == 5 for ti in dtime[::-1]].index(True)
+
+selected_sst = sst[start_month_index : end_month_index +1]
+
 li = []
-for i in range(0, len(sst[:,0,0])):
-    coords = np.column_stack((lon_grid[~sst[i,:,:].mask], lat_grid[~sst[i,:,:].mask]))
-    new_sst = interpolate.griddata(coords, sst[i,:,:][~sst[i,:,:].mask], (clim_lon_grid, clim_lat_grid), method='nearest') # Interpolation from the 0.01 resolution to 0.05
+for i in range(0, len(selected_sst[:,0,0])):
+    coords = np.column_stack((lon_grid[~selected_sst[i,:,:].mask], lat_grid[~selected_sst[i,:,:].mask]))
+    new_sst = interpolate.griddata(coords, selected_sst[i,:,:][~selected_sst[i,:,:].mask], (clim_lon_grid, clim_lat_grid), method='nearest') # Interpolation from the 0.01 resolution to 0.05
     li.append(new_sst)
 inter_sst = np.stack(li)
 inter_sst = inter_sst - 273.15
@@ -157,11 +164,15 @@ for i in range(0,len(clim_lat)):
 # For the map we use CLIM LAT AND LON and realtime
 # For duration map we use duration
 
-# TODO check that the duration array works, create a Intensity array and plot the mhw map
+# TODO create a Intensity array and plot the mhw map
 # TODO plot also th egraph that QUIM wants which is a line graph of the temperature over the years (anomaly like)
 # TODO create the anomaly graphs
 
-map_temperature(clim_lat, clim_lon, realtime, duration, type='duration')
+
+inter_duration = duration[start_month_index : end_month_index +1]
+
+# For if I need it ma.masked_where(inter_duration == 0, inter_duration)
+map_temperature(clim_lat, clim_lon, realtime[start_month_index:end_month_index +1], ma.masked_where(duration == 0, duration), type='duration')
 
 
 print('hola')
