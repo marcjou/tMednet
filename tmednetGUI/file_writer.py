@@ -516,6 +516,7 @@ class Excel:
             for depth in self.mydf2['depth(m)'].unique():
                 monthlydict['month'] = month
                 monthlydict['depth'] = depth
+                self.mydf2.replace('', np.NaN, inplace=True) # Replaces the empty values for NaN in order to calculate
                 monthlydict['mean'] = np.nanmean(
                     self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
                 self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)

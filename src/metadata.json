@@ -552,6 +552,32 @@
             "end_year": "2021",
             "institution": "Medsharks"
         },
+        
+        "184": {
+            "lat": "42.7877",
+            "long": "9.4894",
+            "site_number": "",
+            "site_name": "Cap Corse (Sagro)",
+            "site_code": "159",
+            "eco_region": "W-Med",
+            "sub_basin": "Corsica",
+            "start_year": "2013",
+            "end_year": "2022",
+            "institution": ""
+        },
+        
+        "79": {
+            "lat": "43.0281",
+            "long": "9.4065",
+            "site_number": "",
+            "site_name": "Cap Corse (Giraglia)",
+            "site_code": "79",
+            "eco_region": "W-Med",
+            "sub_basin": "Corsica",
+            "start_year": "2018",
+            "end_year": "2022",
+            "institution": ""
+        },
         "161": {
             "lat": "40.0223",
             "long": "15.2708",

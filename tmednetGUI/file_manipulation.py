@@ -84,7 +84,7 @@ def load_data(args, consolescreen=False):
                                     range(1, len(good))]
                 datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
             else:
-                datos["timegmt"] = [datetime.strptime(good[i][0] + ' ' + good[i][1], "%d/%m/%Y %H:%M:%S") for i in
+                datos["timegmt"] = [datetime.strptime(str(good[i][0]) + ' ' + str(good[i][1]), "%d/%m/%Y %H:%M:%S") for i in
                                     range(1, len(good))]
                 datos["temp"] = [float(good[i][2]) for i in range(1, len(good))]
             igm = '_'.join(good[0]).find("GMT")
@@ -644,7 +644,16 @@ def running_average_special(year_df, running=240):
     arr = []
     for depth in depths:
         arr.append(uniform_filter1d(year_df[str(depth)].dropna(), size=running))
-    dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.dropna().index)
+    maxlen = max(len(i) for i in arr)
+    for i in range(0, len(arr)):
+        if len(arr[i]) < maxlen:
+            remainder = [np.NaN] * (maxlen - len(arr[i]))
+            arr[i] = np.concatenate((arr[i], remainder))
+    if maxlen < len(year_df):
+        remainder = [np.NaN] * (len(year_df) - maxlen)
+        for i in range(0, len(arr)):
+            arr[i] = np.concatenate((arr[i], remainder))
+    dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.index)
     '''
     for depth in depths:
         # Cambiado entre otros index del data al dropna
