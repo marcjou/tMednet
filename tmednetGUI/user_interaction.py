@@ -11,6 +11,7 @@ import excel_writer as ew
 from datetime import datetime
 import marineHeatWaves as mhw
 import tkinter.font as tkFont
+import surface_temperature as st
 from PIL import Image, ImageTk
 import file_manipulation as fm
 from datetime import timedelta
@@ -93,6 +94,9 @@ class tmednet(tk.Frame):
         toolsmenu.add_command(label='Create netCDF',
                               command=lambda: self.window_browser('Select historical file',
                                                                   self.generate_netCDF, 'Historical: '))
+        toolsmenu.add_command(label='Create Heat spikes',
+                              command=lambda: self.window_browser('Select historical file',
+                                                                  self.create_heat_spikes, 'Historical: '))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1304,6 +1308,14 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         df = pd.read_csv(filename, sep='\t')
         fm.convert_to_netCDF('finalCDM', df, self.consolescreen)
+
+
+    def create_heat_spikes(self):
+        filename = self.openfileinput.get()
+        self.newwindow.destroy()
+        df = pd.read_csv(filename, sep='\t')
+        st.browse_heat_spikes(df)
+        self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod
     def help():

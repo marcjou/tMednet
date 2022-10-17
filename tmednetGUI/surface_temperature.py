@@ -92,10 +92,11 @@ def marine_heat_spikes_plotter(data, depth):
 
 
 # Opens the data
-dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
-data2 = dataset.drop(['Time'], axis=1)
+#dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
+#data2 = dataset.drop(['Time'], axis=1)
 
-for depth in data2.columns[1:]:
-    marine_heat_spikes_plotter(pd.DataFrame(data2, columns=['Date', depth]), depth)
+def browse_heat_spikes(data):
+    data = data.drop(['Time'], axis=1)
+    for depth in data.columns[1:]:
+        marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth)
 # TODO hacer esto automatico para cada profundidad de un site en concreto // copiar los colores de marinheatwaves
-print('hola')
