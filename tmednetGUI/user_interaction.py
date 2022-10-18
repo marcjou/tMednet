@@ -911,6 +911,7 @@ class tmednet(tk.Frame):
 
         # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
+        # TODO esto se puede cambiar por un Cycler y entonces no dependeria del trozo de codigo extraño de más abajo
         # Setting the properties of the line as lists to be used on a for loop depending on the year
         markers = ['+', 'o', 'x', 's', 'd', '^', 'v', 'p', 'h', '*']
         colors = ['b', 'b', 'k', 'k']
@@ -1313,8 +1314,9 @@ class tmednet(tk.Frame):
     def create_heat_spikes(self):
         filename = self.openfileinput.get()
         self.newwindow.destroy()
+        sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
-        st.browse_heat_spikes(df)
+        st.browse_heat_spikes(df, sitename)
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod
