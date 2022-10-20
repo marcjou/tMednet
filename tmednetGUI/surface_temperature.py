@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 
 
-def marine_heat_spikes_setter(data):
+def marine_heat_spikes_setter(data, clim=False):
     # Sets the time columns
     data['Date'] = pd.to_datetime(data['Date'], dayfirst=True)
     data.insert(1, 'day', pd.DatetimeIndex(data['Date']).day)
@@ -22,6 +22,8 @@ def marine_heat_spikes_setter(data):
     percentile_legend = first_year + '-' + second2last_year + ' p90'
     low_percentile_legend = first_year + '-' + second2last_year + ' p10'
     this_year_legend = last_year
+    if clim:
+        last_years_legend = last_years_legend + ' Climatology'
     return data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend
 
 def marine_heat_spikes_filter(data, depth):
@@ -74,7 +76,6 @@ def marine_heat_spikes_plotter(data, depth, sitename):
     concated['x4'] = difference * 4 + concated[last_years_legend]
     # Starts the axes and plots the data
     ax = plt.axes()
-    # TODO set categories for spikes by making new transparent lines
     cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'], color=['#a62929', '#a62929', 'blue', '#141414', 'blue', 'blue', 'blue'], alpha=[1.,1.,0.,1., 0., 0., 0.])
     ax.set_prop_cycle(cycler)
     concated.plot(ax=ax)
@@ -106,6 +107,40 @@ def marine_heat_spikes_plotter(data, depth, sitename):
     ax.remove()
 
 
+def anomalies_plotter(data, depth, sitename):
+    data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(data, clim=True)
+    last_years_filtered = marine_heat_spikes_filter(data, depth)
+    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend)
+    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, years='new')
+    # Sets a unique Dataframe consisting of the other three
+    concated = pd.concat([last_years_means, this_year_mean], axis=1)
+    prop = concated.index.strftime('%b')
+    concated.index = concated.index.strftime('%m-%d')
+    anomaly = pd.DataFrame(concated[this_year_legend] - concated[last_years_legend], index=concated.index,
+                           columns=['anomaly'])
+    anomaly['zero'] = 0
+    ax = plt.axes()
+    cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'], alpha=[1., 0.7], linewidth=[0.7, 0.7])
+    ax.set_prop_cycle(cycler)
+    concated.plot(ax=ax)
+
+    plt.fill_between(concated.index, concated[last_years_legend], concated[this_year_legend],
+                     where=(concated[this_year_legend] > concated[last_years_legend]), color='#fa5a5a')
+    plt.fill_between(concated.index, concated[last_years_legend], concated[this_year_legend],
+                     where=(concated[this_year_legend] < concated[last_years_legend]), color='#5aaaff')
+
+    plt.xlabel('')
+    plt.xticks(
+        ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01', '12-01'])
+    plt.xlim((concated.index[0], concated.index[-1]))
+    ax.set_xticklabels(prop.unique())
+
+    plt.title('Anomalies in ' + sitename+ ' at ' + depth + ' meters deep')
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(handles=[handles[0]])
+    plt.savefig('../src/output_images/anomalies_'+sitename+'_' + depth + '.png')
+    ax.remove()
+
 # Opens the data
 #dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
 #data2 = dataset.drop(['Time'], axis=1)
@@ -115,6 +150,10 @@ def browse_heat_spikes(data, sitename):
     data = data.drop(['Time'], axis=1)
     for depth in data.columns[1:]:
         marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename)
-# TODO hacer esto automatico para cada profundidad de un site en concreto // copiar los colores de marinheatwaves
+
+def browse_anomalies(data, sitename):
+    data = data.drop(['Time'], axis=1)
+    for depth in data.columns[1:]:
+        anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename)
 
 #browse_heat_spikes(dataset)

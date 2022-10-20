@@ -97,6 +97,9 @@ class tmednet(tk.Frame):
         toolsmenu.add_command(label='Create Heat spikes',
                               command=lambda: self.window_browser('Select historical file',
                                                                   self.create_heat_spikes, 'Historical: '))
+        toolsmenu.add_command(label='Create anomalies',
+                              command=lambda: self.window_browser('Select historical file',
+                                                                  self.create_anomalies, 'Historical: '))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1317,6 +1320,14 @@ class tmednet(tk.Frame):
         sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
         st.browse_heat_spikes(df, sitename)
+        self.console_writer('Plots saved at output_images', 'action')
+
+    def create_anomalies(self):
+        filename = self.openfileinput.get()
+        self.newwindow.destroy()
+        sitename = filename[filename.find('Database'):].split('_')[3]
+        df = pd.read_csv(filename, sep='\t')
+        st.browse_anomalies(df, sitename)
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod
