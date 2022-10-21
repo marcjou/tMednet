@@ -110,6 +110,38 @@ def marine_heat_spikes_plotter(data, depth, sitename):
     plt.savefig('../src/output_images/spike_' + sitename + ' ' + depth + '.png')
     ax.remove()
 
+    # Plot the zoom for summer
+    prop_zoom = prop.to_list()
+    prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
+    concated_zoom = concated.loc['06-01':'10-01'][:-1]
+    ax = plt.axes()
+    cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'],
+                        color=['#a62929', '#a62929', 'blue', '#141414', 'blue', 'blue', 'blue'],
+                        alpha=[1., 1., 0., 1., 0., 0., 0.])
+    ax.set_prop_cycle(cycler)
+    concated_zoom.plot(ax=ax)
+
+    plt.fill_between(concated_zoom.index, concated_zoom[percentile_legend], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] > concated_zoom[percentile_legend]), color='#f8e959')
+    plt.fill_between(concated_zoom.index, concated_zoom['x2'], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] > concated_zoom['x2']), color='#f66000')
+    plt.fill_between(concated_zoom.index, concated_zoom['x3'], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] > concated_zoom['x3']), color='#ce2200')
+    plt.fill_between(concated_zoom.index, concated_zoom['x4'], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] > concated_zoom['x4']), color='#810000')
+
+    plt.xlabel('')
+    plt.xticks(
+        ['06-01', '07-01', '08-01', '09-01'])
+    plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
+    ax.set_xticklabels(prop_zoom.unique())
+
+    plt.title('Heat Spikes in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch])
+    plt.savefig('../src/output_images/spike_Summer Months_' + sitename + '_' + depth + '.png')
+    ax.remove()
+
 
 def anomalies_plotter(data, depth, sitename):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
@@ -144,6 +176,35 @@ def anomalies_plotter(data, depth, sitename):
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]])
     plt.savefig('../src/output_images/anomalies_' + sitename + '_' + depth + '.png')
+    ax.remove()
+
+    # Plot the zoom for summer
+    prop_zoom = prop.to_list()
+    prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
+    concated_zoom = concated.loc['06-01':'10-01'][:-1]
+    anomaly = pd.DataFrame(concated_zoom[this_year_legend] - concated_zoom[last_years_legend], index=concated_zoom.index,
+                           columns=['anomaly'])
+    anomaly['zero'] = 0
+    ax = plt.axes()
+    cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'], alpha=[1., 0.7], linewidth=[0.7, 0.7])
+    ax.set_prop_cycle(cycler)
+    concated_zoom.plot(ax=ax)
+
+    plt.fill_between(concated_zoom.index, concated_zoom[last_years_legend], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] > concated_zoom[last_years_legend]), color='#fa5a5a')
+    plt.fill_between(concated_zoom.index, concated_zoom[last_years_legend], concated_zoom[this_year_legend],
+                     where=(concated_zoom[this_year_legend] < concated_zoom[last_years_legend]), color='#5aaaff')
+
+    plt.xlabel('')
+    plt.xticks(
+        ['06-01', '07-01', '08-01', '09-01'])
+    plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
+    ax.set_xticklabels(prop_zoom.unique())
+
+    plt.title('Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(handles=[handles[0]])
+    plt.savefig('../src/output_images/anomalies_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
 
 
