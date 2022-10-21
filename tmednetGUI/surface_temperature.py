@@ -4,7 +4,7 @@ import matplotlib.patches as mpatches
 from scipy.ndimage.filters import uniform_filter1d
 
 
-def marine_heat_spikes_setter(data, clim=False):
+def marine_heat_spikes_setter(data, target_year, clim=False):
     # Sets the time columns
     data['Date'] = pd.to_datetime(data['Date'], dayfirst=True)
     data.insert(1, 'day', pd.DatetimeIndex(data['Date']).day)
@@ -13,8 +13,8 @@ def marine_heat_spikes_setter(data, clim=False):
 
     # Gets the names of the legends
     first_year = str(data['year'].min())
-    second2last_year = str(data['year'].max() - 1)
-    last_year = str(data['year'].max())
+    second2last_year = str(target_year - 1)
+    last_year = str(target_year)
     last_years_legend = first_year + '-' + second2last_year
     percentile_legend = first_year + '-' + second2last_year + ' p90'
     low_percentile_legend = first_year + '-' + second2last_year + ' p10'
@@ -36,11 +36,11 @@ def marine_heat_spikes_filter(data, depth):
     return last_years_filtered
 
 
-def marine_heat_spikes_df_setter(data, depth, legend, percentile=False, years='old'):
+def marine_heat_spikes_df_setter(data, depth, legend, target_year, percentile=False, years='old'):
     if years == 'old':
-        locator = data['year'] != data['year'].max()
+        locator = data['year'] < target_year
     else:
-        locator = data['year'] == data['year'].max()
+        locator = data['year'] == target_year
     if not percentile:
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).mean().rename(
             columns={depth: legend}).drop('year', axis=1)
@@ -56,14 +56,14 @@ def marine_heat_spikes_df_setter(data, depth, legend, percentile=False, years='o
     return df
 
 
-def marine_heat_spikes_plotter(data, depth, sitename):
+def marine_heat_spikes_plotter(data, depth, sitename, target_year):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
-        data)
+        data, target_year)
     last_years_filtered = marine_heat_spikes_filter(data, depth)
-    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend)
-    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, percentile=.9)
-    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, years='new')
-    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, percentile=.1)
+    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, target_year, percentile=.9)
+    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
+    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, target_year, percentile=.1)
     # Sets a unique Dataframe consisting of the other
     concated = pd.concat([last_years_means, last_years_percentile, low_percentile, this_year_mean], axis=1)
     prop = concated.index.strftime('%b')
@@ -103,11 +103,14 @@ def marine_heat_spikes_plotter(data, depth, sitename):
 
     # Sets the legend in order to include the fill_between value
     fill_patch = mpatches.Patch(color='#f8e959', label='Marine heat spike')
+    spike2_patch = mpatches.Patch(color='#f66000', label='Category x2')
+    spike3_patch = mpatches.Patch(color='#ce2200', label='Category x3')
+    spike4_patch = mpatches.Patch(color='#810000', label='Category x3')
     low_patch = mpatches.Patch(color='#c7ecf2', label='Marine low spike')
     handles, labels = plt.gca().get_legend_handles_labels()
-    plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch])
-    plt.title('Daily sea temperature in ' + sitename + ' at ' + depth + ' meters deep')
-    plt.savefig('../src/output_images/spike_' + sitename + ' ' + depth + '.png')
+    plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch, spike2_patch, spike3_patch, spike4_patch])
+    plt.title(str(target_year) +' Daily sea temperature in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.savefig('../src/output_images/' + str(target_year) +'_spike_' + sitename + ' ' + depth + '.png')
     ax.remove()
 
     # Plot the zoom for summer
@@ -136,19 +139,19 @@ def marine_heat_spikes_plotter(data, depth, sitename):
     plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
     ax.set_xticklabels(prop_zoom.unique())
 
-    plt.title('Heat Spikes in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.title(str(target_year)+' Heat Spikes in Summer in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
-    plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch])
-    plt.savefig('../src/output_images/spike_Summer Months_' + sitename + '_' + depth + '.png')
+    plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch, spike2_patch, spike3_patch, spike4_patch])
+    plt.savefig('../src/output_images/' + str(target_year) +'_spike_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
 
 
-def anomalies_plotter(data, depth, sitename):
+def anomalies_plotter(data, depth, sitename, target_year):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
-        data, clim=True)
+        data, target_year, clim=True)
     last_years_filtered = marine_heat_spikes_filter(data, depth)
-    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend)
-    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, years='new')
+    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
     # Sets a unique Dataframe consisting of the other three
     concated = pd.concat([last_years_means, this_year_mean], axis=1)
     prop = concated.index.strftime('%b')
@@ -172,10 +175,10 @@ def anomalies_plotter(data, depth, sitename):
     plt.xlim((concated.index[0], concated.index[-1]))
     ax.set_xticklabels(prop.unique())
 
-    plt.title('Anomalies in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.title(str(target_year) + ' Anomalies in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]])
-    plt.savefig('../src/output_images/anomalies_' + sitename + '_' + depth + '.png')
+    plt.savefig('../src/output_images/' + str(target_year) +'_anomalies_' + sitename + '_' + depth + '.png')
     ax.remove()
 
     # Plot the zoom for summer
@@ -201,10 +204,10 @@ def anomalies_plotter(data, depth, sitename):
     plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
     ax.set_xticklabels(prop_zoom.unique())
 
-    plt.title('Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.title(str(target_year) +'Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]])
-    plt.savefig('../src/output_images/anomalies_Summer Months_' + sitename + '_' + depth + '.png')
+    plt.savefig('../src/output_images/' + str(target_year) +'_anomalies_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
 
 
@@ -213,15 +216,15 @@ def anomalies_plotter(data, depth, sitename):
 # data2 = dataset.drop(['Time'], axis=1)
 
 
-def browse_heat_spikes(data, sitename):
+def browse_heat_spikes(data, sitename, year):
     data = data.drop(['Time'], axis=1)
     for depth in data.columns[1:]:
-        marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename)
+        marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename, year)
 
 
-def browse_anomalies(data, sitename):
+def browse_anomalies(data, sitename, year):
     data = data.drop(['Time'], axis=1)
     for depth in data.columns[1:]:
-        anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename)
+        anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename, year)
 
 # browse_heat_spikes(dataset)

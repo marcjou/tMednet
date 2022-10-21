@@ -96,10 +96,10 @@ class tmednet(tk.Frame):
                                                                   self.generate_netCDF, 'Historical: '))
         toolsmenu.add_command(label='Create Heat spikes',
                               command=lambda: self.window_browser('Select historical file',
-                                                                  self.create_heat_spikes, 'Historical: '))
+                                                                  self.create_heat_spikes, 'Historical: ', 'Year'))
         toolsmenu.add_command(label='Create anomalies',
                               command=lambda: self.window_browser('Select historical file',
-                                                                  self.create_anomalies, 'Historical: '))
+                                                                  self.create_anomalies, 'Historical: ', 'Year'))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1316,18 +1316,22 @@ class tmednet(tk.Frame):
 
     def create_heat_spikes(self):
         filename = self.openfileinput.get()
+        year = self.secondInput.get()
         self.newwindow.destroy()
         sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
-        st.browse_heat_spikes(df, sitename)
+        for i in range(int(year), 2023):
+            st.browse_heat_spikes(df, sitename, i)
         self.console_writer('Plots saved at output_images', 'action')
 
     def create_anomalies(self):
         filename = self.openfileinput.get()
+        year = self.secondInput.get()
         self.newwindow.destroy()
         sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
-        st.browse_anomalies(df, sitename)
+        for i in range(int(year), 2023):
+            st.browse_anomalies(df, sitename, int(year))
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod
