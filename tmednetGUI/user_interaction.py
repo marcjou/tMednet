@@ -1331,7 +1331,7 @@ class tmednet(tk.Frame):
         sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
         for i in range(int(year), 2023):
-            st.browse_anomalies(df, sitename, int(year))
+            st.browse_anomalies(df, sitename, i)
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod

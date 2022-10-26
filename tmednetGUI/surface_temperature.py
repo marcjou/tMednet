@@ -55,68 +55,49 @@ def marine_heat_spikes_df_setter(data, depth, legend, target_year, percentile=Fa
 
     return df
 
-
-def marine_heat_spikes_plotter(data, depth, sitename, target_year):
-    data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
-        data, target_year)
-    last_years_filtered = marine_heat_spikes_filter(data, depth)
-    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
-    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, target_year, percentile=.9)
-    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
-    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, target_year, percentile=.1)
-    # Sets a unique Dataframe consisting of the other
-    concated = pd.concat([last_years_means, last_years_percentile, low_percentile, this_year_mean], axis=1)
-    prop = concated.index.strftime('%b')
-    concated.index = concated.index.strftime('%m-%d')
-
-    # Now it's time to set the categories of the spikes, which are multiples of the difference between the climatology
-    # and the p90
-
-    difference = concated[percentile_legend] - concated[last_years_legend]
-    concated['x2'] = difference * 2 + concated[last_years_legend]
-    concated['x3'] = difference * 3 + concated[last_years_legend]
-    concated['x4'] = difference * 4 + concated[last_years_legend]
+def spike_plot_setter(data, prop, target_year, sitename, depth, percentile_legend, this_year_legend):
     # Starts the axes and plots the data
     ax = plt.axes()
     cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'],
                         color=['#a62929', '#a62929', 'blue', '#141414', 'blue', 'blue', 'blue'],
                         alpha=[1., 1., 0., 1., 0., 0., 0.])
     ax.set_prop_cycle(cycler)
-    concated.plot(ax=ax)
+    data.plot(ax=ax)
 
     # #ff9507 color of the fill_between classic
-    plt.fill_between(concated.index, concated[percentile_legend], concated[this_year_legend],
-                     where=(concated[this_year_legend] > concated[percentile_legend]), color='#f8e959')
-    plt.fill_between(concated.index, concated['x2'], concated[this_year_legend],
-                     where=(concated[this_year_legend] > concated['x2']), color='#f66000')
-    plt.fill_between(concated.index, concated['x3'], concated[this_year_legend],
-                     where=(concated[this_year_legend] > concated['x3']), color='#ce2200')
-    plt.fill_between(concated.index, concated['x4'], concated[this_year_legend],
-                     where=(concated[this_year_legend] > concated['x4']), color='#810000')
+    plt.fill_between(data.index, data[percentile_legend], data[this_year_legend],
+                     where=(data[this_year_legend] > data[percentile_legend]), color='#f8e959')
+    plt.fill_between(data.index, data['x2'], data[this_year_legend],
+                     where=(data[this_year_legend] > data['x2']), color='#f66000')
+    plt.fill_between(data.index, data['x3'], data[this_year_legend],
+                     where=(data[this_year_legend] > data['x3']), color='#ce2200')
+    plt.fill_between(data.index, data['x4'], data[this_year_legend],
+                     where=(data[this_year_legend] > data['x4']), color='#810000')
     # plt.fill_between(concated.index, concated[low_percentile_legend], concated[this_year_legend],
     #                 where=(concated[this_year_legend] < concated[low_percentile_legend]), color='#c7ecf2')
     plt.xlabel('')
     plt.xticks(
         ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01', '12-01'])
-    plt.xlim((concated.index[0], concated.index[-1]))
+    plt.xlim((data.index[0], data.index[-1]))
     ax.set_xticklabels(prop.unique())
 
     # Sets the legend in order to include the fill_between value
-    fill_patch = mpatches.Patch(color='#f8e959', label='Marine heat spike')
-    spike2_patch = mpatches.Patch(color='#f66000', label='Category x2')
-    spike3_patch = mpatches.Patch(color='#ce2200', label='Category x3')
-    spike4_patch = mpatches.Patch(color='#810000', label='Category x3')
+    fill_patch = mpatches.Patch(color='#f8e959', label='Moderate')
+    spike2_patch = mpatches.Patch(color='#f66000', label='Strong')
+    spike3_patch = mpatches.Patch(color='#ce2200', label='Severe')
+    spike4_patch = mpatches.Patch(color='#810000', label='Extreme')
     low_patch = mpatches.Patch(color='#c7ecf2', label='Marine low spike')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch, spike2_patch, spike3_patch, spike4_patch])
-    plt.title(str(target_year) +' Daily sea temperature in ' + sitename + ' at ' + depth + ' meters deep')
-    plt.savefig('../src/output_images/' + str(target_year) +'_spike_' + sitename + ' ' + depth + '.png')
+    plt.title(str(target_year) + ' Marine HeatWaves in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.savefig('../src/output_images/' + str(target_year) + '_spike_' + sitename + ' ' + depth + '.png')
     ax.remove()
 
+def spike_zoom_setter(data, prop, target_year, sitename, depth, percentile_legend, this_year_legend):
     # Plot the zoom for summer
     prop_zoom = prop.to_list()
     prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
-    concated_zoom = concated.loc['06-01':'10-01'][:-1]
+    concated_zoom = data.loc['06-01':'10-01'][:-1]
     ax = plt.axes()
     cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'],
                         color=['#a62929', '#a62929', 'blue', '#141414', 'blue', 'blue', 'blue'],
@@ -138,54 +119,74 @@ def marine_heat_spikes_plotter(data, depth, sitename, target_year):
         ['06-01', '07-01', '08-01', '09-01'])
     plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
     ax.set_xticklabels(prop_zoom.unique())
-
-    plt.title(str(target_year)+' Heat Spikes in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    # Sets the legend in order to include the fill_between value
+    fill_patch = mpatches.Patch(color='#f8e959', label='Moderate')
+    spike2_patch = mpatches.Patch(color='#f66000', label='Strong')
+    spike3_patch = mpatches.Patch(color='#ce2200', label='Severe')
+    spike4_patch = mpatches.Patch(color='#810000', label='Extreme')
+    low_patch = mpatches.Patch(color='#c7ecf2', label='Marine low spike')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=handles[:2] + [handles[3]] + [fill_patch, spike2_patch, spike3_patch, spike4_patch])
-    plt.savefig('../src/output_images/' + str(target_year) +'_spike_Summer Months_' + sitename + '_' + depth + '.png')
+    plt.title(str(target_year) + ' Marine HeatWaves in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.savefig('../src/output_images/' + str(target_year) + '_spike_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
 
 
-def anomalies_plotter(data, depth, sitename, target_year):
+def marine_heat_spikes_plotter(data, depth, sitename, target_year):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
-        data, target_year, clim=True)
+        data, target_year)
     last_years_filtered = marine_heat_spikes_filter(data, depth)
     last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, target_year, percentile=.9)
     this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
-    # Sets a unique Dataframe consisting of the other three
-    concated = pd.concat([last_years_means, this_year_mean], axis=1)
+    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, target_year, percentile=.1)
+    # Sets a unique Dataframe consisting of the other
+    concated = pd.concat([last_years_means, last_years_percentile, low_percentile, this_year_mean], axis=1)
     prop = concated.index.strftime('%b')
     concated.index = concated.index.strftime('%m-%d')
-    anomaly = pd.DataFrame(concated[this_year_legend] - concated[last_years_legend], index=concated.index,
-                           columns=['anomaly'])
-    anomaly['zero'] = 0
+
+    # Now it's time to set the categories of the spikes, which are multiples of the difference between the climatology
+    # and the p90
+
+    difference = concated[percentile_legend] - concated[last_years_legend]
+    concated['x2'] = difference * 2 + concated[last_years_legend]
+    concated['x3'] = difference * 3 + concated[last_years_legend]
+    concated['x4'] = difference * 4 + concated[last_years_legend]
+    spike_plot_setter(concated, prop, target_year, sitename, depth, percentile_legend, this_year_legend)
+    spike_zoom_setter(concated, prop, target_year, sitename, depth, percentile_legend, this_year_legend)
+
+
+def anomaly_plot_setter(data, prop, sitename, target_year, depth, last_years_legend, this_year_legend):
     ax = plt.axes()
     cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'], alpha=[1., 0.7], linewidth=[0.7, 0.7])
     ax.set_prop_cycle(cycler)
-    concated.plot(ax=ax)
+    data.plot(ax=ax)
 
-    plt.fill_between(concated.index, concated[last_years_legend], concated[this_year_legend],
-                     where=(concated[this_year_legend] > concated[last_years_legend]), color='#fa5a5a')
-    plt.fill_between(concated.index, concated[last_years_legend], concated[this_year_legend],
-                     where=(concated[this_year_legend] < concated[last_years_legend]), color='#5aaaff')
+    plt.fill_between(data.index, data[last_years_legend], data[this_year_legend],
+                     where=(data[this_year_legend] > data[last_years_legend]), color='#fa5a5a')
+    plt.fill_between(data.index, data[last_years_legend], data[this_year_legend],
+                     where=(data[this_year_legend] < data[last_years_legend]), color='#5aaaff')
 
     plt.xlabel('')
     plt.xticks(
         ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01', '12-01'])
-    plt.xlim((concated.index[0], concated.index[-1]))
+    plt.xlim((data.index[0], data.index[-1]))
     ax.set_xticklabels(prop.unique())
 
     plt.title(str(target_year) + ' Anomalies in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]])
-    plt.savefig('../src/output_images/' + str(target_year) +'_anomalies_' + sitename + '_' + depth + '.png')
+    plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + sitename + '_' + depth + '.png')
     ax.remove()
 
+
+def anomaly_zoom_setter(data, prop, sitename, target_year, depth, last_years_legend, this_year_legend):
     # Plot the zoom for summer
     prop_zoom = prop.to_list()
     prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
-    concated_zoom = concated.loc['06-01':'10-01'][:-1]
-    anomaly = pd.DataFrame(concated_zoom[this_year_legend] - concated_zoom[last_years_legend], index=concated_zoom.index,
+    concated_zoom = data.loc['06-01':'10-01'][:-1]
+    anomaly = pd.DataFrame(concated_zoom[this_year_legend] - concated_zoom[last_years_legend],
+                           index=concated_zoom.index,
                            columns=['anomaly'])
     anomaly['zero'] = 0
     ax = plt.axes()
@@ -204,11 +205,29 @@ def anomalies_plotter(data, depth, sitename, target_year):
     plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
     ax.set_xticklabels(prop_zoom.unique())
 
-    plt.title(str(target_year) +'Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
+    plt.title(str(target_year) + ' Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]])
-    plt.savefig('../src/output_images/' + str(target_year) +'_anomalies_Summer Months_' + sitename + '_' + depth + '.png')
+    plt.savefig(
+        '../src/output_images/' + str(target_year) + '_anomalies_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
+
+
+def anomalies_plotter(data, depth, sitename, target_year):
+    data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
+        data, target_year, clim=True)
+    last_years_filtered = marine_heat_spikes_filter(data, depth)
+    last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+    this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
+    # Sets a unique Dataframe consisting of the other three
+    concated = pd.concat([last_years_means, this_year_mean], axis=1)
+    prop = concated.index.strftime('%b')
+    concated.index = concated.index.strftime('%m-%d')
+    anomaly = pd.DataFrame(concated[this_year_legend] - concated[last_years_legend], index=concated.index,
+                           columns=['anomaly'])
+    anomaly['zero'] = 0
+    anomaly_plot_setter(concated, prop, sitename, target_year, depth, last_years_legend, this_year_legend)
+    anomaly_zoom_setter(concated, prop, sitename, target_year, depth, last_years_legend, this_year_legend)
 
 
 # Opens the data
