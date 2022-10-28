@@ -94,7 +94,8 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
 mat = io.loadmat('../src/mhwclim_1982-2011_L4REP_MED.mat')
 
 
-nc = NetCDFFile('/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
+#nc = NetCDFFile('/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
+nc = NetCDFFile('/home/marc/PycharmProjects/MedNet/src/SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_a_V2_1666948230812.nc')
 lat = nc.variables['lat'][:]
 lon = nc.variables['lon'][:]
 time = nc.variables['time'][:]
@@ -126,8 +127,8 @@ clim_lon_grid = np.repeat(clim_lon.reshape(1, len(clim_lon)), repeats=len(clim_l
 
 
 # Used to filter only the selected months, simply change the number of the months you want to get the MHW
-start_month_index = [ti.month == 5 for ti in dtime].index(True)
-end_month_index = len(dtime) - 1 - [ti.month == 5 for ti in dtime[::-1]].index(True)
+start_month_index = [ti.month == 6 for ti in dtime].index(True)
+end_month_index = len(dtime) - 1 - [ti.month == 6 for ti in dtime[::-1]].index(True)
 
 selected_sst = sst[start_month_index : end_month_index +1]
 

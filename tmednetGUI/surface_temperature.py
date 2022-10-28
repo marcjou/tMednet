@@ -36,17 +36,22 @@ def marine_heat_spikes_filter(data, depth):
     return last_years_filtered
 
 
-def marine_heat_spikes_df_setter(data, depth, legend, target_year, percentile=False, years='old'):
+def marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', years='old', percentile=0):
     if years == 'old':
         locator = data['year'] < target_year
     else:
         locator = data['year'] == target_year
-    if not percentile:
+    if type=='mean':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).mean().rename(
             columns={depth: legend}).drop('year', axis=1)
-    else:
+    if type=='percentile':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).quantile(percentile).rename(
             columns={depth: legend}).drop(['year', 'Date'], axis=1)
+    if type=='minmax':
+        df = data.loc[locator].groupby(['day', 'month'], as_index=False).min().rename(
+            columns={depth: 'min'}).drop(['year', 'Date'], axis=1)
+        df['max'] = data.loc[locator].groupby(['day', 'month'], as_index=False).max().rename(
+            columns={depth: 'max'}).drop(['year', 'Date'], axis=1)['max']
     df.sort_values(['month', 'day'], inplace=True)
     df['date'] = pd.to_datetime(
         '2020/' + df["month"].astype(str) + "/" + df["day"].astype(str))
@@ -137,9 +142,9 @@ def marine_heat_spikes_plotter(data, depth, sitename, target_year):
         data, target_year)
     last_years_filtered = marine_heat_spikes_filter(data, depth)
     last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
-    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, target_year, percentile=.9)
+    last_years_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, percentile_legend, target_year,type='percentile', percentile=.9)
     this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
-    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, target_year, percentile=.1)
+    low_percentile = marine_heat_spikes_df_setter(last_years_filtered, depth, low_percentile_legend, target_year,type='percentile', percentile=.1)
     # Sets a unique Dataframe consisting of the other
     concated = pd.concat([last_years_means, last_years_percentile, low_percentile, this_year_mean], axis=1)
     prop = concated.index.strftime('%b')
@@ -158,7 +163,7 @@ def marine_heat_spikes_plotter(data, depth, sitename, target_year):
 
 def anomaly_plot_setter(data, prop, sitename, target_year, depth, last_years_legend, this_year_legend):
     ax = plt.axes()
-    cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'], alpha=[1., 0.7], linewidth=[0.7, 0.7])
+    cycler = plt.cycler(linestyle=['-', '-', '-', '-'], color=['black', 'grey', 'blue', 'red'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
     ax.set_prop_cycle(cycler)
     data.plot(ax=ax)
 
@@ -190,7 +195,7 @@ def anomaly_zoom_setter(data, prop, sitename, target_year, depth, last_years_leg
                            columns=['anomaly'])
     anomaly['zero'] = 0
     ax = plt.axes()
-    cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'], alpha=[1., 0.7], linewidth=[0.7, 0.7])
+    cycler = plt.cycler(linestyle=['-', '-', '-', '-'], color=['black', 'grey', 'blue', 'red'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
     ax.set_prop_cycle(cycler)
     concated_zoom.plot(ax=ax)
 
@@ -212,6 +217,7 @@ def anomaly_zoom_setter(data, prop, sitename, target_year, depth, last_years_leg
         '../src/output_images/' + str(target_year) + '_anomalies_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
 
+#def get_max_and_min(data):
 
 def anomalies_plotter(data, depth, sitename, target_year):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
@@ -219,8 +225,9 @@ def anomalies_plotter(data, depth, sitename, target_year):
     last_years_filtered = marine_heat_spikes_filter(data, depth)
     last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
     this_year_mean = marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
+    min_max_temp = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year, type='minmax')
     # Sets a unique Dataframe consisting of the other three
-    concated = pd.concat([last_years_means, this_year_mean], axis=1)
+    concated = pd.concat([last_years_means, this_year_mean, min_max_temp], axis=1)
     prop = concated.index.strftime('%b')
     concated.index = concated.index.strftime('%m-%d')
     anomaly = pd.DataFrame(concated[this_year_legend] - concated[last_years_legend], index=concated.index,
