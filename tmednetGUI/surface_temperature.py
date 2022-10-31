@@ -163,7 +163,7 @@ def marine_heat_spikes_plotter(data, depth, sitename, target_year):
 
 def anomaly_plot_setter(data, prop, sitename, target_year, depth, last_years_legend, this_year_legend):
     ax = plt.axes()
-    cycler = plt.cycler(linestyle=['-', '-', '-', '-'], color=['black', 'grey', 'blue', 'red'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
+    cycler = plt.cycler(linestyle=['-', '-', '--', '--'], color=['black', 'grey', '#01086b', '#820316'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
     ax.set_prop_cycle(cycler)
     data.plot(ax=ax)
 
@@ -180,7 +180,7 @@ def anomaly_plot_setter(data, prop, sitename, target_year, depth, last_years_leg
 
     plt.title(str(target_year) + ' Anomalies in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
-    plt.legend(handles=[handles[0]])
+    plt.legend(handles=[handles[0], handles[2], handles[3]], labels=[labels[0]] + ['Historic min.', 'Historic max.'])
     plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + sitename + '_' + depth + '.png')
     ax.remove()
 
@@ -195,7 +195,7 @@ def anomaly_zoom_setter(data, prop, sitename, target_year, depth, last_years_leg
                            columns=['anomaly'])
     anomaly['zero'] = 0
     ax = plt.axes()
-    cycler = plt.cycler(linestyle=['-', '-', '-', '-'], color=['black', 'grey', 'blue', 'red'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
+    cycler = plt.cycler(linestyle=['-', '-', '--', '--'], color=['black', 'grey', '#01086b', '#820316'], alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
     ax.set_prop_cycle(cycler)
     concated_zoom.plot(ax=ax)
 
@@ -212,7 +212,7 @@ def anomaly_zoom_setter(data, prop, sitename, target_year, depth, last_years_leg
 
     plt.title(str(target_year) + ' Anomalies in Summer in ' + sitename + ' at ' + depth + ' meters deep')
     handles, labels = plt.gca().get_legend_handles_labels()
-    plt.legend(handles=[handles[0]])
+    plt.legend(handles=[handles[0], handles[2], handles[3]], labels=[labels[0]] + ['Historic min.', 'Historic max.'])
     plt.savefig(
         '../src/output_images/' + str(target_year) + '_anomalies_Summer Months_' + sitename + '_' + depth + '.png')
     ax.remove()
