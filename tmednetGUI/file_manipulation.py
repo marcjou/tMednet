@@ -420,8 +420,12 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         filtered_df = df[start_time: end_time]
     if filtered_df.columns[0] == '5':
         filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
-
-    return filtered_df.interpolate(axis=1), np.nanmin(df.values), np.nanmax(df.values)
+        #TODO check this histmax assumption, if the planet goes heating it may be deprecated
+    if np.nanmax(df.values) > 30:
+        histmax = 30
+    else:
+        histmax = np.nanmax(df.values)
+    return filtered_df.interpolate(axis=1), np.nanmin(df.values), histmax
 
 
 def check_for_interpolation(df):
@@ -643,8 +647,17 @@ def running_average_special(year_df, running=240):
     depths = list(year_df.columns)
     arr = []
     for depth in depths:
-        arr.append(uniform_filter1d(year_df[str(depth)].dropna(), size=running))
+        #TODO se ha realizado un pequeño cambio aquí revisar si es incompatible con lo anteriormente creado
+
+        first_nonnan = year_df[depth].first_valid_index()
+        empty = np.empty(year_df.index.get_loc(first_nonnan))
+        empty.fill(np.nan)
+        incomplete = uniform_filter1d(year_df[str(depth)].dropna(), size=running)
+        arr.append(np.insert(incomplete,0,empty))
     maxlen = max(len(i) for i in arr)
+
+
+
     for i in range(0, len(arr)):
         if len(arr[i]) < maxlen:
             remainder = [np.NaN] * (maxlen - len(arr[i]))

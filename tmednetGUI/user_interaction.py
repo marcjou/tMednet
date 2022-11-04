@@ -716,8 +716,12 @@ class tmednet(tk.Frame):
             # self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.plot.invert_yaxis()
             # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
-            levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
-            levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
+            #levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
+            #levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
+
+            levels = np.arange(np.floor(hismintemp), 26, 1)
+            levels2 = np.arange(np.floor(hismintemp), 26, 0.1)
+
 
             # Draws a contourn line.
             # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
@@ -924,6 +928,7 @@ class tmednet(tk.Frame):
         # TODO check code in 2030 to change this method
         # We get all the years on the dataset
         years = df['year'].unique()
+        years = years[years != 0]
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
         maxdays = 0  # Used to set the maximum number of days to point in the X axis
