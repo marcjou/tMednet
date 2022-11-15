@@ -46,7 +46,7 @@ def marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', 
             columns={depth: legend}).drop('year', axis=1)
     if type=='percentile':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).quantile(percentile).rename(
-            columns={depth: legend}).drop(['year', 'Date'], axis=1)
+            columns={depth: legend}).drop(['year'], axis=1)
     if type=='minmax':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).min().rename(
             columns={depth: 'min'}).drop(['year', 'Date'], axis=1)

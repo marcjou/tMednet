@@ -59,7 +59,7 @@ def load_data(args, consolescreen=False):
                 consolescreen.insert("end", "file ")
                 consolescreen.insert("end", filein + "\n =============\n")
 
-            f = open(filein, "r")
+            f = open(filein, "r", encoding='iso-8859-15')
             a = f.readlines()
             f.close()
             # We clean and separate values that contain "Enregistré"
@@ -421,11 +421,13 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     if filtered_df.columns[0] == '5':
         filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
         #TODO check this histmax assumption, if the planet goes heating it may be deprecated
+    '''
     if np.nanmax(df.values) > 30:
         histmax = 30
     else:
         histmax = np.nanmax(df.values)
-    return filtered_df.interpolate(axis=1), np.nanmin(df.values), histmax
+    '''
+    return filtered_df.interpolate(axis=1), np.nanmin(df.values), np.nanmax(df.values)
 
 
 def check_for_interpolation(df):

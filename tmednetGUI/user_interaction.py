@@ -719,8 +719,15 @@ class tmednet(tk.Frame):
             #levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
             #levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
 
-            levels = np.arange(np.floor(hismintemp), 26, 1)
-            levels2 = np.arange(np.floor(hismintemp), 26, 0.1)
+            # Checks the historic min and max values to use in the colourbar, if they are too outlandish
+            # over 5 degrees of difference, it uses its own max and min for this year.
+            if hismaxtemp >= np.round(np.nanmax(df.values) + 5):
+                hismaxtemp = np.round(np.nanmax(df.values)) + 1
+            if hismintemp <= np.round(np.nanmin(df.values) - 5):
+                hismintemp = np.round(np.nanmin(df.values)) + 1
+
+            levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
+            levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
 
 
             # Draws a contourn line.
@@ -794,7 +801,9 @@ class tmednet(tk.Frame):
 
         year_df, foo, bar = fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
-        year_df.drop('0', axis=1, inplace=True)
+        if '0' in year_df.columns:
+            year_df.drop('0', axis=1, inplace=True)
+
 
         year_df = fm.running_average_special(year_df, running=360)
         # dfdelta = fm.running_average(self.mdata, running=360)

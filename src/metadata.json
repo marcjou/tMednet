@@ -589,6 +589,54 @@
             "start_year": "2021",
             "end_year": "2021",
             "institution": "Medsharks"
+        },
+        "160": {
+            "lat": "38.0917",
+            "long": "13.5674",
+            "site_number": "",
+            "site_name": "Formica di Porticello",
+            "site_code": "160",
+            "eco_region": "W-Med",
+            "sub_basin": "S-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2021",
+            "institution": "Medsharks"
+        },
+        "165": {
+            "lat": "41.3672",
+            "long": "12.6131",
+            "site_number": "",
+            "site_name": "Costacuti (Anzio)",
+            "site_code": "165",
+            "eco_region": "W-Med",
+            "sub_basin": "S-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2021",
+            "institution": "Medsharks"
+        },
+        "169": {
+            "lat": "38.2559",
+            "long": "15.7115",
+            "site_number": "",
+            "site_name": "Scilla Montagna",
+            "site_code": "169",
+            "eco_region": "W-Med",
+            "sub_basin": "S-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2022",
+            "institution": "Medsharks"
+        },
+        "147": {
+            "lat": "42.8352",
+            "long": "9.3086",
+            "site_number": "",
+            "site_name": "Cap Corse (Canelle)",
+            "site_code": "147",
+            "eco_region": "W-Med",
+            "sub_basin": "Corsica",
+            "start_year": "2020",
+            "end_year": "2022",
+            "institution": ""
         }
     },
     "regions": {
