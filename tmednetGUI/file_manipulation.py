@@ -427,7 +427,13 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     else:
         histmax = np.nanmax(df.values)
     '''
-    return filtered_df.interpolate(axis=1), np.nanmin(df.values), np.nanmax(df.values)
+    # Gets the historic min and max values only for the months from May through November
+    dfcopy = df.copy()
+    dfcopy.index = pd.to_datetime(dfcopy.index)
+    dfcopy = dfcopy.loc[(dfcopy.index.month>=5) & (dfcopy.index.month<12)]
+    histmin = round(np.nanmin(dfcopy.quantile(0.01))) - 1
+    histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
+    return filtered_df.interpolate(axis=1), histmin, histmax
 
 
 def check_for_interpolation(df):
@@ -510,29 +516,36 @@ def zoom_data(data, consolescreen=False):
         data: The mdata dictionary
     Version: 05/2021, MJB: Documentation
     """
+
+
+    enddate = data["datafin"] # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
+    startdate = data["datainici"] # - timedelta(hours=int(data["GMT"][1:]))
+
     # Gets the first and last 72h of operation to look for the possible errors.
     # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
     time_series = [data['time'][:72], data['time'][-72:]]
     temperatures = [data['temp'][:72], data['temp'][-72:]]
+    if np.argwhere(np.array(time_series[1]) == np.array(enddate)).size == 0:
+        time_series[1] = data['time'][data['time'].index(enddate) - 72:]
+        temperatures[1] = data['temp'][data['time'].index(enddate) - 72:]
+
     ftimestamp = [item.timestamp() for item in time_series[1]]
     finaldydx = diff(temperatures[1]) / diff(ftimestamp)
     indexes = np.argwhere(finaldydx > 0.0006) + 1  # Gets the indexes in which the variation is too big (removing)
     # Checks whether if the error values begin before the declarated time of removal or later.
     # If later, the time of removal is the marked time to be removed
 
-    enddate = data["datafin"] # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
-    startdate = data["datainici"] # - timedelta(hours=int(data["GMT"][1:]))
     if (time_series[0][0] - startdate).total_seconds() > 0 and (time_series[0][0] - startdate).total_seconds() < 7200:
         startdate = time_series[0][0]
     # If the removal time is way earlier than 72h from the last registered data, a warning is raised
     try:
 
         if indexes.size != 0:
-            if enddate < data['time'][int(indexes[0]) - 72]:
+            if enddate < data['time'][int(indexes[0]) - len(temperatures[1])]:
                 index = np.argwhere(np.array(time_series[1]) == np.array(enddate))
-                indexes = np.array(range(int(index), len(temperatures[0])))
+                indexes = np.array(range(int(index), len(temperatures[1])))
             else:
-                indexes = np.array(range(int(indexes[0]), len(temperatures[0])))
+                indexes = np.array(range(int(indexes[0]), len(temperatures[1])))
             start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
             # start_index = np.array(range(int(start_index), len(temperatures[0])))
             return time_series, temperatures, indexes, start_index

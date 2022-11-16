@@ -440,16 +440,16 @@ class tmednet(tk.Frame):
         if indexes.size != 0:
             if indexes[0] + 1 == len(time_series[0]):
                 self.plot2.plot(time_series[1][:int(indexes[0])],
-                                masked_temperatures[-len(time_series[0]):(int(indexes[0]) - len(time_series[0]))],
+                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
                                 '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
             else:
                 self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
-                                masked_temperatures[-len(time_series[0]):(int(indexes[0]) - len(time_series[0]) + 1)],
+                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
                                 '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
             self.plot2.legend()
             # Plots in the same graph the last part which represents the errors in the data from removing the sensors
             self.plot2.plot(time_series[1][int(indexes[0]):],
-                            masked_temperatures[(int(indexes[0]) - len(time_series[0])):],
+                            masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
                             '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
             self.plot2.set(ylabel='Temperature (DEG C)',
                            title=self.files[index] + "\n" + 'Depth:' + str(
@@ -457,7 +457,7 @@ class tmednet(tk.Frame):
                                self.mdata[index]['region']))
         else:
             self.plot2.plot(time_series[1],
-                            masked_temperatures[-len(time_series[0]):],
+                            masked_temperatures[-len(time_series[1]):],
                             '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
             self.plot2.legend()
             self.plot2.set(ylabel='Temperature (DEG C)',
@@ -721,10 +721,14 @@ class tmednet(tk.Frame):
 
             # Checks the historic min and max values to use in the colourbar, if they are too outlandish
             # over 5 degrees of difference, it uses its own max and min for this year.
-            if hismaxtemp >= np.round(np.nanmax(df.values) + 5):
-                hismaxtemp = np.round(np.nanmax(df.values)) + 1
-            if hismintemp <= np.round(np.nanmin(df.values) - 5):
-                hismintemp = np.round(np.nanmin(df.values)) + 1
+            # We use percentile 99% and 1% to decide the upper and lower levels and trim outlandish data
+            dfcopy = df.copy()
+            dfcopy.index = pd.to_datetime(dfcopy.index)
+            dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
+            if hismaxtemp < round(np.nanmax(dfcopy.quantile(0.99))) + 1:
+                hismaxtemp = round(np.nanmax(dfcopy.quantile(0.99))) + 1
+            if hismintemp > np.round(np.nanmin(dfcopy.quantile(0.01))) - 1:
+                hismintemp = round(np.nanmin(dfcopy.quantile(0.01))) - 1
 
             levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
             levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
