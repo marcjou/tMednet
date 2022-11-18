@@ -535,7 +535,9 @@ def zoom_data(data, consolescreen=False):
     # Checks whether if the error values begin before the declarated time of removal or later.
     # If later, the time of removal is the marked time to be removed
 
-    if (time_series[0][0] - startdate).total_seconds() > 0 and (time_series[0][0] - startdate).total_seconds() < 7200:
+    # Checks if the declared date is earlier than the real date, if so, uses the real date as start date
+    # Old chunk and (time_series[0][0] - startdate).total_seconds() < 7200
+    if (time_series[0][0] - startdate).total_seconds() > 0:
         startdate = time_series[0][0]
     # If the removal time is way earlier than 72h from the last registered data, a warning is raised
     try:
@@ -661,18 +663,36 @@ def running_average_special(year_df, running=240):
     indi = len(year_df)
     depths = list(year_df.columns)
     arr = []
+    df_empty = pd.DataFrame({str(depths[0]): []})
     for depth in depths:
         #TODO se ha realizado un pequeño cambio aquí revisar si es incompatible con lo anteriormente creado
-
+        '''
         first_nonnan = year_df[depth].first_valid_index()
-        empty = np.empty(year_df.index.get_loc(first_nonnan))
-        empty.fill(np.nan)
-        incomplete = uniform_filter1d(year_df[str(depth)].dropna(), size=running)
-        arr.append(np.insert(incomplete,0,empty))
-    maxlen = max(len(i) for i in arr)
+        # TODO si hay un hueco muy grande en la serie deberia ignorar ese hueco y no hacer el filtro en el y retomar la serie más adelante
+        if first_nonnan:
+            empty = np.empty(year_df.index.get_loc(first_nonnan))
+            empty.fill(np.nan)
+            incomplete = uniform_filter1d(year_df[str(depth)].dropna(), size=running)
+            arr.append(np.insert(incomplete,0,empty))
+        else:
+            nonna_df = year_df[str(depth)].dropna()
+            nan_df = year_df[year_df[str(depth)].isnull()]
+            complete = uniform_filter1d(nonna_df, size=running)
+            complete_df = pd.DataFrame(complete, columns=[str(depth)], index=nonna_df.index)
+            complete_df = pd.concat([complete_df, nan_df[str(depth)]], sort=False).sort_index()
+            arr.append(complete)
+            '''
+        nonna_df = year_df[str(depth)].dropna()
+        nan_df = year_df[year_df[str(depth)].isnull()]
+        complete = uniform_filter1d(nonna_df, size=running)
+        complete_df = pd.DataFrame(complete, columns=[str(depth)], index=nonna_df.index)
+        complete_df = pd.concat([complete_df, nan_df[str(depth)]], sort=False).sort_index()
+        df_empty[str(depth)] = complete_df[str(depth)]
+    #maxlen = max(len(i) for i in arr)
 
+    dfdelta = df_empty.copy()
 
-
+    '''
     for i in range(0, len(arr)):
         if len(arr[i]) < maxlen:
             remainder = [np.NaN] * (maxlen - len(arr[i]))
@@ -682,7 +702,7 @@ def running_average_special(year_df, running=240):
         for i in range(0, len(arr)):
             arr[i] = np.concatenate((arr[i], remainder))
     dfdelta = pd.DataFrame(np.column_stack(arr), columns=depths, index=year_df.index)
-    '''
+    
     for depth in depths:
         # Cambiado entre otros index del data al dropna
         series1 = pd.DataFrame(uniform_filter1d(year_df[str(depth)].dropna(), size=running),

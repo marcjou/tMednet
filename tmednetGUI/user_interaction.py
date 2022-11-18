@@ -546,7 +546,7 @@ class tmednet(tk.Frame):
                                self.mdata[i]['region']))
             self.plot1.legend()
 
-            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[0]):],
+            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[1]):],
                             '-', label=str(self.mdata[i]['depth']))
             self.plot2.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
