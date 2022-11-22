@@ -923,6 +923,22 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, console=self.consolescreen)  # returns an excel object
         df = excel_object.mydf3
 
+        dfhist_control = pd.read_csv(historical, sep='\t')
+        dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
+        dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
+
+        # Check if any depth is all nan which means there are no data for said depth
+        depths = df['depth(m)'].unique()
+
+        for depth in depths:
+            for year in df['year'].unique():
+                if dfhist_control.loc[dfhist_control['year'] == int(year)][depth].isnull().all():
+                    for i in range(23, 29):
+                        df.loc[(df['year'] == str(year)) & (df['depth(m)'] == depth), 'Ndays>=' + str(i)] = np.nan
+                else:
+                    print('not all na')
+
+
         # Creates the subplots and deletes the old plot
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
