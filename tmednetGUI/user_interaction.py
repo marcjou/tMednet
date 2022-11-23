@@ -967,12 +967,14 @@ class tmednet(tk.Frame):
             for i in range(23, 29):
                 yearly_plot = np.column_stack(
                     (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
+                #if yearly_plot != np.nan:
+                yearly_plot[pd.isnull(yearly_plot)] = -999
                 yearly_plot = yearly_plot.astype(int)
                 if yearly_plot[-1, -1] > maxdepth:
                     maxdepth = yearly_plot[-1, -1]
                 if np.max(yearly_plot[:, 0]) > maxdays:
                     maxdays = np.max(yearly_plot[:, 0])
-                temperatures[i] = np.copy(yearly_plot)
+                temperatures[i] = np.ma.masked_where(yearly_plot == -999, yearly_plot)
             year_dict[year] = temperatures.copy()
             self.plot.set(ylim=(0, maxdepth + 2))
             self.plot.set(xlim=(-2, maxdays + 2))
