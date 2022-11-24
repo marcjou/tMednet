@@ -12,7 +12,7 @@ import time
 class Excel:
 
     def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, lastyear=False, console=False):
-        self.df = pd.read_csv(input_path, '\t')
+        self.df = pd.read_csv(input_path, sep='\t')
         self.mhwdf = self.df.copy()
         self.n = 0
         self.total = {}
@@ -545,7 +545,7 @@ def big_merge(filename1, filename2, output):
         df2.replace(np.nan, '', regex=True, inplace=True)
         df2.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)
     else:
-        df1 = pd.read_csv(filename1, '\t')
+        df1 = pd.read_csv(filename1, sep='\t')
         dfconc = pd.concat([df1, df2])
 
 
