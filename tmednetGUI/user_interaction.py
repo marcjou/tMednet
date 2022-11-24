@@ -750,7 +750,10 @@ class tmednet(tk.Frame):
                     df_cuts.append(df[index_old:index_cut])
                     index_old = index_cut
                     # df_second = df[index_cut:]
-
+            # Checks how many depths the file has, if there is only one depth it creates a new one 1 meter above
+            if len(depths) == 1:
+                depths = np.insert(depths, 0, depths[0] - 1)
+                df.insert(0, str(depths[0]), df[str(depths[1])])
             if index_cut:
                 df_cuts.append(df[index_cut:])
                 cf = []
