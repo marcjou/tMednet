@@ -113,7 +113,9 @@ class Excel:
                     if month == '07' or month == '08' or month == '09':
                         self.seasonalmeans[column].append(round(np.nanmean(self.total[column]), 3))
 
-                self.mydf = self.mydf.append(self.appendict[column], ignore_index=True)
+                #self.mydf = self.mydf.append(self.appendict[column], ignore_index=True)
+                self.mydf = pd.concat([self.mydf, pd.DataFrame.from_dict([self.appendict[column]])], axis=0,
+                                       join='outer', ignore_index=True)
                 self.appendict[column]['N'] = 0
                 self.total[column] = []
 
@@ -139,7 +141,9 @@ class Excel:
                         len([days for days in self.total2[column] if days >= 25]) / 24)
                     self.appendict2[column]['Ndays>=26'] = round(
                         len([days for days in self.total2[column] if days >= 26]) / 24)
-                self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
+                #self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
+                self.mydf2 = pd.concat([self.mydf2, pd.DataFrame.from_dict([self.appendict2[column]])], axis=0,
+                                       join='outer', ignore_index=True)
                 self.appendict2[column]['N'] = 0
                 self.total2[column] = []
                 self.dailymeans[column] = []
@@ -172,7 +176,9 @@ class Excel:
                         len([days for days in self.total3[column] if days >= 27]) / 24)
                     self.appendict3[column]['Ndays>=28'] = round(
                         len([days for days in self.total3[column] if days >= 28]) / 24)
-                self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
+                #self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
+                self.mydf3 = pd.concat([self.mydf3, pd.DataFrame.from_dict([self.appendict3[column]])], axis=0,
+                                       join='outer', ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
                 self.seasonalmeans[column] = []
@@ -377,7 +383,9 @@ class Excel:
                         len([days for days in self.total3[column] if days >= 27]) / 24)
                     self.appendict3[column]['Ndays>=28'] = round(
                         len([days for days in self.total3[column] if days >= 28]) / 24)
-                self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
+                #self.mydf3 = self.mydf3.append(self.appendict3[column], ignore_index=True)
+                self.mydf3 = pd.concat([self.mydf3, pd.DataFrame.from_dict([self.appendict3[column]])], axis=0,
+                                       join='outer', ignore_index=True)
                 self.appendict3[column]['N'] = 0
                 self.total3[column] = []
 
@@ -463,7 +471,8 @@ class Excel:
                     self.appendict2[column]['Ndays>=24'] = len([days for days in self.total2[column] if days >= 24])
                     self.appendict2[column]['Ndays>=25'] = len([days for days in self.total2[column] if days >= 25])
                     self.appendict2[column]['Ndays>=26'] = len([days for days in self.total2[column] if days >= 26])
-                self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
+                #self.mydf2 = self.mydf2.append(self.appendict2[column], ignore_index=True)
+                self.mydf2 = pd.concat([self.mydf2, pd.DataFrame.from_dict([self.appendict2[column]])], axis=0, join='outer', ignore_index=True)
                 self.appendict2[column]['N'] = 0
                 self.total2[column] = []
 
@@ -519,7 +528,9 @@ class Excel:
                 self.mydf2.replace('', np.NaN, inplace=True) # Replaces the empty values for NaN in order to calculate
                 monthlydict['mean'] = np.nanmean(
                     self.mydf2.loc[(self.mydf2['month'] == month) & (self.mydf2['depth(m)'] == depth), 'mean'])
-                self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)
+                #self.monthlymeandf = self.monthlymeandf.append(monthlydict, ignore_index=True)
+                self.monthlymeandf = pd.concat([self.monthlymeandf, pd.DataFrame.from_dict([monthlydict])], axis=0,
+                                       join='outer', ignore_index=True)
 
 
 def big_merge(filename1, filename2, output):
