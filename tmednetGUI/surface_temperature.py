@@ -266,7 +266,7 @@ def multidepth_anomaly_plot_setter(data_dict, prop_dict, sitename, target_year, 
     plt.title('Anomalies in ' + sitename + ' in ' + str(target_year))
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles=[handles[0]], labels=['Multi-Year Mean'])
-    #plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + sitename + '_' + depth + '.png')
+    plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + sitename + '_Multidepth.png')
     ax.remove()
 
 def multidepth_anomaly_plotter(data, depths, sitename, target_year):
@@ -296,7 +296,7 @@ def multidepth_anomaly_plotter(data, depths, sitename, target_year):
 
 
 # Opens the data
-dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
+#dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
 # data2 = dataset.drop(['Time'], axis=1)
 
 
@@ -318,4 +318,4 @@ def tridepth_anomalies(data, sitename, year):
     multidepth_anomaly_plotter(data, depths, sitename, year)
 
 # browse_anomalies(dataset, 'Medes', 2022)
-tridepth_anomalies(dataset, 'Medes', 2022)
+#tridepth_anomalies(dataset, 'Medes', 2022)

@@ -931,13 +931,17 @@ class tmednet(tk.Frame):
         dfhist_control = pd.read_csv(historical, sep='\t')
         dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
         dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
+        dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date']).month
+        dfhist_summer = dfhist_control.loc[
+            (dfhist_control['month'] == 7) | (dfhist_control['month'] == 8) | (
+                        dfhist_control['month'] == 9)]
 
         # Check if any depth is all nan which means there are no data for said depth
         depths = df['depth(m)'].unique()
 
         for depth in depths:
             for year in df['year'].unique():
-                if dfhist_control.loc[dfhist_control['year'] == int(year)][depth].isnull().all():
+                if (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].isnull().all()) | (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].count() / 24 < 30):
                     for i in range(23, 29):
                         df.loc[(df['year'] == str(year)) & (df['depth(m)'] == depth), 'Ndays>=' + str(i)] = np.nan
                 else:
