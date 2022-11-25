@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from labellines import labelLines, labelLine
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 from scipy.ndimage.filters import uniform_filter1d
@@ -238,9 +239,66 @@ def anomalies_plotter(data, depth, sitename, target_year):
     anomaly_zoom_setter(concated, prop, sitename, target_year, depth, last_years_legend, this_year_legend)
 
 
+def multidepth_anomaly_plot_setter(data_dict, prop_dict, sitename, target_year, depths, last_years_legend, this_year_legend):
+    ax = plt.axes()
+    cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'],
+                        alpha=[1., 0.7], linewidth=[0.7, 0.7])
+    ax.set_prop_cycle(cycler)
+    
+    data_dict.plot(ax=ax)
+    #labelLines(plt.gca().get_lines(), zorder=2.5)
+    lines = ax.get_lines()
+    labelLine(lines[0], 200, label='10')
+    labelLine(lines[2], 200, label='25')
+    labelLine(lines[4], 200, label='40')
+    for depth in depths:
+        plt.fill_between(data_dict.index, data_dict[last_years_legend[depth]], data_dict[this_year_legend[depth]],
+                         where=(data_dict[this_year_legend[depth]] > data_dict[last_years_legend[depth]]), color='#fa5a5a')
+        plt.fill_between(data_dict.index, data_dict[last_years_legend[depth]], data_dict[this_year_legend[depth]],
+                         where=(data_dict[this_year_legend[depth]] < data_dict[last_years_legend[depth]]), color='#5aaaff')
+
+    plt.xlabel('')
+    plt.xticks(
+        ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01', '12-01'])
+    plt.xlim((data_dict.index[0], data_dict.index[-1]))
+    ax.set_xticklabels(prop_dict.unique())
+
+    plt.title('Anomalies in ' + sitename + ' in ' + str(target_year))
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(handles=[handles[0]], labels=['Multi-Year Mean'])
+    #plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + sitename + '_' + depth + '.png')
+    ax.remove()
+
+def multidepth_anomaly_plotter(data, depths, sitename, target_year):
+    last_legend_dict = {}
+    this_legend_dict = {}
+    for depth in depths:
+        data_depth, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
+            pd.DataFrame(data, columns=['Date', depth]), target_year, clim=True)
+        this_year_legend = this_year_legend + ' (' + depth + 'm)'
+        last_years_legend = last_years_legend + ' (' + depth + 'm)'
+        last_legend_dict[depth] = last_years_legend
+        this_legend_dict[depth] = this_year_legend
+        last_years_filtered = marine_heat_spikes_filter(data_depth, depth)
+        last_years_means = marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+        this_year_mean = marine_heat_spikes_df_setter(data_depth, depth, this_year_legend, target_year, years='new')
+
+        # Sets a unique Dataframe consisting of the other three
+        if depth == '10':
+            concated = pd.concat([last_years_means, this_year_mean], axis=1)
+            prop = concated.index.strftime('%b')
+        else:
+            concated = pd.concat([concated, last_years_means, this_year_mean], axis=1)
+
+    concated.index = concated.index.strftime('%m-%d')
+
+    multidepth_anomaly_plot_setter(concated, prop, sitename, target_year, depths, last_legend_dict, this_legend_dict)
+
+
 # Opens the data
-# dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
+dataset = pd.read_csv('../src/input_files/Database_T_06_Medes_200207-202210.txt', sep="\t")
 # data2 = dataset.drop(['Time'], axis=1)
+
 
 
 def browse_heat_spikes(data, sitename, year):
@@ -254,4 +312,10 @@ def browse_anomalies(data, sitename, year):
     for depth in data.columns[1:]:
         anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename, year)
 
-# browse_heat_spikes(dataset)
+def tridepth_anomalies(data, sitename, year):
+    data = data.drop(['Time'], axis=1)
+    depths = ['10', '25', '40']
+    multidepth_anomaly_plotter(data, depths, sitename, year)
+
+# browse_anomalies(dataset, 'Medes', 2022)
+tridepth_anomalies(dataset, 'Medes', 2022)
