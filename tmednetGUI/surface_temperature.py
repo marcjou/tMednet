@@ -27,15 +27,48 @@ def marine_heat_spikes_setter(data, target_year, clim=False):
 
 
 def marine_heat_spikes_filter(data, depth):
-    # Filter the data for 15 days
-    last_years_filtered = pd.DataFrame(uniform_filter1d(data[depth].dropna(), size=360),
-                                       index=data[depth].dropna().index, columns=[depth]).reindex(data.index)
-    last_years_filtered['Date'] = data['Date']
-    last_years_filtered['year'] = data['year']
-    last_years_filtered['month'] = data['month']
-    last_years_filtered['day'] = data['day']
+    not_null_index = data.loc[data[depth].notnull()].index
+    oldindex = not_null_index[0]
+    end_index = []
+    start_index = []
+    for i in not_null_index:
+        hueco = i - oldindex
+        if hueco <= 24:
+            oldindex = i
+        else:
+            end_index.append(oldindex)
+            start_index.append(i)
+            oldindex = i
+    if len(end_index) > 0:
+        for i in range(0, len(end_index)):
+            if (i == 0):
+                last_years_filtered = pd.DataFrame(uniform_filter1d(data[depth].loc[i:end_index[i]].dropna(), size=360),
+                                                   index=data[depth].loc[i:end_index[i]].dropna().index, columns=[depth]).reindex(data.loc[i:end_index[i]].index)
+                df_filtered = last_years_filtered.copy()
+            elif (i == (len(end_index) - 1)):
+                last_years_filtered = pd.DataFrame(uniform_filter1d(data[depth].loc[start_index[i]: len(data) - 1].dropna(), size=360),
+                                                   index=data[depth].loc[start_index[i]: len(data) - 1].dropna().index,
+                                                   columns=[depth]).reindex(data.loc[start_index[i]: len(data) - 1].index)
+                df_filtered = pd.concat([df_filtered, last_years_filtered], axis=0, join='outer')
+            else:
+                last_years_filtered = pd.DataFrame(
+                    uniform_filter1d(data[depth].loc[start_index[i]: end_index[i+1]].dropna(), size=360),
+                    index=data[depth].loc[start_index[i]: end_index[i+1]].dropna().index,
+                    columns=[depth]).reindex(data.loc[start_index[i]: end_index[i+1]].index)
+                df_filtered = pd.concat([df_filtered, last_years_filtered], axis=0, join='outer')
+    else:
 
-    return last_years_filtered
+        # Filter the data for 15 days
+        df_filtered = pd.DataFrame(uniform_filter1d(data[depth].dropna(), size=360),
+                                           index=data[depth].dropna().index, columns=[depth]).reindex(data.index)
+
+    df_filtered = df_filtered.reindex(data.index)
+    df_filtered['Date'] = data['Date']
+    df_filtered['year'] = data['year']
+    df_filtered['month'] = data['month']
+    df_filtered['day'] = data['day']
+
+    return df_filtered
 
 
 def marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', years='old', percentile=0):
@@ -46,9 +79,13 @@ def marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', 
     if type=='mean':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).mean().rename(
             columns={depth: legend}).drop('year', axis=1)
+        if 'Date' in df:
+            df.drop('Date', axis=1)
     if type=='percentile':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).quantile(percentile).rename(
             columns={depth: legend}).drop(['year'], axis=1)
+        if 'Date' in df:
+            df.drop('Date', axis=1, inplace=True)
     if type=='minmax':
         df = data.loc[locator].groupby(['day', 'month'], as_index=False).min().rename(
             columns={depth: 'min'}).drop(['year', 'Date'], axis=1)
