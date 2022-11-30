@@ -166,8 +166,7 @@ for i in range(0,len(clim_lat)):
 # For duration map we use duration
 
 # TODO create a Intensity array and plot the mhw map
-# TODO plot also th egraph that QUIM wants which is a line graph of the temperature over the years (anomaly like)
-# TODO create the anomaly graphs
+
 
 
 inter_duration = duration[start_month_index : end_month_index +1]
