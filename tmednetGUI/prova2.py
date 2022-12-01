@@ -77,6 +77,32 @@ def map_temperature(lat, lon, realtime, asst):
     for filename in set(filenames):
         os.remove(filename)
 
+
+def mask_and_interpolate(ds_asst_sliced, lon_grid, lat_grid, clim_lon_grid, clim_lat_grid):
+    # Mask the NaN values
+    start = time.time()
+    ds_asst_masked = ds_asst_sliced.to_masked_array()
+    end = time.time()
+    timu = end - start
+    print('time for masking ds: ' + str(timu))
+
+    # Here is where the intepolation takes effect
+    start = time.time()
+    li = []
+    for i in range(0, len(ds_asst_sliced[:, 0, 0])):
+        coords = np.column_stack((lon_grid[~ds_asst_masked[i, :, :].mask], lat_grid[~ds_asst_masked[i, :, :].mask]))
+        new_sst = interpolate.griddata(coords, ds_asst_masked[i, :, :][~ds_asst_masked[i, :, :].mask],
+                                       (clim_lon_grid, clim_lat_grid),
+                                       method='nearest')  # Interpolation from the 0.01 resolution to 0.05
+        li.append(new_sst)
+    end = time.time()
+    timu = end - start
+    print('time for interpolating ds: ' + str(timu))
+    inter_sst = np.stack(li)
+    inter_sst = inter_sst - 273.15
+
+    return inter_sst
+
 '''
 start = time.time()
 nc = NetCDFFile('/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
@@ -143,25 +169,8 @@ lon_grid = np.repeat(ds_lon.values.reshape(1, len(ds_lon)), repeats=len(ds_lat),
 clim_lat_grid = np.repeat(clim_lat.reshape(len(clim_lat), 1), repeats=len(clim_lon), axis=1)
 clim_lon_grid = np.repeat(clim_lon.reshape(1, len(clim_lon)), repeats=len(clim_lat), axis=0)
 
-# Mask the NaN values
-start = time.time()
-ds_asst_masked = ds_asst_sliced.to_masked_array()
-end = time.time()
-timu = end - start
-print('time for masking ds: ' + str(timu))
 
-# Here is where the intepolation takes effect
-start = time.time()
-li = []
-for i in range(0, len(ds_asst_sliced[:,0,0])):
-    coords = np.column_stack((lon_grid[~ds_asst_masked[i,:,:].mask], lat_grid[~ds_asst_masked[i,:,:].mask]))
-    new_sst = interpolate.griddata(coords, ds_asst_masked[i,:,:][~ds_asst_masked[i,:,:].mask], (clim_lon_grid, clim_lat_grid), method='nearest') # Interpolation from the 0.01 resolution to 0.05
-    li.append(new_sst)
-end = time.time()
-timu = end - start
-print('time for interpolating ds: ' + str(timu))
-inter_sst = np.stack(li)
-inter_sst = inter_sst - 273.15
+inter_sst = mask_and_interpolate(ds_asst_sliced, lon_grid, lat_grid, clim_lon_grid, clim_lat_grid)
 
 point_clim = {}
 
