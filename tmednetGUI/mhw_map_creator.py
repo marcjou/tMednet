@@ -129,69 +129,51 @@ class MHWMapper:
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
         return ax
 
-    def map_temperature(self, type):
+    def __create_image_by_type(self, lons, lats, ax, mode, filenames):
+        start = time.time()
+        if mode == 'temperature':
+            ds = self.ds_asst_interpolated - 273.15
+            levels = np.arange(math.trunc(float(ds.quantile(0.01))),
+                               math.trunc(float(ds.quantile(0.99))) + 1, 1)
+            cmap = 'RdYlBu_r'
+        elif mode == 'duration':
+            ds = np.ma.masked_where(self.duration == 0, self.duration)
+            levels = np.arange(0, 31, 5)
+            cmap = 'Purples'
+        elif mode == 'intensity':
+            ds = np.ma.masked_where(self.intensity == 0, self.intensity)
+            levels = np.arange(0, 10, 1)
+            cmap = 'RdYlBu_r'
+        end = time.time()
+        timu = end - start
+        print('Time for creating levels: ' + str(timu))
+        print('after levels')
+
+        for i in range(0, ds.shape[0]):
+            print('Loop i: ' + str(i))
+            start = time.time()
+            temp = ax.contourf(lons, lats, ds[i, :, :] - 273.15, levels=levels, transform=ccrs.PlateCarree(),
+                               cmap=cmap)
+            end = time.time()
+            timu = end - start
+            print('Time to create temp: ' + str(timu))
+            if i == 0:
+                cb = plt.colorbar(temp, location="bottom", ticks=levels)
+            plt.title(str(self.ds_time[i].values))
+            # plt.show()
+            print('hey')
+            plt.savefig('../src/output_images/image_' + str(i) + '.png')
+            print('hoy')
+            filenames.append('../src/output_images/image_' + str(i) + '.png')
+            # ax.remove()
+        return filenames
+
+    def map_temperature(self, mode):
         lons, lats = np.meshgrid(self.clim_lon, self.clim_lat)
         filenames = []
         # mhw.detect(ordtime, temp)
         ax = self.ax_setter()
-
-        if type == 'temperature':
-            asst = self.ds_asst_interpolated
-            print('before levels')
-            start = time.time()
-            levels = np.arange(math.trunc(float(asst.quantile(0.01)) - 273.15),
-                               math.trunc(float(asst.quantile(0.99)) - 273.15) + 1, 1)
-            end = time.time()
-            timu = end - start
-            print('Time for creating levels: ' + str(timu))
-            print('after levels')
-            for i in range(0, asst.shape[0]):
-    
-                print('Loop i: ' + str(i))
-                start = time.time()
-                temp = ax.contourf(lons, lats, asst[i, :, :] - 273.15, levels=levels, transform=ccrs.PlateCarree(),
-                                   cmap='RdYlBu_r')
-                end = time.time()
-                timu = end - start
-                print('Time to create temp: ' + str(timu))
-                if i == 0:
-                    cb = plt.colorbar(temp, location="bottom", ticks=levels)
-                plt.title(str(self.ds_time[i].values))
-                # plt.show()
-                print('hey')
-                plt.savefig('../src/output_images/image_' + str(i) + '.png')
-                print('hoy')
-                filenames.append('../src/output_images/image_' + str(i) + '.png')
-                # ax.remove()
-        elif type == 'duration':
-            ds_duration = np.ma.masked_where(self.duration == 0, self.duration)
-            levels = np.arange(0, 31, 5)
-            cmap = 'Purples'
-            for i in range(0, ds_duration.shape[0]):
-                temp = ax.contourf(lons, lats, ds_duration[i, :, :], levels=levels, cmap=cmap)
-                if i == 0:
-                    cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
-                plt.title(str(self.ds_time[i].values))
-                # plt.show()
-                print('hey')
-                plt.savefig('../src/output_images/image_' + str(i) + '.png')
-                print('hoy')
-                filenames.append('../src/output_images/image_' + str(i) + '.png')
-        elif type == 'intensity':
-            ds_intensity = np.ma.masked_where(self.intensity == 0, self.intensity)
-            levels = np.arange(0, 10, 1)
-            cmap = 'RdYlBu_r'
-            for i in range(0, ds_intensity.shape[0]):
-                temp = ax.contourf(lons, lats, ds_intensity[i, :, :], levels=levels, cmap=cmap)
-                if i == 0:
-                    cb = map.colorbar(temp, "bottom", size="5%", pad="2%", ticks=levels)
-                plt.title(str(self.ds_time[i].values))
-                # plt.show()
-                print('hey')
-                plt.savefig('../src/output_images/image_' + str(i) + '.png')
-                print('hoy')
-                filenames.append('../src/output_images/image_' + str(i) + '.png')
-
+        filenames = self.__create_image_by_type(lons, lats, ax, mode, filenames)
         # build gif
         with imageio.get_writer('mygif3.gif', mode='I', duration=0.7) as writer:
             for filename in filenames:
