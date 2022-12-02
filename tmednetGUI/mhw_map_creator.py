@@ -23,6 +23,7 @@ os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
 class MHWMapper:
     _mat = ''
     duration = None
+    intensity = None
 
     def __init__(self, climatology_path, dataset_path, start_period=str(date.today().year)+'-06-01', end_period=str(date.today().year)+'-06-30'):
         # Set the matlab dictionary using the climatology from Nat
@@ -110,15 +111,37 @@ class MHWMapper:
                     mhws, bad = mhw.detect(np.asarray(self.ordtime), sstt, previousClimatology=point_clim)
                     # Sets the duration of the MHW into an array to be plotted
                     if mhws['time_start'] != []:
-                        start = mhws['index_start'][0]
-                        for n in range(0, mhws['duration'][0]):
-                            self.duration[start + n, i, j] = n + 1
+                        for m in range(0, len(mhws['index_start'])):
+                            start = mhws['index_start'][m]
+                            for n in range(0, mhws['duration'][m]):
+                                self.duration[start + n, i, j] = n + 1
 
         return self.duration
 
     def get_intensity(self):
-        # TODO create the method to get the intensity, just as the duration method works
-        pass
+        point_clim = {}
+        self.intensity = self.ds_asst_interpolated.copy()
+        self.intensity[:, :, :] = 0
+        for i in range(0, len(self.clim_lat)):
+            print('Estamos en la i: ' + i)
+            for j in range(0, len(self.clim_lon)):
+                if np.ma.is_masked(self.ds_asst_interpolated[0, i, j]):
+                    pass
+                else:
+                    sstt = self.ds_asst_interpolated[:, i, j].tolist()
+                    point_clim['seas'] = self.clim['seas'][i, j, :]
+                    point_clim['thresh'] = self.clim['thresh'][i, j, :]
+                    point_clim['missing'] = self.clim['missing'][i, j, :]
+                    mhws, bad = mhw.detect(np.asarray(self.ordtime), sstt, previousClimatology=point_clim)
+                    # Sets the duration of the MHW into an array to be plotted
+                    if mhws['time_start'] != []:
+                        for m in range(0, len(mhws['index_start'])):
+                            start = mhws['index_start'][m]
+                            for n in range(0, mhws['duration'][m]):
+                                self.intensity[start + n, i, j] = sstt[start + n] - point_clim['seas'][start + n]
+
+        return self.intensity
+
     @staticmethod
     def ax_setter():
         ax = plt.axes(projection=ccrs.Mercator())
@@ -129,7 +152,7 @@ class MHWMapper:
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
         return ax
 
-    def __create_image_by_type(self, lons, lats, ax, mode, filenames):
+    def __create_image_by_type(self, lons, lats, mode, filenames):
         start = time.time()
         if mode == 'temperature':
             ds = self.ds_asst_interpolated - 273.15
@@ -137,10 +160,12 @@ class MHWMapper:
                                math.trunc(float(ds.quantile(0.99))) + 1, 1)
             cmap = 'RdYlBu_r'
         elif mode == 'duration':
+            self.duration = self.get_duration()
             ds = np.ma.masked_where(self.duration == 0, self.duration)
             levels = np.arange(0, 31, 5)
             cmap = 'Purples'
         elif mode == 'intensity':
+            self.intensity = self.get_intensity()
             ds = np.ma.masked_where(self.intensity == 0, self.intensity)
             levels = np.arange(0, 10, 1)
             cmap = 'RdYlBu_r'
@@ -150,6 +175,7 @@ class MHWMapper:
         print('after levels')
 
         for i in range(0, ds.shape[0]):
+            ax = self.ax_setter()
             print('Loop i: ' + str(i))
             start = time.time()
             temp = ax.contourf(lons, lats, ds[i, :, :] - 273.15, levels=levels, transform=ccrs.PlateCarree(),
@@ -165,17 +191,15 @@ class MHWMapper:
             plt.savefig('../src/output_images/image_' + str(i) + '.png')
             print('hoy')
             filenames.append('../src/output_images/image_' + str(i) + '.png')
-            # ax.remove()
+            ax.remove()
         return filenames
 
     def map_temperature(self, mode):
         lons, lats = np.meshgrid(self.clim_lon, self.clim_lat)
         filenames = []
-        # mhw.detect(ordtime, temp)
-        ax = self.ax_setter()
-        filenames = self.__create_image_by_type(lons, lats, ax, mode, filenames)
+        filenames = self.__create_image_by_type(lons, lats, mode, filenames)
         # build gif
-        with imageio.get_writer('mygif3.gif', mode='I', duration=0.7) as writer:
+        with imageio.get_writer('../src/output_images/' + str(mode) + '_mygif.gif', mode='I', duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
                 writer.append_data(image)
