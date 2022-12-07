@@ -50,7 +50,7 @@ def excel_writer(filein, fileout):
     dfexcel['date'] = dfexcel['date'].dt.date
     # Write the Excel file with the given DataFrames as sheets
     writer = ExcelWriter('../src/output_files/' + fileout + '.xlsx')
-    mhwdf = create_mhw(mhwdf)
+    #mhwdf = create_mhw(mhwdf)
     dfexcel.to_excel(writer, 'Daily', index=False)
     dfmonthly.to_excel(writer, 'Monthly', index=False)
     dfseasonal.to_excel(writer, 'Seasonal', index=False)
@@ -78,10 +78,10 @@ def read_and_setup(filein):
         columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
                  'Ndays>=26'])
     dfseasonal = pd.DataFrame(
-        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'hist_mean', 'std', 'hist_std', 'max', 'hist_max', 'min', 'hist_min', 'Ndays>=23', 'Ndays>=24',
+        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
                      'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
     dfinterseason = pd.DataFrame(
-        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'hist_mean', 'std', 'hist_std', 'max', 'hist_max', 'min', 'hist_min', 'Ndays>=23', 'Ndays>=24',
+        columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
                      'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
     # Iterates for each depth (which is a column on the historic DataFrame) and appends to the final excel DataFrame
     for depth in depths:
@@ -91,13 +91,13 @@ def read_and_setup(filein):
             columns=['year', 'month', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=24', 'Ndays>=25',
                      'Ndays>=26'])
         dfinterseason = pd.DataFrame(
-            columns=['year', 'season', 'depth(m)', 'N', 'mean', 'hist_mean', 'std', 'hist_std', 'max', 'hist_max', 'min', 'hist_min', 'Ndays>=23', 'Ndays>=24',
+            columns=['year', 'season', 'depth(m)', 'N', 'mean', 'std', 'max', 'min', 'Ndays>=23', 'Ndays>=24',
                      'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
         temp = df.groupby('Date')[str(depth)]
         tempmonth = df.groupby(['year', 'month'])[str(depth)]
         tempseason = df.loc[(df['month'] >= 7) & (df['month'] <= 9)].groupby(['year'])[str(depth)]
         last_year = df['year'][len(df)-1]
-        temphist = df.loc[(df['month'] >= 7) & (df['month'] <= 9) & (df['year'] < last_year)][str(depth)]
+        #temphist = df.loc[(df['month'] >= 7) & (df['month'] <= 9) & (df['year'] < last_year)][str(depth)]
         depto = np.repeat(depth, len(temp)).tolist()
         deptomonth = np.repeat(depth, len(tempmonth.count())).tolist()
         deptoseason = np.repeat(depth, len(tempseason)).tolist()
@@ -130,13 +130,13 @@ def read_and_setup(filein):
         dfinterseason['depth(m)'] = deptoseason
         dfinterseason['N'] = tempseason.count().values
         dfinterseason['mean'] = tempseason.mean().values.round(3)
-        dfinterseason['hist_mean'] = temphist.mean().round(3)
+        #dfinterseason['hist_mean'] = np.round(temphist.mean(), 3)
         dfinterseason['std'] = tempseason.std().values.round(3)
-        dfinterseason['hist_std'] = temphist.std().round(3)
+        #dfinterseason['hist_std'] = np.round(temphist.std(), 3)
         dfinterseason['min'] = tempseason.min().values.round(3)
-        dfinterseason['hist_min'] = temphist.min().round(3)
+        #dfinterseason['hist_min'] = np.round(temphist.min(), 3)
         dfinterseason['max'] = tempseason.max().values.round(3)
-        dfinterseason['hist_max'] = temphist.max().round(3)
+        #dfinterseason['hist_max'] = np.round(temphist.max(), 3)
         dfinterseason['Ndays>=23'] = np.round(tempseason.apply(lambda x: x[x >= 23].count()).values/24)
         dfinterseason['Ndays>=24'] = np.round(tempseason.apply(lambda x: x[x >= 24].count()).values/24)
         dfinterseason['Ndays>=25'] = np.round(tempseason.apply(lambda x: x[x >= 25].count()).values/24)

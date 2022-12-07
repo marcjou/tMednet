@@ -53,6 +53,7 @@ class MHWMapper:
         self.clim['missing'] = np.isnan(self.clim['seas'])
         self.clim_lat = self._mat['mhwclim']['lat'][0, 0][:, 0]
         self.clim_lon = self._mat['mhwclim']['lon'][0, 0][0, :]
+        self.clim_seas_transposed = np.transpose(self.clim['seas'], (2, 0, 1))
         return self.clim, self.clim_lat, self.clim_lon
 
     def __set_ds(self):
@@ -64,11 +65,16 @@ class MHWMapper:
 
     def __set_sliced_ds(self, start_period, end_period):
         start_time = pd.to_datetime(start_period)
+        start_year = pd.to_datetime(str(date.today().year)+'-01-01')
+        start_index = (start_time - start_year).days - 1
         try:
             end_time = pd.to_datetime(end_period)
+            end_index = (end_time - start_year).days
             self.ds_dtime.loc[end_time]  # TODO change this to check if end_time exists in the ds
         except:
             end_time = self.ds_dtime[-1].values
+            end_index = (end_time - start_year).days
+        self.clim_sliced = self.clim_seas_transposed[start_index:end_index, :, :]
         self.ds_time = self.ds_dtime.loc[start_time:end_time].dt.strftime('%Y-%m-%d')
         self.ds_asst_sliced = self.ds_asst.sel(time=slice(start_time, end_time))
 
@@ -91,15 +97,15 @@ class MHWMapper:
             li.append(new_sst)
         inter_sst = np.stack(li)
         inter_sst = inter_sst - 273.15
-
-        return inter_sst
+        masked_sst = np.ma.masked_where(~np.isfinite(self.clim_sliced), inter_sst)
+        return masked_sst
 
     def get_duration(self):
         point_clim = {}
         self.duration = self.ds_asst_interpolated.copy()
         self.duration[:, :, :] = 0
         for i in range(0, len(self.clim_lat)):
-            print('Estamos en la i: ' + i)
+            print('Estamos en la i: ' + str(i))
             for j in range(0, len(self.clim_lon)):
                 if np.ma.is_masked(self.ds_asst_interpolated[0, i, j]):
                     pass
@@ -155,9 +161,9 @@ class MHWMapper:
     def __create_image_by_type(self, lons, lats, mode, filenames):
         start = time.time()
         if mode == 'temperature':
-            ds = self.ds_asst_interpolated - 273.15
-            levels = np.arange(math.trunc(float(ds.quantile(0.01))),
-                               math.trunc(float(ds.quantile(0.99))) + 1, 1)
+            ds = self.ds_asst_interpolated
+            levels = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
+                               math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
             cmap = 'RdYlBu_r'
         elif mode == 'duration':
             self.duration = self.get_duration()
@@ -178,13 +184,13 @@ class MHWMapper:
             ax = self.ax_setter()
             print('Loop i: ' + str(i))
             start = time.time()
-            temp = ax.contourf(lons, lats, ds[i, :, :] - 273.15, levels=levels, transform=ccrs.PlateCarree(),
+            temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
                                cmap=cmap)
             end = time.time()
             timu = end - start
             print('Time to create temp: ' + str(timu))
-            if i == 0:
-                cb = plt.colorbar(temp, location="bottom", ticks=levels)
+            #if i == 0:
+            cb = plt.colorbar(temp, location="bottom", ticks=levels)
             plt.title(str(self.ds_time[i].values))
             # plt.show()
             print('hey')

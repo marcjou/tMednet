@@ -26,6 +26,9 @@ from mpl_toolkits.basemap import Basemap
 import imageio
 from datetime import datetime
 
+import mhw_map_creator as mpc
+
+
 def ax_setter():
     ax = plt.axes(projection=ccrs.Mercator())
     ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
@@ -125,6 +128,8 @@ timu = end - start
 print(' Time for nc: ' + str(timu))
 '''
 
+
+'''
 # Set the matlab dictionary using the climatology from Nat
 mat = io.loadmat('../src/mhwclim_1982-2011_L4REP_MED.mat')
 clim = {}
@@ -199,4 +204,9 @@ print('time for creating the duration: ' + str(timu))
 
 map_temperature(ds_lat, ds_lon, ds_time, ds_asst_sliced)
 
+'''
+
+
+df_map = mpc.MHWMapper('../src/mhwclim_1982-2011_L4REP_MED.mat', '/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
+df_map.map_temperature('duration')
 print('hola')
