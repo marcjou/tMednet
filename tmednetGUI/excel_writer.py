@@ -36,7 +36,7 @@ def create_mhw(mhwdf):
     return diff
 
 # Converts the data from the historic file to a DataFrame and selects the needed data to create the Excel
-def excel_writer(filein, fileout):
+def excel_writer(filein):
     start = time.time()
     # Reads the historic file and converts it to a DataFrame. Loads all the DataFrames to make the calculations
     dfexcel, dfmonthly, dfseasonal, mhwdf = read_and_setup(filein)
@@ -49,7 +49,9 @@ def excel_writer(filein, fileout):
     dfseasonal = dfseasonal.sort_values(by=['year', 'depth(m)'])
     dfexcel['date'] = dfexcel['date'].dt.date
     # Write the Excel file with the given DataFrames as sheets
-    writer = ExcelWriter('../src/output_files/' + fileout + '.xlsx')
+    filein_split = filein.split('_')
+    fileout_name = filein_split[3] + '_Data_Report_' + filein_split[4] + '_' + filein_split[5][:-4]
+    writer = ExcelWriter('../src/output_files/' + fileout_name + '.xlsx')
     #mhwdf = create_mhw(mhwdf)
     dfexcel.to_excel(writer, 'Daily', index=False)
     dfmonthly.to_excel(writer, 'Monthly', index=False)

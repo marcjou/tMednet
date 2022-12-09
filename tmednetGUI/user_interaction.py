@@ -89,8 +89,7 @@ class tmednet(tk.Frame):
         toolsmenu.add_command(label='Historical Merge', command=self.bigmerger)
         toolsmenu.add_command(label='Create Excel',
                               command=lambda: self.window_browser('Select file and output file name',
-                                                                  self.write_excel, 'Input: ',
-                                                                  'Output: '))
+                                                                  self.write_excel, 'Input: '))
         toolsmenu.add_command(label='Create netCDF',
                               command=lambda: self.window_browser('Select historical file',
                                                                   self.generate_netCDF, 'Historical: '))
@@ -1312,10 +1311,10 @@ class tmednet(tk.Frame):
         """
         self.console_writer('Writing the Excel file, please wait this could take some minutes...', 'action')
         input = self.openfileinput.get()
-        output = self.secondInput.get()
+        #output = self.secondInput.get()
         self.newwindow.destroy()
         # fw.Excel(input, '../src/output_files/' + output + '.xlsx')
-        ew.excel_writer(input, output)
+        ew.excel_writer(input)
         self.console_writer('Excel file successfully created!', 'action')
 
     def browse_file(self, merge=False):
