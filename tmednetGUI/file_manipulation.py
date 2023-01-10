@@ -80,8 +80,13 @@ def load_data(args, consolescreen=False):
                 else:
                     good.append(a[i])  # Only uses the data without the "Enregistré" string to avoid errors
             if len(good[1]) == 4:
-                datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
-                                    range(1, len(good))]
+                # Check if the format year is in two digits or four (8 digits mean 2 for day, 2 for month 2 for year and 2 slash)
+                if len(good[1][1]) == 8:
+                    datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%y %H:%M:%S") for i in
+                                        range(1, len(good))]
+                elif len(good[1][1]) == 10:
+                    datos["timegmt"] = [datetime.strptime(good[i][1] + ' ' + good[i][2], "%d/%m/%Y %H:%M:%S") for i in
+                                        range(1, len(good))]
                 datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
             else:
                 datos["timegmt"] = [datetime.strptime(str(good[i][0]) + ' ' + str(good[i][1]), "%d/%m/%Y %H:%M:%S") for i in

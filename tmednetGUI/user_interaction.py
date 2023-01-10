@@ -99,6 +99,9 @@ class tmednet(tk.Frame):
         toolsmenu.add_command(label='Create anomalies',
                               command=lambda: self.window_browser('Select historical file',
                                                                   self.create_anomalies, 'Historical: ', 'Year'))
+        toolsmenu.add_command(label='Create tridepth anomalies',
+                              command=lambda: self.window_browser('Select historical file',
+                                                                  self.create_tridepth_anomalies, 'Historical: ', 'Year'))
         menubar.add_cascade(label='Tools', menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -1376,6 +1379,16 @@ class tmednet(tk.Frame):
         df = pd.read_csv(filename, sep='\t')
         for i in range(int(year), 2023):
             st.browse_anomalies(df, sitename, i)
+        self.console_writer('Plots saved at output_images', 'action')
+
+    def create_tridepth_anomalies(self):
+        filename = self.openfileinput.get()
+        year = self.secondInput.get()
+        self.newwindow.destroy()
+        sitename = filename[filename.find('Database'):].split('_')[3]
+        df = pd.read_csv(filename, sep='\t')
+        for i in range(int(year), 2023):
+            st.tridepth_anomalies(df, sitename, i)
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod

@@ -50,7 +50,7 @@ def excel_writer(filein):
     dfexcel['date'] = dfexcel['date'].dt.date
     # Write the Excel file with the given DataFrames as sheets
     filein_split = filein.split('_')
-    fileout_name = filein_split[3] + '_Data_Report_' + filein_split[4] + '_' + filein_split[5][:-4]
+    fileout_name = filein_split[3] + '_Stat_Report_' + filein_split[4] + '_' + filein_split[5][:-4]
     writer = ExcelWriter('../src/output_files/' + fileout_name + '.xlsx')
     #mhwdf = create_mhw(mhwdf)
     dfexcel.to_excel(writer, 'Daily', index=False)

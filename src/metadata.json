@@ -626,6 +626,32 @@
             "end_year": "2022",
             "institution": "Medsharks"
         },
+        
+        "188": {
+            "lat": "42.7268",
+            "long": "10.4349",
+            "site_number": "",
+            "site_name": "Elba(Picchi de Pablo)",
+            "site_code": "188",
+            "eco_region": "W-Med",
+            "sub_basin": "N-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2022",
+            "institution": "Reef Check"
+        },
+        
+        "187": {
+            "lat": "44.2333",
+            "long": "8.4444",
+            "site_number": "",
+            "site_name": "Isola di Bergeggi",
+            "site_code": "188",
+            "eco_region": "W-Med",
+            "sub_basin": "Ligurian",
+            "start_year": "2021",
+            "end_year": "2022",
+            "institution": "Reef Check"
+        },
         "147": {
             "lat": "42.8352",
             "long": "9.3086",
