@@ -72,7 +72,7 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
         #plt.get_cmap('Purples').set_under('#608abf')
         for i in range(0, asst.shape[0]):
             # TODO Lo de siempre, arreglar la colorbar pero ahora con Cartopy
-            temp = ax.contourf(lons, lats, asst[i, :, :],transform=ccrs.PlateCarree(), cmap=cmap)
+            temp = ax.contourf(lons, lats, asst[i, :, :],transform=ccrs.PlateCarree(), levels=levels, cmap=cmap)
             if i == 0:
                 #Get the day where the max duration is displayed in order to create the complete colorbar
                 #max_index = np.argwhere(asst == asst.max())[0][0]
@@ -83,6 +83,13 @@ def map_temperature(lat, lon, realtime, asst, type='temperature'):
             plt.savefig('../src/output_images/image_' + str(i) + '.png')
             print('hoy')
             filenames.append('../src/output_images/image_' + str(i) + '.png')
+            ax.remove()
+            ax = plt.axes(projection=ccrs.Mercator())
+            ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
+            ax.add_feature(cf.OCEAN)
+            ax.add_feature(cf.LAND)
+            ax.coastlines(resolution='10m')
+            ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
     # mhw.detect(ordtime, temp)
 
     # build gif
@@ -133,8 +140,8 @@ clim_lon_grid = np.repeat(clim_lon.reshape(1, len(clim_lon)), repeats=len(clim_l
 
 
 # Used to filter only the selected months, simply change the number of the months you want to get the MHW
-start_month_index = [ti.month == 5 for ti in dtime].index(True)
-end_month_index = len(dtime) - 1 - [ti.month == 5 for ti in dtime[::-1]].index(True)
+start_month_index = [ti.month == 6 for ti in dtime].index(True)
+end_month_index = len(dtime) - 1 - [ti.month == 6 for ti in dtime[::-1]].index(True)
 
 selected_sst = sst[start_month_index : end_month_index +1]
 

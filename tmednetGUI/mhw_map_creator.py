@@ -117,10 +117,10 @@ class MHWMapper:
                     mhws, bad = mhw.detect(np.asarray(self.ordtime), sstt, previousClimatology=point_clim)
                     # Sets the duration of the MHW into an array to be plotted
                     if mhws['time_start'] != []:
-                        for m in range(0, len(mhws['index_start'])):
-                            start = mhws['index_start'][m]
-                            for n in range(0, mhws['duration'][m]):
-                                self.duration[start + n, i, j] = n + 1
+                        #for m in range(0, len(mhws['index_start'])):
+                        start = mhws['index_start'][0]
+                        for n in range(0, mhws['duration'][0]):
+                            self.duration[start + n, i, j] = n + 1
 
         return self.duration
 
@@ -129,7 +129,8 @@ class MHWMapper:
         self.intensity = self.ds_asst_interpolated.copy()
         self.intensity[:, :, :] = 0
         for i in range(0, len(self.clim_lat)):
-            print('Estamos en la i: ' + i)
+            print('Estamos en la i: ' + str(i)
+                  )
             for j in range(0, len(self.clim_lon)):
                 if np.ma.is_masked(self.ds_asst_interpolated[0, i, j]):
                     pass
@@ -165,16 +166,19 @@ class MHWMapper:
             levels = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
                                math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
             cmap = 'RdYlBu_r'
+            ylabel = 'Temperature (ºC)'
         elif mode == 'duration':
             self.duration = self.get_duration()
             ds = np.ma.masked_where(self.duration == 0, self.duration)
             levels = np.arange(0, 31, 5)
             cmap = 'Purples'
+            ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
             self.intensity = self.get_intensity()
             ds = np.ma.masked_where(self.intensity == 0, self.intensity)
             levels = np.arange(0, 10, 1)
             cmap = 'RdYlBu_r'
+            ylabel = 'Max Intensity (ºC)'
         end = time.time()
         timu = end - start
         print('Time for creating levels: ' + str(timu))
@@ -190,7 +194,7 @@ class MHWMapper:
             timu = end - start
             print('Time to create temp: ' + str(timu))
             #if i == 0:
-            cb = plt.colorbar(temp, location="bottom", ticks=levels)
+            cb = plt.colorbar(temp, location="bottom", ticks=levels, label=ylabel)
             plt.title(str(self.ds_time[i].values))
             # plt.show()
             print('hey')
@@ -205,7 +209,7 @@ class MHWMapper:
         filenames = []
         filenames = self.__create_image_by_type(lons, lats, mode, filenames)
         # build gif
-        with imageio.get_writer('../src/output_images/' + str(mode) + '_mygif.gif', mode='I', duration=0.7) as writer:
+        with imageio.get_writer('../src/output_images/' + str(mode) + '_June_VJan23gif.gif', mode='I', duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
                 writer.append_data(image)

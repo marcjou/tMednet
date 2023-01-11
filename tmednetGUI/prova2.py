@@ -207,6 +207,6 @@ map_temperature(ds_lat, ds_lon, ds_time, ds_asst_sliced)
 '''
 
 
-df_map = mpc.MHWMapper('../src/mhwclim_1982-2011_L4REP_MED.mat', '/home/marcjou/Escritorio/Projects/Sat_Data/reduced_20220627.nc')
-df_map.map_temperature('duration')
+df_map = mpc.MHWMapper('../src/mhwclim_1982-2011_L4REP_MED.mat', '/home/marcjou/Escritorio/Projects/Sat_Data/reduced_202206.nc', start_period='2022-06-01', end_period='2022-06-30')
+df_map.map_temperature('temperature')
 print('hola')
