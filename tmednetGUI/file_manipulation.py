@@ -432,13 +432,17 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     else:
         histmax = np.nanmax(df.values)
     '''
+    # TODO add this line of code to the creation of the historical merge
+    # Merges the rows that have the same index
+    filtered_df = filtered_df.groupby(level=0).mean()
     # Gets the historic min and max values only for the months from May through November
     dfcopy = df.copy()
     dfcopy.index = pd.to_datetime(dfcopy.index)
     dfcopy = dfcopy.loc[(dfcopy.index.month>=5) & (dfcopy.index.month<12)]
     histmin = round(np.nanmin(dfcopy.quantile(0.01))) - 1
     histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
-    return filtered_df.interpolate(axis=1), histmin, histmax
+    # limit_area='inside' parameter makes that only NaN values inside valid values will be filled
+    return filtered_df.interpolate(axis=1, limit_area='inside'), histmin, histmax
 
 
 def check_for_interpolation(df):
