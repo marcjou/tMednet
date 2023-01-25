@@ -652,6 +652,32 @@
             "end_year": "2022",
             "institution": "Reef Check"
         },
+        
+        "123": {
+            "lat": "43.6746",
+            "long": "7.3317",
+            "site_number": "",
+            "site_name": "Villefranche_(Causiniere)",
+            "site_code": "123",
+            "eco_region": "W-Med",
+            "sub_basin": "Ligurian",
+            "start_year": "2019",
+            "end_year": "2022",
+            "institution": "Núria Teixidó"
+        },
+        
+        "93": {
+            "lat": "40.7017",
+            "long": "13.9557",
+            "site_number": "",
+            "site_name": "Ischia_(SanPancrazio)",
+            "site_code": "93",
+            "eco_region": "W-Med",
+            "sub_basin": "S_Thyrrenian",
+            "start_year": "2012",
+            "end_year": "2022",
+            "institution": "Núria Teixidó"
+        },
         "147": {
             "lat": "42.8352",
             "long": "9.3086",

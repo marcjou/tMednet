@@ -12,7 +12,7 @@ import time
 class Excel:
 
     def __init__(self, input_path, output_path='', write_excel=True, seasonal=True, lastyear=False, console=False):
-        self.df = pd.read_csv(input_path, sep='\t')
+        self.df = pd.read_csv(input_path, sep='\t', dayfirst=True)
         self.mhwdf = self.df.copy()
         self.n = 0
         self.total = {}

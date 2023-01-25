@@ -151,6 +151,7 @@ def interpolate_hours(data):
                 dfcontrol = pd.DataFrame(np.arange(len(daterange)), index=daterange)
                 dfmerge = dfraw.merge(dfcontrol, how='outer', left_index=True,
                                       right_index=True).interpolate(method='index', limit_direction='both')
+                dfmerge = dfmerge[dfmerge.index.astype('int64') // 10 ** 9 % 3600 == 0]
                 dfinter = dfmerge.drop(columns='0_y')
                 sinter = dfinter['0_x'].round(3)
                 dat['temp'] = sinter[daterange].values.tolist()

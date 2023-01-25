@@ -727,11 +727,14 @@ class tmednet(tk.Frame):
             dfcopy = df.copy()
             dfcopy.index = pd.to_datetime(dfcopy.index)
             dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
+            # Quantile changes with the amount of data available, with less data is possible to have a higher outlier
+            # We only take into account the quantile for all the years to make it correct.
+            '''
             if hismaxtemp < round(np.nanmax(dfcopy.quantile(0.99))) + 1:
                 hismaxtemp = round(np.nanmax(dfcopy.quantile(0.99))) + 1
             if hismintemp > np.round(np.nanmin(dfcopy.quantile(0.01))) - 1:
                 hismintemp = round(np.nanmin(dfcopy.quantile(0.01))) - 1
-
+            '''
             levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
             levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
 
@@ -810,7 +813,7 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        year_df, foo, bar = fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, hismintemp, hismaxtemp = fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)
@@ -882,8 +885,10 @@ class tmednet(tk.Frame):
         oldepth = 0
         for depth in usedf['depth'].unique():
             if oldepth != 0:
+
                 self.plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
                                        usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
+                                       
             oldepth = depth
 
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
@@ -892,12 +897,12 @@ class tmednet(tk.Frame):
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
 
         for depth in histdf['depth'].unique():
-            histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
+           histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
                                                       label='_nolegend_', legend=False, zorder=5)
 
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
-        self.plot.set_ylim([10, 28])  # Sets the limits for the Y axis
+        self.plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
         self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
         leg = self.plot.legend(title='Depth (m)')
         self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
@@ -930,7 +935,7 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, console=self.consolescreen)  # returns an excel object
         df = excel_object.mydf3
 
-        dfhist_control = pd.read_csv(historical, sep='\t')
+        dfhist_control = pd.read_csv(historical, sep='\t', dayfirst=True)
         dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
         dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
         dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date']).month
@@ -988,7 +993,13 @@ class tmednet(tk.Frame):
                 temperatures[i] = np.ma.masked_where(yearly_plot == -999, yearly_plot)
             year_dict[year] = temperatures.copy()
             self.plot.set(ylim=(0, maxdepth + 2))
-            self.plot.set(xlim=(-2, maxdays + 2))
+            if maxdays >= 30:
+                ticks = 10
+            elif maxdays >=20:
+                ticks = 5
+            else:
+                ticks = 2
+            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
             if int(year) < 2000:
                 color = colors[0]
                 if year == years[-1]:
@@ -1024,6 +1035,7 @@ class tmednet(tk.Frame):
         self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
                       title=historical.split('_')[4] + ' Summer days ≥ 23ºC')
+        self.plot.xaxis.grid(True, linestyle='dashed')
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
@@ -1063,8 +1075,14 @@ class tmednet(tk.Frame):
             self.clear_plots(clear_thresholds=False)
             self.counter.append('Thresholds')
             self.plot = self.fig.add_subplot(111)
+            if maxdays >= 30:
+                ticks = 10
+            elif maxdays >=20:
+                ticks = 5
+            else:
+                ticks = 2
             self.plot.set(ylim=(0, maxdepth + 2))
-            self.plot.set(xlim=(-2, maxdays + 2))
+            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
             for year in years:
                 if int(year) < 2000:
                     color = colors[0]
@@ -1100,6 +1118,7 @@ class tmednet(tk.Frame):
             self.plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' Summer days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
+            self.plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
 
         self.curtab = i
