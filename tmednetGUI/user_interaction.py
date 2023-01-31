@@ -851,6 +851,9 @@ class tmednet(tk.Frame):
                     newdf = pd.merge(newdf, year_df.groupby('day')[depth].mean(), right_index=True, left_index=True)
                 else:
                     newdf = pd.DataFrame(year_df.groupby('day')[depth].mean())
+        idx = pd.date_range(newdf.index[0], newdf.index[-1])
+        newdf = newdf.reindex(idx, fill_value=np.nan)
+
 
         # BLOCK ENDS HERE!!!!!!!
 
@@ -1386,8 +1389,10 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         sitename = filename[filename.find('Database'):].split('_')[3]
         df = pd.read_csv(filename, sep='\t')
-        for i in range(int(year), 2023):
-            st.browse_heat_spikes(df, sitename, i)
+        hismaxtemp = round(np.max(df.quantile(0.99))) + 1
+        lastyear = datetime.strptime(df['Date'][len(df) - 1], '%d/%m/%Y').year + 1
+        for i in range(int(year), lastyear):
+            st.browse_heat_spikes(df, sitename, i, hismaxtemp)
         self.console_writer('Plots saved at output_images', 'action')
 
     def create_anomalies(self):

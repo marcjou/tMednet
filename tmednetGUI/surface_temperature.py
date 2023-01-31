@@ -99,7 +99,7 @@ def marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', 
 
     return df
 
-def spike_plot_setter(data, prop, target_year, sitename, depth, percentile_legend, this_year_legend):
+def spike_plot_setter(data, prop, target_year, sitename, depth, percentile_legend, this_year_legend, hismaxtemp):
     # Starts the axes and plots the data
     ax = plt.axes()
     cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'],
@@ -125,6 +125,8 @@ def spike_plot_setter(data, prop, target_year, sitename, depth, percentile_legen
     plt.xlim((data.index[0], data.index[-1]))
     ax.set_xticklabels(prop.unique())
 
+    plt.ylim(12, hismaxtemp)
+    plt.yticks(np.arange(12, hismaxtemp + 1, 2))
     # Sets the legend in order to include the fill_between value
     fill_patch = mpatches.Patch(color='#f8e959', label='Moderate')
     spike2_patch = mpatches.Patch(color='#f66000', label='Strong')
@@ -176,7 +178,7 @@ def spike_zoom_setter(data, prop, target_year, sitename, depth, percentile_legen
     ax.remove()
 
 
-def marine_heat_spikes_plotter(data, depth, sitename, target_year):
+def marine_heat_spikes_plotter(data, depth, sitename, target_year, hismaxtemp):
     data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = marine_heat_spikes_setter(
         data, target_year)
     last_years_filtered = marine_heat_spikes_filter(data, depth)
@@ -196,7 +198,7 @@ def marine_heat_spikes_plotter(data, depth, sitename, target_year):
     concated['x2'] = difference * 2 + concated[last_years_legend]
     concated['x3'] = difference * 3 + concated[last_years_legend]
     concated['x4'] = difference * 4 + concated[last_years_legend]
-    spike_plot_setter(concated, prop, target_year, sitename, depth, percentile_legend, this_year_legend)
+    spike_plot_setter(concated, prop, target_year, sitename, depth, percentile_legend, this_year_legend, hismaxtemp)
     spike_zoom_setter(concated, prop, target_year, sitename, depth, percentile_legend, this_year_legend)
 
 
@@ -338,10 +340,10 @@ def multidepth_anomaly_plotter(data, depths, sitename, target_year):
 
 
 
-def browse_heat_spikes(data, sitename, year):
+def browse_heat_spikes(data, sitename, year, hismaxtemp):
     data = data.drop(['Time'], axis=1)
     for depth in data.columns[1:]:
-        marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename, year)
+        marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, sitename, year, hismaxtemp)
 
 
 def browse_anomalies(data, sitename, year):
@@ -354,5 +356,6 @@ def tridepth_anomalies(data, sitename, year):
     depths = ['10', '25', '40']
     multidepth_anomaly_plotter(data, depths, sitename, year)
 
+#browse_heat_spikes(dataset, 'Medes', 2019)
 # browse_anomalies(dataset, 'Medes', 2022)
 #tridepth_anomalies(dataset, 'Medes', 2022)

@@ -416,7 +416,9 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     del df['Time']
     if start_time not in df.index:
         n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
-        start_time = datetime.strftime(min(n, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
+        # Makes sure to only browse the values that are after the desired month
+        nn = [x for x in n if x >= datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')]
+        start_time = datetime.strftime(min(nn, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
     if end_time not in df.index:
         n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
         end_time = datetime.strftime(min(n, key=lambda x: abs(x - datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S'))),
