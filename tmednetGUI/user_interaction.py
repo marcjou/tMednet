@@ -898,6 +898,10 @@ class tmednet(tk.Frame):
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
                       '30': '#a7d6e7',
                       '35': '#9ec6de', '40': '#3a6daf', '45': '#214f8a', '50': '#0a3164'}
+        # Checks if there is empty depths to delete them and make them not show on the legend
+        for depth in newdf.columns:
+            if newdf[depth].isnull().all():
+                del newdf[depth]
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
         if str(minyear) != year:
             for depth in histdf['depth'].unique():
