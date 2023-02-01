@@ -445,7 +445,13 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     histmin = round(np.nanmin(dfcopy.quantile(0.01))) - 1
     histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
     # limit_area='inside' parameter makes that only NaN values inside valid values will be filled
-    return filtered_df.interpolate(axis=1, limit_area='inside'), histmin, histmax
+    # Checks if it has been called by stratification or annual to decide wether interpolate between columns or not
+    if start_month == '01':
+        final_df = filtered_df.interpolate(axis=0, limit_area='inside')
+    elif start_month == '05':
+        final_df = filtered_df.interpolate(axis=1, limit_area='inside')
+    minyear = pd.to_datetime(df.index).year.min()
+    return final_df, histmin, histmax, minyear
 
 
 def check_for_interpolation(df):

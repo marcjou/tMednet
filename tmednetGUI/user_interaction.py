@@ -813,7 +813,7 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
 
-        year_df, hismintemp, hismaxtemp = fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, hismintemp, hismaxtemp, minyear = fm.historic_to_df(historical, year, start_month='01', end_month='01')
 
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)
@@ -885,23 +885,24 @@ class tmednet(tk.Frame):
         usedf = histdf.copy()
         usedf.set_index('month', inplace=True)
         usedf.sort_index(inplace=True)
-        oldepth = 0
-        for depth in usedf['depth'].unique():
-            if oldepth != 0:
+        if str(minyear) != year:
+            oldepth = 0
+            for depth in usedf['depth'].unique():
+                if oldepth != 0:
 
-                self.plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
-                                       usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
-                                       
-            oldepth = depth
+                    self.plot.fill_between(np.unique(usedf.index), usedf.loc[usedf['depth'] == oldepth]['mean'],
+                                           usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
+
+                oldepth = depth
 
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
                       '30': '#a7d6e7',
                       '35': '#9ec6de', '40': '#3a6daf', '45': '#214f8a', '50': '#0a3164'}
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
-
-        for depth in histdf['depth'].unique():
-           histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
-                                                      label='_nolegend_', legend=False, zorder=5)
+        if str(minyear) != year:
+            for depth in histdf['depth'].unique():
+                histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
+                                                          label='_nolegend_', legend=False, zorder=5)
 
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
