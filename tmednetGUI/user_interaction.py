@@ -693,7 +693,7 @@ class tmednet(tk.Frame):
         year = self.secondInput.get()
         self.newwindow.destroy()
 
-        df, hismintemp, hismaxtemp = fm.historic_to_df(historical, year)
+        df, hismintemp, hismaxtemp, bad = fm.historic_to_df(historical, year)
         try:
             global cb
             self.clear_plots()

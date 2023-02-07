@@ -678,6 +678,19 @@
             "end_year": "2022",
             "institution": "Núria Teixidó"
         },
+        
+        "140": {
+            "lat": "37.0011",
+            "long": "15.3359",
+            "site_number": "",
+            "site_name": "Plemmirio MPA",
+            "site_code": "140",
+            "eco_region": "W-Med",
+            "sub_basin": "Sicilia",
+            "start_year": "2020",
+            "end_year": "2021",
+            "institution": "Monica Montefalcone"
+        },
         "147": {
             "lat": "42.8352",
             "long": "9.3086",
