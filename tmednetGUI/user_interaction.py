@@ -698,7 +698,7 @@ class tmednet(tk.Frame):
             global cb
             self.clear_plots()
             self.counter.append("Stratification")
-            depths = np.array(list(map(int, list(df.columns))))
+            depths = np.array(list(map(float, list(df.columns))))
             if self.plot1.axes:
                 plt.Axes.remove(self.plot1)
                 plt.Axes.remove(self.plot2)
@@ -770,8 +770,30 @@ class tmednet(tk.Frame):
                                                  cmap='RdYlBu_r', levels=levels2))
                 cb = plt.colorbar(cf[0], ax=self.plot, label='Temperature (ºC)', ticks=levels)
             else:
-                cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
-                                        levels=levels2)
+                # Checks if there is a vertical gap bigger than 5 meters and if so instead of interpolating
+                # Plots two different plots to keep the hole inbetween
+                str_depths = [f'{x:g}' for x in depths]
+                vertical_split = []
+                for i in range(0, len(depths)):
+                    if i < len(depths) - 1:
+                        res = depths[i + 1] - depths[i]
+                        if res > 5.:
+                            vertical_split.append(i)
+                if vertical_split:
+                    old_index = 0
+                    for i in vertical_split:
+                        cf = self.plot.contourf(df_datetime, -depths[old_index: i + 1],
+                                                df.filter(items=str_depths[old_index:i + 1]).values.T, 256, extend='both',
+                                                cmap='RdYlBu_r',
+                                                levels=levels2)
+                        old_index = i + 1
+                    cf = self.plot.contourf(df_datetime, -depths[old_index:],
+                                            df.filter(items=str_depths[old_index:]).values.T, 256, extend='both',
+                                            cmap='RdYlBu_r',
+                                            levels=levels2)
+                else:
+                    cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
+                                            levels=levels2)
 
                 cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
             self.cbexists = True
@@ -814,7 +836,7 @@ class tmednet(tk.Frame):
         histdf = excel_object.monthlymeandf
 
         year_df, hismintemp, hismaxtemp, minyear = fm.historic_to_df(historical, year, start_month='01', end_month='01')
-
+        year_df.index = year_df.index.strftime('%Y-%m-%d %H:%M:%S')
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)
 

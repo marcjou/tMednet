@@ -446,10 +446,27 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
     # limit_area='inside' parameter makes that only NaN values inside valid values will be filled
     # Checks if it has been called by stratification or annual to decide wether interpolate between columns or not
+    # Does not interpolate if there is a gap bigger than 1 days (24h)
     if start_month == '01':
-        final_df = filtered_df.interpolate(axis=0, limit_area='inside')
+        filtered_df.index = pd.to_datetime(filtered_df.index)
+        final_df = filtered_df.interpolate(method='time', axis=0, limit_area='inside', limit= 24, limit_direction='forward')
     elif start_month == '05':
+        depths = filtered_df.columns
+        bad_depths = []
+        for i in range(0,len(depths)):
+            if i != len(depths) - 1:
+                if filtered_df[depths[i + 1]].isnull().all() == True and filtered_df[depths[i]].isnull().all() == False:
+                    filtered_df.insert(filtered_df.columns.get_loc(depths[i]) + 1, str(int(depths[i]) + 2.5), filtered_df[depths[i]])
+                    bad_depths.append(depths[i + 1])
+            if i>0:
+                if filtered_df[depths[i - 1]].isnull().all() == True and filtered_df[depths[i]].isnull().all() == False:
+                    filtered_df.insert(filtered_df.columns.get_loc(depths[i]), str(int(depths[i]) - 2.5),
+                                                                               filtered_df[depths[i]])
+                    bad_depths.append(depths[i - 1])
+        for depth in bad_depths:
+            del filtered_df[depth]
         final_df = filtered_df.interpolate(axis=1, limit_area='inside')
+
     minyear = pd.to_datetime(df.index).year.min()
     return final_df, histmin, histmax, minyear
 
