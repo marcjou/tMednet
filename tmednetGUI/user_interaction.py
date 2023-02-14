@@ -1020,6 +1020,7 @@ class tmednet(tk.Frame):
         # Establish a max difference of records of 10 days (240 records)
         # Whole records is 2208
         # Overriding the above criteria, now established that the records cannot be different than 240 from the max one
+        legend_years = years.copy()
         for year in years:
             '''
             for ni in df.loc[df['year'] == year].index:
@@ -1030,12 +1031,17 @@ class tmednet(tk.Frame):
                             df['Ndays>=' + str(j)][ni] = np.nan
             '''
             maxndays = np.nanmax(df.loc[df['year'] == year]['N'])
+            check = False
             for ni in df.loc[df['year'] == year].index:
                 if maxndays - df['N'][ni] > 240:
                     df['N'][ni] = np.nan
+                    check = True
                     for j in range(23, 29):
                         df['Ndays>=' + str(j)][ni] = np.nan
-
+            if check == True:
+                # Adds asterisk to year
+                legend_years[np.where(legend_years == year)[0][0]] = year + '*'
+                check = False
             for i in range(23, 29):
                 yearly_plot = np.column_stack(
                     (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
@@ -1056,29 +1062,32 @@ class tmednet(tk.Frame):
             else:
                 ticks = 2
             self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
-            if int(year) < 2000:
+            # Remove asterisks (if any) on years
+            seq_type = type(year)
+            int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
+            if int_year < 2000:
                 color = colors[0]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 1990]
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 1990]
                                , color=color, linestyle=lines[0])
-            elif int(year) >= 2000 and int(year) < 2010:
+            elif int_year >= 2000 and int_year < 2010:
                 color = colors[1]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2000],
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2000],
                                color=color, linestyle=lines[1])
-            elif int(year) >= 2010 and int(year) < 2020:
+            elif int_year >= 2010 and int_year < 2020:
                 color = colors[2]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2010],
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2010],
                                color=color, linestyle=lines[2])
-            elif int(year) >= 2020 and int(year) < 2030:
+            elif int_year >= 2020 and int_year < 2030:
                 color = colors[3]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int(year) - 2020],
+                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2020],
                                color=color, linestyle=lines[3])
 
             self.plot.invert_yaxis()
@@ -1088,7 +1097,7 @@ class tmednet(tk.Frame):
         box = self.plot.get_position()
         self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
-        self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+        self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
                       title=historical.split('_')[4] + ' Summer days ≥ 23ºC')
         self.plot.xaxis.grid(True, linestyle='dashed')
@@ -1100,7 +1109,7 @@ class tmednet(tk.Frame):
                             command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth,
                                                                                                   year_dict, markers,
                                                                                                   colors, lines, years,
-                                                                                                  maxdays, historical))
+                                                                                                  maxdays, historical, legend_years))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -1109,7 +1118,7 @@ class tmednet(tk.Frame):
         print('Ayo')
         self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
 
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical):
+    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
         """
            Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
            Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
@@ -1140,29 +1149,32 @@ class tmednet(tk.Frame):
             self.plot.set(ylim=(0, maxdepth + 2))
             self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
             for year in years:
-                if int(year) < 2000:
+                # Remove asterisks (if any) on years
+                seq_type = type(year)
+                int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
+                if int_year < 2000:
                     color = colors[0]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 1990]
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 1990]
                                    , color=color, linestyle=lines[0])
-                elif int(year) >= 2000 and int(year) < 2010:
+                elif int_year >= 2000 and int_year < 2010:
                     color = colors[1]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2000],
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2000],
                                    color=color, linestyle=lines[1])
-                elif int(year) >= 2010 and int(year) < 2020:
+                elif int_year >= 2010 and int_year < 2020:
                     color = colors[2]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2010],
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2010],
                                    color=color, linestyle=lines[2])
-                elif int(year) >= 2020 and int(year) < 2030:
+                elif int_year >= 2020 and int_year < 2030:
                     color = colors[3]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int(year) - 2020],
+                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2020],
                                    color=color, linestyle=lines[3])
 
             self.plot.invert_yaxis()
@@ -1170,7 +1182,7 @@ class tmednet(tk.Frame):
             # Shrink the axis a bit to fit the legend outside of it
             box = self.plot.get_position()
             self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-            self.plot.legend(years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+            self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' Summer days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
