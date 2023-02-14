@@ -965,6 +965,9 @@ class tmednet(tk.Frame):
         excel_object = fw.Excel(historical, write_excel=False, console=self.consolescreen)  # returns an excel object
         df = excel_object.mydf3
 
+        # Converts Number of operation days [N] = 0 to np.nan
+        df['N'].replace(0, np.nan, inplace=True)
+
         dfhist_control = pd.read_csv(historical, sep='\t', dayfirst=True)
         dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
         dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
@@ -983,6 +986,9 @@ class tmednet(tk.Frame):
                         df.loc[(df['year'] == str(year)) & (df['depth(m)'] == depth), 'Ndays>=' + str(i)] = np.nan
                 else:
                     print('not all na')
+
+
+
 
 
         # Creates the subplots and deletes the old plot
@@ -1004,12 +1010,32 @@ class tmednet(tk.Frame):
         # We get all the years on the dataset
         years = df['year'].unique()
         years = years[years != 0]
+
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
         maxdays = 0  # Used to set the maximum number of days to point in the X axis
         temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
         year_dict = {}
+        # Check df to see if a given depth has less records than the next
+        # Establish a max difference of records of 10 days (240 records)
+        # Whole records is 2208
+        # Overriding the above criteria, now established that the records cannot be different than 240 from the max one
         for year in years:
+            '''
+            for ni in df.loc[df['year'] == year].index:
+                if ni != df.loc[df['year'] == year].index[-1]:
+                    if df['N'][ni] != 0 and df['N'][ni] < df['N'][ni + 1] - 240:
+                        df['N'][ni] = np.nan
+                        for j in range(23, 29):
+                            df['Ndays>=' + str(j)][ni] = np.nan
+            '''
+            maxndays = np.nanmax(df.loc[df['year'] == year]['N'])
+            for ni in df.loc[df['year'] == year].index:
+                if maxndays - df['N'][ni] > 240:
+                    df['N'][ni] = np.nan
+                    for j in range(23, 29):
+                        df['Ndays>=' + str(j)][ni] = np.nan
+
             for i in range(23, 29):
                 yearly_plot = np.column_stack(
                     (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
