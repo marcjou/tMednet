@@ -1099,7 +1099,7 @@ class tmednet(tk.Frame):
         # Draws the legend for the different years
         self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
-                      title=historical.split('_')[4] + ' Summer days ≥ 23ºC')
+                      title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
         self.plot.xaxis.grid(True, linestyle='dashed')
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
@@ -1184,7 +1184,7 @@ class tmednet(tk.Frame):
             self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
             self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.plot.set(ylabel='Depth (m)',
-                          title=historical.split('_')[4] + ' Summer days ≥ ' + str(i) + 'ºC')
+                          title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
             self.plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
