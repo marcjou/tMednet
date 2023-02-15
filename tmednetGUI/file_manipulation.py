@@ -451,7 +451,20 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         filtered_df.index = pd.to_datetime(filtered_df.index)
         final_df = filtered_df.interpolate(method='time', axis=0, limit_area='inside', limit= 24, limit_direction='forward')
     elif start_month == '05':
+        # Deletes the depths that are all null
         depths = filtered_df.columns
+        for depth in depths:
+            if filtered_df[depth].isnull().all():
+                del filtered_df[depth]
+        depths = filtered_df.columns
+        int_depths = [eval(i) for i in depths]
+        depth_diff = [t - s for s, t in zip(int_depths, int_depths[1:])]
+        for i in range(0, len(depth_diff)):
+            if depth_diff[i] > 13:
+                filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]) + 1, str(int(depths[i + 1]) + 2.5), filtered_df[depths[i + 1]])
+                filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]), str(int(depths[i + 1]) - 2.5),
+                                   filtered_df[depths[i + 1]])
+        '''
         bad_depths = []
         for i in range(0,len(depths)):
             if i != len(depths) - 1:
@@ -464,7 +477,9 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
                                                                                filtered_df[depths[i]])
                     bad_depths.append(depths[i - 1])
         for depth in bad_depths:
-            del filtered_df[depth]
+            if depth in filtered_df.columns:
+                del filtered_df[depth]
+        '''
         final_df = filtered_df.interpolate(axis=1, limit_area='inside')
 
     minyear = pd.to_datetime(df.index).year.min()

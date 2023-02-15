@@ -777,7 +777,7 @@ class tmednet(tk.Frame):
                 for i in range(0, len(depths)):
                     if i < len(depths) - 1:
                         res = depths[i + 1] - depths[i]
-                        if res > 5.:
+                        if res > 10.:
                             vertical_split.append(i)
                 if vertical_split:
                     old_index = 0
@@ -807,6 +807,9 @@ class tmednet(tk.Frame):
             self.plot.xaxis.set_major_formatter(fmt)
             # Sets the x axis on the top
             self.plot.xaxis.tick_top()
+            # Sets the ticks only for the whole depths, the ones from the file
+            tick_depths = [-i for i in depths if i.is_integer()]
+            self.plot.set_yticks(tick_depths)
 
             self.canvas.draw()
 
@@ -1097,10 +1100,21 @@ class tmednet(tk.Frame):
         box = self.plot.get_position()
         self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
-        self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+        legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.plot.set(ylabel='Depth (m)',
                       title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
         self.plot.xaxis.grid(True, linestyle='dashed')
+
+        p = legend.get_window_extent()
+        self.plot.annotate('Annotation Text', (p.p0[0], p.p1[1]), (p.p0[0], p.p1[1]),
+                 xycoords='figure pixels', zorder=9)
+        # these are matplotlib.patch.Patch properties
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+        # place a text box in upper left in axes coords
+        txtstr = '*data period not complete'
+        self.plot.text(1, 0.55, txtstr, transform=self.plot.transAxes, fontsize=10,
+                verticalalignment='top', bbox=props)
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
@@ -1186,6 +1200,13 @@ class tmednet(tk.Frame):
             self.plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
+            # these are matplotlib.patch.Patch properties
+            props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+            # place a text box in upper left in axes coords
+            txtstr = '*data period not complete'
+            self.plot.text(0.05, 0.95, txtstr, transform=self.plot.transAxes, fontsize=14,
+                           verticalalignment='top', bbox=props)
             self.plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
 
