@@ -929,8 +929,11 @@ class tmednet(tk.Frame):
                 del newdf[depth]
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
         if str(minyear) != year:
-            for depth in histdf['depth'].unique():
-                histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='white',
+            for depth in usedf['depth'].unique():
+                histdf['depth'] = histdf['depth'].astype('int')
+                histdf.sort_values(['month', 'depth'], inplace=True)
+                histdf['depth'] = histdf['depth'].astype('str')
+                histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='#e9e8e8',
                                                           label='_nolegend_', legend=False, zorder=5)
 
         self.plot.set(ylabel='Temperature (ºC) smoothed',
