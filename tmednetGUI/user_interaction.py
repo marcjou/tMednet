@@ -1041,9 +1041,13 @@ class tmednet(tk.Frame):
             for ni in df.loc[df['year'] == year].index:
                 if maxndays - df['N'][ni] > 240:
                     df['N'][ni] = np.nan
-                    check = True
                     for j in range(23, 29):
                         df['Ndays>=' + str(j)][ni] = np.nan
+                # Check if a year has an incomplete season (under 2208 records, 92 days)
+                if df['N'][ni] < 2208:
+                    check = True
+                else:
+                    check = False
             if check == True:
                 # Adds asterisk to year
                 legend_years[np.where(legend_years == year)[0][0]] = year + '*'
@@ -1109,15 +1113,10 @@ class tmednet(tk.Frame):
         self.plot.xaxis.grid(True, linestyle='dashed')
 
         p = legend.get_window_extent()
-        self.plot.annotate('Annotation Text', (p.p0[0], p.p1[1]), (p.p0[0], p.p1[1]),
-                 xycoords='figure pixels', zorder=9)
-        # these are matplotlib.patch.Patch properties
-        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+        self.plot.annotate('*Recorded period not complete', xy=(0,-0.1), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
+                  va="center", ha="left",
+                  bbox=dict(boxstyle="round", fc="w"))
 
-        # place a text box in upper left in axes coords
-        txtstr = '*data period not complete'
-        self.plot.text(1, 0.55, txtstr, transform=self.plot.transAxes, fontsize=10,
-                verticalalignment='top', bbox=props)
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
         for i in range(23, 29):
@@ -1199,17 +1198,16 @@ class tmednet(tk.Frame):
             # Shrink the axis a bit to fit the legend outside of it
             box = self.plot.get_position()
             self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-            self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+            legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
-            # these are matplotlib.patch.Patch properties
-            props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
-            # place a text box in upper left in axes coords
-            txtstr = '*data period not complete'
-            self.plot.text(0.05, 0.95, txtstr, transform=self.plot.transAxes, fontsize=14,
-                           verticalalignment='top', bbox=props)
+            p = legend.get_window_extent()
+            self.plot.annotate('*Recorded period not complete', xy=(0, -0.1), xycoords=p, xytext=(0.1, 0),
+                               textcoords="offset points",
+                               va="center", ha="left",
+                               bbox=dict(boxstyle="round", fc="w"))
             self.plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
 
