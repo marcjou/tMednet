@@ -546,6 +546,9 @@ def big_merge(filename1, filename2, output):
         df2.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)
     else:
         df1 = pd.read_csv(filename1, sep='\t')
+        # Add white space between datasets
+        df1 = pd.concat([df1, pd.Series([None]*len(df1.columns),index=df1.columns).to_frame().T],
+                        axis=0, join='outer', ignore_index=True)
         dfconc = pd.concat([df1, df2])
         # Check if there is duplicity
         df1['dates'] = df1['Date'] + ' ' + df1['Time']
