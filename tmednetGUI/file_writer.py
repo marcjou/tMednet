@@ -547,10 +547,18 @@ def big_merge(filename1, filename2, output):
     else:
         df1 = pd.read_csv(filename1, sep='\t')
         dfconc = pd.concat([df1, df2])
-
-
+        # Check if there is duplicity
+        df1['dates'] = df1['Date'] + ' ' + df1['Time']
+        df2['dates'] = df2['Date'] + ' ' + df2['Time']
+        df1_in = df1.set_index('dates')
+        df2_in = df2.set_index('dates')
+        df = pd.concat([df1_in, df2_in], axis=1, keys=['df1', 'df2'], join='inner')
+        duplicity = []
+        if len(df) > 0:
+            duplicity = df.index
         dfconc.replace(np.nan, '', regex=True, inplace=True)
 
 
 
         dfconc.to_csv('../src/output_files/' + output + '.txt', sep='\t', index=False)
+        return duplicity

@@ -1411,7 +1411,12 @@ class tmednet(tk.Frame):
         """
         self.newwindow.destroy()
         self.console_writer('Historical Merge successful!', 'action')
-        fw.big_merge(filename1, filename2, output)
+        duplicity = fw.big_merge(filename1, filename2, output)
+        if len(duplicity) > 0:
+            self.console_writer('Found duplicity between '
+                                + str(len(duplicity)) + ' dates. First occurrence at '
+                                + str(duplicity[0]) + ' last at ' + str(duplicity[-1]), 'warning')
+
 
     def write_excel(self):
         """
