@@ -2,6 +2,7 @@ import os
 import time
 import math
 import imageio
+import calendar
 import numpy as np
 import xarray as xr
 import pandas as pd
@@ -109,8 +110,11 @@ class MHWMapper:
         lons, lats = self.lon, self.lat
         filenames = []
         filenames = self.__create_image_by_type(lons, lats, mode, filenames)
+        dt = datetime.strptime(self.ds_time.values[0], '%Y-%m-%d')
+        year = dt.year
+        month = calendar.month_name[dt.month]
         # build gif
-        with imageio.get_writer('../src/output_images/' + str(mode) + '_June_VJan23gif.gif', mode='I', duration=0.7) as writer:
+        with imageio.get_writer('../src/output_images/' + str(mode) + '_' + month + '_' + str(year) + '.gif', mode='I', duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
                 writer.append_data(image)
