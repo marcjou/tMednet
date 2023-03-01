@@ -35,7 +35,10 @@ with open("../src/tmednet_log.txt", "w") as file_object:
     for index, row in df.iterrows():
         site_line = '****Site code: {}****\n\n'.format(str(index))
         utc_jump_line = '-Last record in local time: {} at {}\n\n\n'.format(row['Date'], row['Time'])
-        separator = '-' * len(utc_jump_line)
+        separator = '-' * 51
         jumpline = '\n\n'
-        file_object.writelines([site_line, utc_jump_line, separator, jumpline])
+        if index == 1:
+            file_object.writelines([separator, jumpline, site_line, utc_jump_line, separator, jumpline])
+        else:
+            file_object.writelines([site_line, utc_jump_line, separator, jumpline])
 print('Hi there')
