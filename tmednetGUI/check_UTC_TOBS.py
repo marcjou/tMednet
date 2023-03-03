@@ -33,6 +33,8 @@ df.index = df.index.astype(int)
 df.sort_index(inplace=True)
 with open("../src/tmednet_log.txt", "w") as file_object:
     for index, row in df.iterrows():
+        if index < 10:
+            index = '0' + str(index)
         site_line = '****Site code: {}****\n\n'.format(str(index))
         utc_jump_line = '-Last record in local time: {} at {}\n\n\n'.format(row['Date'], row['Time'])
         separator = '-' * 51
