@@ -31,6 +31,12 @@ df.columns = ['Date', 'Time']
 df.index = site
 df.index = df.index.astype(int)
 df.sort_index(inplace=True)
+df1 = df.copy()
+df1['Site'] = df1.index
+df1['Local time until'] = df1['Date'] + ' ' + df1['Time']
+del df1['Date']
+del df1['Time']
+df1.to_excel('../src/tmednet_log.xlsx', index=False)
 with open("../src/tmednet_log.txt", "w") as file_object:
     for index, row in df.iterrows():
         if index < 10:

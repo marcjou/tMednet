@@ -960,6 +960,7 @@ class tmednet(tk.Frame):
        Method: plot_thresholds(self)
        Purpose: Creates the thresholds graph
        Require:
+       Criteria: 
        Version: 11/2021, MJB: Documentation
        """
         historical = self.openfileinput.get()
