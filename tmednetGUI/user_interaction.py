@@ -1113,8 +1113,8 @@ class tmednet(tk.Frame):
                       title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
         self.plot.xaxis.grid(True, linestyle='dashed')
 
-        p = legend.get_window_extent()
-        self.plot.annotate('*Recorded period not complete', xy=(0,-0.1), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
+        p = self.plot.get_window_extent()
+        self.plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
                   va="center", ha="left",
                   bbox=dict(boxstyle="round", fc="w"))
 
