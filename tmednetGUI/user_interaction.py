@@ -835,8 +835,20 @@ class tmednet(tk.Frame):
         self.clear_plots()
         self.counter.append("Cycles")
 
+        '''
         excel_object = fw.Excel(historical, write_excel=False, seasonal=False)  # returns an excel object
         histdf = excel_object.monthlymeandf
+        '''
+        histdf = pd.read_csv(historical, sep='\t')
+        depths = histdf.columns[2:]
+        histdf['day'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).day
+        histdf['month'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).month
+        histdf['day_month'] = histdf['day'].astype(str) + '-' + histdf['month'].astype(str)
+        histdf['day_month'] = histdf['day_month'] +'-' + year
+        histdf['day_month'] = pd.DatetimeIndex(histdf['day_month'], dayfirst=True)
+
+        orderedhist_df = histdf.groupby('day_month')[depths].mean()
+        orderedhist_df.sort_index(inplace=True)
 
         year_df, hismintemp, hismaxtemp, minyear = fm.historic_to_df(historical, year, start_month='01', end_month='01')
         year_df.index = year_df.index.strftime('%Y-%m-%d %H:%M:%S')
@@ -845,6 +857,8 @@ class tmednet(tk.Frame):
 
 
         year_df = fm.running_average_special(year_df, running=360)
+        orderedhist_df = fm.running_average_special(orderedhist_df, running=15)
+        orderedhist_df.index = pd.DatetimeIndex(orderedhist_df.index)
         # dfdelta = fm.running_average(self.mdata, running=360)
 
         # All this block serves only to transform the data from hourly to daily. It should be inside its own method
@@ -885,6 +899,7 @@ class tmednet(tk.Frame):
         # TODO Why the filter does not look the same? ASk Nathaniel
         # TODO change the x axis to reflect the name of the month
 
+        '''
         # Dict to change from string months to datetime
 
         monthDict = {}
@@ -897,19 +912,21 @@ class tmednet(tk.Frame):
                 monthDict[str(i)] = datetime.strptime(year + '-' + str(i) + '-01',
                                                       '%Y-%m-%d')
                 # monthDict[str(i)] = datetime.strptime(datetime.strftime(dfdelta.index[0], '%Y') + '-' + str(i) + '-01', '%Y-%m-%d')
-
+        '''
         # Creates the subplots and deletes the old plot
         if self.plot1.axes:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
 
         self.plot = self.fig.add_subplot(111)
-
+        '''
         for month in histdf['month'].unique():
             histdf['month'].replace(month, monthDict[month], inplace=True)
+        
         usedf = histdf.copy()
         usedf.set_index('month', inplace=True)
         usedf.sort_index(inplace=True)
+        
         if str(minyear) != year:
             oldepth = 0
             for depth in usedf['depth'].unique():
@@ -919,6 +936,9 @@ class tmednet(tk.Frame):
                                            usedf.loc[usedf['depth'] == depth]['mean'], facecolor='lightgrey', zorder=0)
 
                 oldepth = depth
+        '''
+
+
 
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
                       '30': '#a7d6e7',
@@ -928,6 +948,19 @@ class tmednet(tk.Frame):
             if newdf[depth].isnull().all():
                 del newdf[depth]
         newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
+
+        leg = self.plot.legend(title='Depth (m)')
+
+        if str(minyear) != year:
+            oldepth = 0
+            for depth in orderedhist_df.columns:
+                if oldepth != 0:
+                    self.plot.fill_between(np.unique(orderedhist_df.index), orderedhist_df[oldepth],
+                                           orderedhist_df[depth], facecolor='lightgrey', zorder=0)
+                oldepth = depth
+                orderedhist_df.plot(kind='line', ax=self.plot, color='#e9e8e8', label='_nolegend_', legend=False, zorder=5)
+
+        '''
         if str(minyear) != year:
             for depth in usedf['depth'].unique():
                 histdf['depth'] = histdf['depth'].astype('int')
@@ -935,12 +968,12 @@ class tmednet(tk.Frame):
                 histdf['depth'] = histdf['depth'].astype('str')
                 histdf.loc[histdf['depth'] == depth].plot(kind='line', x='month', y='mean', ax=self.plot, color='#e9e8e8',
                                                           label='_nolegend_', legend=False, zorder=5)
-
+        '''
         self.plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
         self.plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
         self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
-        leg = self.plot.legend(title='Depth (m)')
+
         self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
 
         # Sets the X axis as the initials of the months
