@@ -23,15 +23,49 @@ os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
 
 
 class MHWMapper:
-    _mat = ''
-    duration = None
-    intensity = None
+    """
+    Creates a MHWMapper object which is a netcdf file open with xarray. This object has methods to create
+    different maps regarding the MHW
+
+    ...
+
+    Attributes
+    ----------
+    ds : xarray DatArray
+        array that contains all the netcdf data
+    MHW : xarray DataArray
+        array with the intensity of the MHW of a whole year of operation
+    MHW_days : xarray DataArray
+        array with the duration of the MHW of a whole year of operation
+    ds_dtime : xarray DataArray
+        array with the dates of the year of operation in datetime64
+    lat : xarray DataArray
+        array containing the latitude coordinates
+    lon : xarray DataArray
+        array containing the longitude coordinates
+    ds_time : xarray DataArray
+        array that containsthe dates of the period being plotted
+    ds_MHW_sliced : xarray DataArray
+        array with the intensity of the MHW of the period being plotted
+    ds_MHW_days_sliced : xarray DataArray
+        array with the duration of the MHW of the period being plotted
+
+    Methods
+    -------
+    
+    Version: 02/2023, MJB: Documentation
+    """
 
     def __init__(self, dataset_path, start_period=str(date.today().year) + '-06-01',
                  end_period=str(date.today().year) + '-06-30'):
+        """
+        Method: __init__(self)
+        Purpose: Plots the Annual T Cycles plot for the loaded files
+        Require:
+        Version: 09/2021, MJB: Documentation
+        """
         # Set up the Netcdf satellite data using the xarray library
         with xr.open_dataset(dataset_path) as self.ds:
-            self.variables = self.ds.variables
             self.MHW = self.ds.MHW
             self.MHW_days = self.ds.MHW_days
             self.ds_dtime = self.ds.time
@@ -83,12 +117,15 @@ class MHWMapper:
                             index = n
                     elif counter > 0:
                         if n <= len(raw_duration) - 3:
-                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[n - 2, i, j].isnull() == False) and (raw_duration[n + 1, i, j].isnull() == False or raw_duration[n + 2, i, j].isnull() == False):
+                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[
+                                n - 2, i, j].isnull() == False) and (
+                                    raw_duration[n + 1, i, j].isnull() == False or raw_duration[
+                                n + 2, i, j].isnull() == False):
                                 counter = 1 + counter
                                 proc_duration[n, i, j] = counter
                                 index = n
                             else:
-                                #raw_duration[0:index - 2, i, j] = range(1, counter - 1)
+                                # raw_duration[0:index - 2, i, j] = range(1, counter - 1)
                                 counter = 0
                                 index = 0
                     elif n > 0 and counter == 0:
@@ -99,12 +136,15 @@ class MHWMapper:
                             proc_duration[n, i, j] = counter2
                             index = n
                         if n <= len(raw_duration) - 3:
-                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[n - 2, i, j].isnull() == False) and (raw_duration[n + 1, i, j].isnull() == False or raw_duration[n + 2, i, j].isnull() == False):
+                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[
+                                n - 2, i, j].isnull() == False) and (
+                                    raw_duration[n + 1, i, j].isnull() == False or raw_duration[
+                                n + 2, i, j].isnull() == False):
                                 counter2 = 1 + counter2
                                 proc_duration[n, i, j] = counter2
                                 index = n
                             else:
-                                #raw_duration[oldindex:index - 2, i, j] = range(1, counter2 - 1)
+                                # raw_duration[oldindex:index - 2, i, j] = range(1, counter2 - 1)
                                 counter2 = 0
                                 index = 0
 
@@ -173,3 +213,5 @@ class MHWMapper:
         # Remove files
         for filename in set(filenames):
             os.remove(filename)
+
+
