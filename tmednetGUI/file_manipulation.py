@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from scipy.ndimage.filters import uniform_filter1d
 import progressbar as pb
 
-
+#TODO REWORK WHOLE CODE TO WORK WITH DATAFRAMES FROM THE START
 def load_coordinates(region):
     """
     Method: load_coordinates(region)
