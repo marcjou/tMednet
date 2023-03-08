@@ -21,12 +21,14 @@ from netCDF4 import Dataset as NetCDFFile
 
 os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
 
+
 class MHWMapper:
     _mat = ''
     duration = None
     intensity = None
 
-    def __init__(self, dataset_path, start_period=str(date.today().year)+'-06-01', end_period=str(date.today().year)+'-06-30'):
+    def __init__(self, dataset_path, start_period=str(date.today().year) + '-06-01',
+                 end_period=str(date.today().year) + '-06-30'):
         # Set up the Netcdf satellite data using the xarray library
         with xr.open_dataset(dataset_path) as self.ds:
             self.variables = self.ds.variables
@@ -63,6 +65,54 @@ class MHWMapper:
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
         return ax
 
+    def get_duration(self, lats, lons):
+        # TODO muy ineficiente, buscar la manera de comprobar si hay un hueco de dos dias o menos entre datos o si empieza el mes con datos del anterior de manera más eficiente. Ahora 16s por loop de lat, 127 loops igual a 33min de procesado
+        raw_duration = self.ds_MHW_days_sliced
+        proc_duration = raw_duration.copy()
+        for i in range(0, len(lats)):
+            start = time.time()
+            for j in range(0, len(lons)):
+                counter = 0
+                counter2 = 0
+                index = 0
+                for n in range(0, len(raw_duration)):
+                    if n == 0:
+                        if raw_duration[n, i, j].isnull() == False:
+                            counter = 1 + counter
+                            proc_duration[n, i, j] = counter
+                            index = n
+                    elif counter > 0:
+                        if n <= len(raw_duration) - 3:
+                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[n - 2, i, j].isnull() == False) and (raw_duration[n + 1, i, j].isnull() == False or raw_duration[n + 2, i, j].isnull() == False):
+                                counter = 1 + counter
+                                proc_duration[n, i, j] = counter
+                                index = n
+                            else:
+                                #raw_duration[0:index - 2, i, j] = range(1, counter - 1)
+                                counter = 0
+                                index = 0
+                    elif n > 0 and counter == 0:
+                        if index == 0:
+                            oldindex = n
+                        if raw_duration[n, i, j].isnull() == False:
+                            counter2 = 1 + counter2
+                            proc_duration[n, i, j] = counter2
+                            index = n
+                        if n <= len(raw_duration) - 3:
+                            if (raw_duration[n - 1, i, j].isnull() == False or raw_duration[n - 2, i, j].isnull() == False) and (raw_duration[n + 1, i, j].isnull() == False or raw_duration[n + 2, i, j].isnull() == False):
+                                counter2 = 1 + counter2
+                                proc_duration[n, i, j] = counter2
+                                index = n
+                            else:
+                                #raw_duration[oldindex:index - 2, i, j] = range(1, counter2 - 1)
+                                counter2 = 0
+                                index = 0
+
+            end = time.time()
+            timu = end - start
+            print('Time for looping over a single lat: ' + str(timu))
+        return proc_duration
+
     def __create_image_by_type(self, lons, lats, mode, filenames):
         start = time.time()
         if mode == 'temperature':
@@ -72,7 +122,7 @@ class MHWMapper:
             cmap = 'RdYlBu_r'
             ylabel = 'Temperature (ºC)'
         elif mode == 'duration':
-            ds = self.ds_MHW_days_sliced
+            ds = self.get_duration(lats, lons)
             levels = np.arange(0, 31, 5)
             cmap = 'Purples'
             ylabel = 'Duration (Nº days)'
@@ -95,7 +145,7 @@ class MHWMapper:
             end = time.time()
             timu = end - start
             print('Time to create temp: ' + str(timu))
-            #if i == 0:
+            # if i == 0:
             cb = plt.colorbar(temp, location="bottom", ticks=levels, label=ylabel)
             plt.title(str(self.ds_time[i].values))
             # plt.show()
@@ -114,7 +164,8 @@ class MHWMapper:
         year = dt.year
         month = calendar.month_name[dt.month]
         # build gif
-        with imageio.get_writer('../src/output_images/' + str(mode) + '_' + month + '_' + str(year) + '.gif', mode='I', duration=0.7) as writer:
+        with imageio.get_writer('../src/output_images/' + str(mode) + '_' + month + '_' + str(year) + '.gif', mode='I',
+                                duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
                 writer.append_data(image)
@@ -122,4 +173,3 @@ class MHWMapper:
         # Remove files
         for filename in set(filenames):
             os.remove(filename)
-
