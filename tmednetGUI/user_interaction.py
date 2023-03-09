@@ -1513,12 +1513,9 @@ class tmednet(tk.Frame):
         filename = self.openfileinput.get()
         year = self.secondInput.get()
         self.newwindow.destroy()
-        sitename = filename[filename.find('Database'):].split('_')[3]
-        df = pd.read_csv(filename, sep='\t')
-        hismaxtemp = round(np.max(df.quantile(0.99))) + 1
-        lastyear = datetime.strptime(df['Date'][len(df) - 1], '%d/%m/%Y').year + 1
-        for i in range(int(year), lastyear):
-            st.browse_heat_spikes(df, sitename, i, hismaxtemp)
+        historic = st.HistoricData(filename)
+        for i in range(int(year), historic.last_year):
+            historic.browse_heat_spikes(i)
         self.console_writer('Plots saved at output_images', 'action')
 
     def create_anomalies(self):
