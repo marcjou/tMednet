@@ -31,25 +31,27 @@ class HistoricData:
     browse_anomalies(year)
         Plots the anomalies for all the depths of the series on a given year
 
-    tridepth_anomalies(year)
-        Plots the anomalies for only 15, 20 and 25m depth of the series on a given year
-
     browse_heat_spikes(year)
         Plots the heat spikes for all the depths of the series on a given year
 
     anomalies_plotter(data, depth, year)
         Plots the anomalies for a given depth on a given year
 
-    multidepth_anomaly_plotter(data, depths, year)
-        Plots the anomalies for only 15, 20 and 25m depth of the series on a given year
+    multidepth_anomaly_plotter(year, depths=['15', '25', '40'])
+        Plots the anomalies for a set of three depths of the series on a given year
 
     marine_heat_spikes_plotter(data, depth, target_year)
         Plots the heat spikes for a given depth on a given year
 
-
-
+    Version: 03/2023 MJB: Documentation
     """
     def __init__(self, filename):
+        """
+        Parameters
+        ----------
+        filename: str
+            The complete path to the Database_T file containing the historic data
+        """
         self.df = pd.read_csv(filename, sep='\t')
         self.site_name = filename[filename.find('Database'):].split('_')[3]
         self.max_temperature = round(np.max(self.df.quantile(0.99, numeric_only=True))) + 1
@@ -60,6 +62,9 @@ class HistoricData:
 
     @staticmethod
     def __marine_heat_spikes_setter(data, target_year, clim=False):
+        # Modifies the data parameter adding day, month and year columns as well as setting the names
+        # Of the legends
+
         # Sets the time columns
         data['Date'] = pd.to_datetime(data['Date'], dayfirst=True)
         data.insert(1, 'day', pd.DatetimeIndex(data['Date']).day)
@@ -80,6 +85,7 @@ class HistoricData:
 
     @staticmethod
     def __marine_heat_spikes_filter(data, depth):
+        # Filters the data using a uniform1d filter
         not_null_index = data.loc[data[depth].notnull()].index
         oldindex = not_null_index[0]
         end_index = []
@@ -129,6 +135,8 @@ class HistoricData:
 
     @staticmethod
     def __marine_heat_spikes_df_setter(data, depth, legend, target_year, type='mean', years='old', percentile=0):
+        # Creates a new dataframe from the one passed from the data parameter that can contain the min and max,
+        # the percentile or the mean of the data
         df = []
         if years == 'old':
             locator = data['year'] < target_year
@@ -158,7 +166,7 @@ class HistoricData:
         return df
 
     def __spike_plot_setter(self, data, prop, target_year, depth, percentile_legend, this_year_legend):
-        # Starts the axes and plots the data
+        # Starts the axes and plots the data for the spikes plot
         ax = plt.axes()
         cycler = plt.cycler(linestyle=['-', '--', '--', '-', '-', '-', '-'],
                             color=['#a62929', '#a62929', 'blue', '#141414', 'blue', 'blue', 'blue'],
@@ -199,7 +207,7 @@ class HistoricData:
         ax.remove()
 
     def __spike_zoom_setter(self, data, prop, target_year, depth, percentile_legend, this_year_legend):
-        # Plot the zoom for summer
+        # Makes the plot zoomed for the summer
         prop_zoom = prop.to_list()
         prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
         concated_zoom = data.loc['06-01':'10-01'][:-1]
@@ -238,6 +246,7 @@ class HistoricData:
         ax.remove()
 
     def __anomaly_plot_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend):
+        # Starts the axes and plots the data for the anomaly plot
         ax = plt.axes()
         cycler = plt.cycler(linestyle=['-', '-', '--', '--'], color=['black', 'grey', '#01086b', '#820316'],
                             alpha=[1., 0.7, 1., 1.], linewidth=[0.7, 0.7, 0.7, 0.7])
@@ -264,7 +273,7 @@ class HistoricData:
         ax.remove()
 
     def __anomaly_zoom_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend):
-        # Plot the zoom for summer
+        # Makes the plot zoomed for the summer
         prop_zoom = prop.to_list()
         prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
         concated_zoom = data.loc['06-01':'10-01'][:-1]
@@ -298,6 +307,20 @@ class HistoricData:
         ax.remove()
 
     def marine_heat_spikes_plotter(self, data, depth, target_year):
+        """
+        Calculates and plots the heat spikes of a given depth for a given year
+
+        Parameters
+        ----------
+        data : DataFrame
+            DataFrame containing all the temperature data to be plotted
+
+        depth : str
+            Depth for which the heat spike will be calculated
+
+        target_year : int
+            Year for which the heat spike wants to be calculated and plotted
+        """
         data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.marine_heat_spikes_setter(
             data, target_year)
         last_years_filtered = self.__marine_heat_spikes_filter(data, depth)
@@ -323,6 +346,20 @@ class HistoricData:
         self.__spike_zoom_setter(concated, prop, target_year, depth, percentile_legend, this_year_legend)
 
     def anomalies_plotter(self, data, depth, target_year):
+        """
+        Calculates and plots the anomaly of a given depth for a given year
+
+        Parameters
+        ----------
+        data : DataFrame
+            DataFrame containing all the temperature data to be plotted
+
+        depth : str
+            Depth for which the anomaly will be calculated
+
+        target_year : int
+            Year for which the anomaly wants to be calculated and plotted
+        """
         data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.marine_heat_spikes_setter(
             data, target_year, clim=True)
         last_years_filtered = self.__marine_heat_spikes_filter(data, depth)
@@ -340,7 +377,7 @@ class HistoricData:
         self.__anomaly_plot_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend)
         self.__anomaly_zoom_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend)
 
-    def multidepth_anomaly_plot_setter(self, data_dict, prop_dict, target_year, depths, last_years_legend,
+    def __multidepth_anomaly_plot_setter(self, data_dict, prop_dict, target_year, depths, last_years_legend,
                                        this_year_legend):
         ax = plt.axes()
         cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'],
@@ -374,7 +411,20 @@ class HistoricData:
         plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + self.site_name + '_Multidepth.png')
         ax.remove()
 
-    def multidepth_anomaly_plotter(self, data, depths, target_year):
+    def multidepth_anomaly_plotter(self, target_year, depths=['15', '25', '40']):
+        """
+        Calculates and plots the anomalies of multiple given depths on the same
+         figure for a given year
+
+        Parameters
+        ----------
+        target_year : int
+            Year for which it wants to be calculated and plotted the anomalies
+
+        depths : list of str, optional
+            The depths for which the anomalies will be calculated (default=['15', '25', '40'])
+        """
+        data = self.df.drop(['Time'], axis=1)
         last_legend_dict = {}
         this_legend_dict = {}
         for depth in depths:
@@ -397,21 +447,34 @@ class HistoricData:
 
         concated.index = concated.index.strftime('%m-%d')
 
-        self.multidepth_anomaly_plot_setter(concated, prop, target_year, depths, last_legend_dict,
+        self.__multidepth_anomaly_plot_setter(concated, prop, target_year, depths, last_legend_dict,
                                        this_legend_dict)
 
     def browse_heat_spikes(self, year):
+        """
+        Erases the Time column on the df attribute to use it later to calculate and
+        plot the heat spikes of a given year in all its depths
+
+        Parameters
+        ----------
+        year : int
+            Year for which it wants to be calculated and plotted the heat spikes
+        """
         data = self.df.drop(['Time'], axis=1)
         for depth in data.columns[1:]:
             self.marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, year)
 
     def browse_anomalies(self, year):
+        """
+        Erases the Time column on the df attribute to use it later to calculate and
+        plot the anomalies of a given year in all its depths
+
+        Parameters
+        ----------
+        year : int
+            Year for which it wants to be calculated and plotted the anomalies
+        """
         data = self.df.drop(['Time'], axis=1)
         for depth in data.columns[1:]:
             self.anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, year)
 
-    #TODO sustituir esta funcion de abajo por la ya existente, son redundantes
-    def tridepth_anomalies(self, year):
-        data = self.df.drop(['Time'], axis=1)
-        depths = ['10', '25', '40']
-        self.multidepth_anomaly_plotter(data, depths, year)
