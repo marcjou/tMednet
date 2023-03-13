@@ -37,7 +37,7 @@ class HistoricData:
     anomalies_plotter(data, depth, year)
         Plots the anomalies for a given depth on a given year
 
-    multidepth_anomaly_plotter(year, depths=['15', '25', '40'])
+    multidepth_anomaly_plotter(year, depths=['10', '25', '40'])
         Plots the anomalies for a set of three depths of the series on a given year
 
     marine_heat_spikes_plotter(data, depth, target_year)
@@ -321,7 +321,7 @@ class HistoricData:
         target_year : int
             Year for which the heat spike wants to be calculated and plotted
         """
-        data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.marine_heat_spikes_setter(
+        data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.__marine_heat_spikes_setter(
             data, target_year)
         last_years_filtered = self.__marine_heat_spikes_filter(data, depth)
         last_years_means = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
@@ -360,7 +360,7 @@ class HistoricData:
         target_year : int
             Year for which the anomaly wants to be calculated and plotted
         """
-        data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.marine_heat_spikes_setter(
+        data, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.__marine_heat_spikes_setter(
             data, target_year, clim=True)
         last_years_filtered = self.__marine_heat_spikes_filter(data, depth)
         last_years_means = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
@@ -411,7 +411,7 @@ class HistoricData:
         plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + self.site_name + '_Multidepth.png')
         ax.remove()
 
-    def multidepth_anomaly_plotter(self, target_year, depths=['15', '25', '40']):
+    def multidepth_anomaly_plotter(self, target_year, depths=['10', '25', '40']):
         """
         Calculates and plots the anomalies of multiple given depths on the same
          figure for a given year
@@ -422,7 +422,7 @@ class HistoricData:
             Year for which it wants to be calculated and plotted the anomalies
 
         depths : list of str, optional
-            The depths for which the anomalies will be calculated (default=['15', '25', '40'])
+            The depths for which the anomalies will be calculated (default=['10', '25', '40'])
         """
         data = self.df.drop(['Time'], axis=1)
         last_legend_dict = {}
@@ -439,7 +439,8 @@ class HistoricData:
             this_year_mean = self.__marine_heat_spikes_df_setter(data_depth, depth, this_year_legend, target_year, years='new')
 
             # Sets a unique Dataframe consisting of the other three
-            if depth == '10':
+
+            if depths.index(depth) == 0:
                 concated = pd.concat([last_years_means, this_year_mean], axis=1)
                 prop = concated.index.strftime('%b')
             else:

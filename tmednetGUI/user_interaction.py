@@ -1508,7 +1508,6 @@ class tmednet(tk.Frame):
         df = pd.read_csv(filename, sep='\t')
         fm.convert_to_netCDF('finalCDM', df, self.consolescreen)
 
-
     def create_heat_spikes(self):
         filename = self.openfileinput.get()
         year = self.secondInput.get()
@@ -1522,20 +1521,18 @@ class tmednet(tk.Frame):
         filename = self.openfileinput.get()
         year = self.secondInput.get()
         self.newwindow.destroy()
-        sitename = filename[filename.find('Database'):].split('_')[3]
-        df = pd.read_csv(filename, sep='\t')
-        for i in range(int(year), 2023):
-            st.browse_anomalies(df, sitename, i)
+        historic = st.HistoricData(filename)
+        for i in range(int(year), historic.last_year):
+            historic.browse_anomalies(i)
         self.console_writer('Plots saved at output_images', 'action')
 
     def create_tridepth_anomalies(self):
         filename = self.openfileinput.get()
         year = self.secondInput.get()
         self.newwindow.destroy()
-        sitename = filename[filename.find('Database'):].split('_')[3]
-        df = pd.read_csv(filename, sep='\t')
-        for i in range(int(year), 2023):
-            st.tridepth_anomalies(df, sitename, i)
+        historic = st.HistoricData(filename)
+        for i in range(int(year), historic.last_year):
+            historic.multidepth_anomaly_plotter(i)
         self.console_writer('Plots saved at output_images', 'action')
 
     @staticmethod
