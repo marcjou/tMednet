@@ -165,7 +165,7 @@ class tmednet(tk.Frame):
 
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.mdata, self.files, self.list, self.cut_data_manually))
-        self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)  # Placeholders
+        self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.mdata, self.list))  # Placeholders
         self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
         self.right_menu.add_separator()
@@ -379,56 +379,6 @@ class tmednet(tk.Frame):
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
             return
-
-    def plot_all_zoom(self):
-        """
-            Method: plot_all_zoom(self)
-            Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
-            Require:
-                canvas: reference to canvas widget
-                subplot: plot object
-            Version: 05/2021, MJB: Documentation
-        """
-        self.clear_plots()
-        index = self.list.curselection()
-
-        for item in index:
-            self.counter.append(item)
-        self.counter.append('Zoom')
-
-        depths = ""
-        # Creates the subplots and deletes the old plot
-        if not self.plot1.axes:
-            self.plot1 = self.fig.add_subplot(211)
-            self.plot2 = self.fig.add_subplot(212)
-
-        for i in index:
-            time_series, temperatures, _, bad = fm.zoom_data(self.mdata[i], self.consolescreen)
-            depths = depths + " " + str(self.mdata[i]['depth'])
-
-            masked_temperatures = np.ma.masked_where(np.array(self.mdata[i]['temp']) == 999,
-                                                     np.array(self.mdata[i]['temp']))
-
-            masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
-                                                            np.array(temperatures[1]))
-            self.plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
-                            '-', label=str(self.mdata[i]['depth']))
-            self.plot1.set(ylabel='Temperature (DEG C)',
-                           title='Temperature at depths:' + depths + " - Region: " + str(
-                               self.mdata[i]['region']))
-            self.plot1.legend()
-
-            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[1]):],
-                            '-', label=str(self.mdata[i]['depth']))
-            self.plot2.set(ylabel='Temperature (DEG C)',
-                           title='Temperature at depths:' + depths + " - Region: " + str(
-                               self.mdata[i]['region']))
-            self.plot2.legend()
-
-            # fig.set_size_inches(14.5, 10.5, forward=True)
-            self.canvas.draw()
-        self.console_writer('Plotting zoom of depths: ', 'action', depths)
-        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
 
     def plot_dif(self):
         """
