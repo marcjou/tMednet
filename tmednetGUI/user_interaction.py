@@ -164,7 +164,7 @@ class tmednet(tk.Frame):
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
         self.right_menu = Menu(frame1, tearoff=0)
-        self.right_menu.add_command(label="Zoom", command=self.plot_zoom)
+        self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.mdata, self.files, self.list, self.cut_data_manually))
         self.right_menu.add_command(label="Zoom all files", command=self.plot_all_zoom)  # Placeholders
         self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
         self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
@@ -273,7 +273,7 @@ class tmednet(tk.Frame):
                 # Checks if the last plot was a Zoom to delete the data
                 if self.gui_plot.counter:
                     if self.gui_plot.counter[-1] == 'Zoom':
-                        self.clear_plots()
+                        self.gui_plot.clear_plots()
                 self.gui_plot.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
                 # dibuixem un cop seleccionat
                 self.gui_plot.plot_ts(self.mdata, self.files, index)
@@ -322,7 +322,7 @@ class tmednet(tk.Frame):
         Require:
         Version: 11/2021, MJB: Documentation
         """
-        self.clear_plots()
+        self.gui_plot.clear_plots()
         self.list.delete(0, END)
         self.textBox.delete('1.0', END)
         self.consolescreen.delete('1.0', END)
@@ -342,76 +342,6 @@ class tmednet(tk.Frame):
                 fm.to_utc(self.mdata)
             except IndexError:
                 self.console_writer('Please, load a file before converting to UTC', 'warning')
-
-    def plot_zoom(self, controller=False):
-        """
-            Method: plot_zoom(self)
-            Purpose: Plot a zoom of the begining and ending of the data
-            Require:
-                canvas: reference to canvas widget
-                subplot: plot object
-            Version: 05/2021, MJB: Documentation
-        """
-        self.clear_plots()
-        index = int(self.list.curselection()[0])
-        time_series, temperatures, indexes, start_index = fm.zoom_data(self.mdata[index], self.consolescreen)
-
-        self.counter.append(index)
-        self.counter.append('Zoom')
-
-        # Creates the subplots and deletes the old plot
-        if not self.plot1.axes:
-            self.plot1 = self.fig.add_subplot(211)
-            self.plot2 = self.fig.add_subplot(212)
-
-        masked_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
-                                                 np.array(self.mdata[index]['temp']))
-
-        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
-                        '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-        self.plot1.legend()
-        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[:int(start_index) + 1],
-                        '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
-
-        self.plot1.set(ylabel='Temperature (DEG C)',
-                       title=self.files[index] + "\n" + 'Depth:' + str(
-                           self.mdata[index]['depth']) + " - Region: " + str(
-                           self.mdata[index]['region']))
-        if indexes.size != 0:
-            if indexes[0] + 1 == len(time_series[0]):
-                self.plot2.plot(time_series[1][:int(indexes[0])],
-                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
-                                '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-            else:
-                self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
-                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
-                                '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-            self.plot2.legend()
-            # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-            self.plot2.plot(time_series[1][int(indexes[0]):],
-                            masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
-                            '-', color='red', marker='o', label=str(self.mdata[index]['depth']))
-            self.plot2.set(ylabel='Temperature (DEG C)',
-                           title=self.files[index] + "\n" + 'Depth:' + str(
-                               self.mdata[index]['depth']) + " - Region: " + str(
-                               self.mdata[index]['region']))
-        else:
-            self.plot2.plot(time_series[1],
-                            masked_temperatures[-len(time_series[1]):],
-                            '-', color='steelblue', marker='o', label=str(self.mdata[index]['depth']))
-            self.plot2.legend()
-            self.plot2.set(ylabel='Temperature (DEG C)',
-                           title=self.files[index] + "\n" + 'Depth:' + str(
-                               self.mdata[index]['depth']) + " - Region: " + str(
-                               self.mdata[index]['region']))
-        # fig.set_size_inches(14.5, 10.5, forward=True)
-        # Controls if we are accesing the event handler through a real click or it loops.
-        if not controller:
-            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: self.cut_data_manually(event, index))
-
-        self.canvas.draw()
-        self.console_writer('Plotting zoom of depth: ', 'action', self.mdata[0]['depth'])
-        self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
 
     def cut_data_manually(self, event, ind):
         """
@@ -1208,40 +1138,6 @@ class tmednet(tk.Frame):
             self.clear_plots()
         except (AttributeError, TypeError):
             self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
-
-    def clear_plots(self, clear_thresholds=True):
-        """
-        Method: clear_plots(self)
-        Purpose: Clear plot
-        Require:
-            canvas: reference to canvas widget
-            subplot: plot object
-        Version:
-        01/2021, EGL: Documentation
-        """
-        self.console_writer('Clearing Plots', 'action')
-        self.index = []
-        self.counter = []
-        if self.plot.axes:
-            self.plot.clear()
-            plt.Axes.remove(self.plot)
-        if self.plot1.axes:
-            self.plot1.clear()
-            self.plot2.clear()
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        if self.cbexists:
-            cb.remove()
-            self.cbexists = False
-        # if self.plotcb.axes():
-        #  self.plotcb.clear()
-        #  plt.Axes.remove(self.plotcb)
-        if clear_thresholds:
-            for tab in self.tabs:
-                self.tabs[tab]['btn'].destroy()
-            self.tabs = {}
-            self.curtab = None
-        self.canvas.draw()
 
     def cut_endings(self):
         """

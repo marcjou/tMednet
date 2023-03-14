@@ -102,6 +102,76 @@ class GUIPlot:
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
+    def plot_zoom(self, mdata, files, list, cut_data_manually, controller=False):
+        """
+            Method: plot_zoom(self)
+            Purpose: Plot a zoom of the begining and ending of the data
+            Require:
+                canvas: reference to canvas widget
+                subplot: plot object
+            Version: 05/2021, MJB: Documentation
+        """
+        self.clear_plots()
+        index = int(list.curselection()[0])
+        time_series, temperatures, indexes, start_index = fm.zoom_data(mdata[index], self.console_writer)
+
+        self.counter.append(index)
+        self.counter.append('Zoom')
+
+        # Creates the subplots and deletes the old plot
+        if not self.plot1.axes:
+            self.plot1 = self.fig.add_subplot(211)
+            self.plot2 = self.fig.add_subplot(212)
+
+        masked_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
+                                                 np.array(mdata[index]['temp']))
+
+        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
+                        '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+        self.plot1.legend()
+        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[:int(start_index) + 1],
+                        '-', color='red', marker='o', label=str(mdata[index]['depth']))
+
+        self.plot1.set(ylabel='Temperature (DEG C)',
+                       title=files[index] + "\n" + 'Depth:' + str(
+                           mdata[index]['depth']) + " - Region: " + str(
+                           mdata[index]['region']))
+        if indexes.size != 0:
+            if indexes[0] + 1 == len(time_series[0]):
+                self.plot2.plot(time_series[1][:int(indexes[0])],
+                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
+                                '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+            else:
+                self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
+                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
+                                '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+            self.plot2.legend()
+            # Plots in the same graph the last part which represents the errors in the data from removing the sensors
+            self.plot2.plot(time_series[1][int(indexes[0]):],
+                            masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
+                            '-', color='red', marker='o', label=str(mdata[index]['depth']))
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=files[index] + "\n" + 'Depth:' + str(
+                               mdata[index]['depth']) + " - Region: " + str(
+                               mdata[index]['region']))
+        else:
+            self.plot2.plot(time_series[1],
+                            masked_temperatures[-len(time_series[1]):],
+                            '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+            self.plot2.legend()
+            self.plot2.set(ylabel='Temperature (DEG C)',
+                           title=files[index] + "\n" + 'Depth:' + str(
+                               mdata[index]['depth']) + " - Region: " + str(
+                               mdata[index]['region']))
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+        # Controls if we are accesing the event handler through a real click or it loops.
+        if not controller:
+            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: cut_data_manually(event, index))
+
+        self.canvas.draw()
+        self.console_writer('Plotting zoom of depth: ', 'action', mdata[0]['depth'])
+        self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+
     def clear_plots(self, clear_thresholds=True):
         """
         Method: clear_plots(self)

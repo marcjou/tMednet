@@ -13,7 +13,8 @@ from datetime import datetime, timedelta
 from scipy.ndimage.filters import uniform_filter1d
 import progressbar as pb
 
-#TODO REWORK WHOLE CODE TO WORK WITH DATAFRAMES FROM THE START
+
+# TODO REWORK WHOLE CODE TO WORK WITH DATAFRAMES FROM THE START
 def load_coordinates(region):
     """
     Method: load_coordinates(region)
@@ -89,7 +90,8 @@ def load_data(args, consolescreen=False):
                                         range(1, len(good))]
                 datos["temp"] = [float(good[i][3]) for i in range(1, len(good))]
             else:
-                datos["timegmt"] = [datetime.strptime(str(good[i][0]) + ' ' + str(good[i][1]), "%d/%m/%Y %H:%M:%S") for i in
+                datos["timegmt"] = [datetime.strptime(str(good[i][0]) + ' ' + str(good[i][1]), "%d/%m/%Y %H:%M:%S") for
+                                    i in
                                     range(1, len(good))]
                 datos["temp"] = [float(good[i][2]) for i in range(1, len(good))]
             igm = '_'.join(good[0]).find("GMT")
@@ -124,7 +126,7 @@ def check_start(data, consolescreen):
     """
     for dat in data:
         titlestart = dat['datainici'].timestamp()
-        filestart= dat['timegmt'][0].timestamp()
+        filestart = dat['timegmt'][0].timestamp()
         if titlestart < filestart:
             consolescreen.insert("end", "Error, start date on the title of the file set before the start date of the "
                                         "file in depth " + str(dat['depth']) + "\n", 'warning')
@@ -212,10 +214,10 @@ def report(args, textbox):
     Version: 01/2021, EGL: Documentation
     """
     textbox.delete(1.0, "end")
-    #TODO format the PDF file to make it more "elegant"
-    #Creating the same report as a PDF
+    # TODO format the PDF file to make it more "elegant"
+    # Creating the same report as a PDF
     pdf = pdf_creator.pdf_starter()
-    #Dict to store the PDF metadata
+    # Dict to store the PDF metadata
     PDF_DATA = {'Date Data Upload': 0, 'Date data ingestion report': datetime.strftime(datetime.today(), '%Y-%m-%d'),
                 'Site code': args.mdata[0]['region'], 'Site name': args.mdata[0]['region_name'],
                 'Sampling depth (m)': [], 'Sampling interval (hh:mm:ss)': '1:00:00',
@@ -263,6 +265,7 @@ def report(args, textbox):
             pdf.text(text)
     pdf.output('test2.pdf', 'F')
 
+
 def metadata_string_creator(textbox, args, PDF_DATA):
     for item in args.mdata:
         daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
@@ -277,7 +280,7 @@ def metadata_string_creator(textbox, args, PDF_DATA):
         textbox.insert("end", cadena)
         PDF_DATA['Sampling depth (m)'].append(item['depth'])
         PDF_DATA['Sensors'].append(item['S/N'])
-        PDF_DATA['NData'].append(sum(map(lambda x : x != 999, item['temp'])))
+        PDF_DATA['NData'].append(sum(map(lambda x: x != 999, item['temp'])))
 
         return textbox, args, PDF_DATA
 
@@ -384,10 +387,9 @@ def list_to_df(data):
 
 
 def historic_to_df(historic, year, start_month='05', end_month='12'):
-
-    start_time = year + '-' + start_month +'-01 00:00:00'
+    start_time = year + '-' + start_month + '-01 00:00:00'
     if end_month == '01':
-        end_time = str(int(year)+1) + '-' + end_month + '-01 00:00:00'
+        end_time = str(int(year) + 1) + '-' + end_month + '-01 00:00:00'
     else:
         end_time = year + '-' + end_month + '-01 00:00:00'
 
@@ -401,7 +403,7 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         else:
             try:
                 df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
-                                                       '%Y-%m-%d %H:%M:%S')
+                                                      '%Y-%m-%d %H:%M:%S')
             except ValueError:
                 splt = df['added'][i].split(':')
                 splt[-1] = '00'
@@ -418,7 +420,8 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
         # Makes sure to only browse the values that are after the desired month
         nn = [x for x in n if x >= datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')]
-        start_time = datetime.strftime(min(nn, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
+        start_time = datetime.strftime(
+            min(nn, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
     if end_time not in df.index:
         n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
         end_time = datetime.strftime(min(n, key=lambda x: abs(x - datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S'))),
@@ -428,7 +431,7 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         filtered_df = df[start_time: end_time]
     if filtered_df.columns[0] == '5':
         filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
-        #TODO check this histmax assumption, if the planet goes heating it may be deprecated
+        # TODO check this histmax assumption, if the planet goes heating it may be deprecated
     '''
     if np.nanmax(df.values) > 30:
         histmax = 30
@@ -441,7 +444,7 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     # Gets the historic min and max values only for the months from May through November
     dfcopy = df.copy()
     dfcopy.index = pd.to_datetime(dfcopy.index)
-    dfcopy = dfcopy.loc[(dfcopy.index.month>=5) & (dfcopy.index.month<12)]
+    dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
     histmin = round(np.nanmin(dfcopy.quantile(0.01))) - 1
     histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
     # limit_area='inside' parameter makes that only NaN values inside valid values will be filled
@@ -449,7 +452,8 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
     # Does not interpolate if there is a gap bigger than 1 days (24h)
     if start_month == '01':
         filtered_df.index = pd.to_datetime(filtered_df.index)
-        final_df = filtered_df.interpolate(method='time', axis=0, limit_area='inside', limit= 24, limit_direction='forward')
+        final_df = filtered_df.interpolate(method='time', axis=0, limit_area='inside', limit=24,
+                                           limit_direction='forward')
     elif start_month == '05':
         # Deletes the depths that are all null
         depths = filtered_df.columns
@@ -461,7 +465,8 @@ def historic_to_df(historic, year, start_month='05', end_month='12'):
         depth_diff = [t - s for s, t in zip(int_depths, int_depths[1:])]
         for i in range(0, len(depth_diff)):
             if depth_diff[i] > 13:
-                filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]) + 1, str(int(depths[i + 1]) + 2.5), filtered_df[depths[i + 1]])
+                filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]) + 1, str(int(depths[i + 1]) + 2.5),
+                                   filtered_df[depths[i + 1]])
                 filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]), str(int(depths[i + 1]) - 2.5),
                                    filtered_df[depths[i + 1]])
         '''
@@ -499,7 +504,6 @@ def check_for_interpolation(df):
     # Not necessary???
 
 
-
 def df_to_txt(df, data, SN):
     """
     Method: df_to_txt(df, data, SN)
@@ -511,7 +515,8 @@ def df_to_txt(df, data, SN):
     Version: 05/2021, MJB: Documentation
     """
     print('writing txt')
-    output = '../src/output_files/' + str(data['region']) + '_' + data['datainici'].strftime('%Y-%m-%d') + '_' + data['datafin'].strftime('%Y-%m-%d')+'_merged.txt'
+    output = '../src/output_files/' + str(data['region']) + '_' + data['datainici'].strftime('%Y-%m-%d') + '_' + data[
+        'datafin'].strftime('%Y-%m-%d') + '_merged.txt'
     with open(output, 'w') as f:
         f.write('#' * (len(data['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
         f.write('\n# Site: ' + str(data['region']))
@@ -558,7 +563,7 @@ def df_to_geojson(df, properties, SN, lat, lon):
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
-def zoom_data(data, consolescreen=False):
+def zoom_data(data, consolescreen):
     """
     Method: zoom_data(data)
     Purpose: Gets the first and last day of operation data
@@ -567,9 +572,8 @@ def zoom_data(data, consolescreen=False):
     Version: 05/2021, MJB: Documentation
     """
 
-
-    enddate = data["datafin"] # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
-    startdate = data["datainici"] # - timedelta(hours=int(data["GMT"][1:]))
+    enddate = data["datafin"]  # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
+    startdate = data["datainici"]  # - timedelta(hours=int(data["GMT"][1:]))
 
     # Gets the first and last 72h of operation to look for the possible errors.
     # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
@@ -605,13 +609,9 @@ def zoom_data(data, consolescreen=False):
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
         return time_series, temperatures, indexes, start_index
     except TypeError:
-        if consolescreen == False:
-            print('WARNING, day of end of operation')
-        else:
-            consolescreen.insert("end", "WARNING, day of end of operation "
-                                 + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.\n",
-                                 'warning')
-            consolescreen.insert("end", "=============\n")
+        consolescreen("WARNING, day of end of operation "
+                      + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.",
+                      'warning')
         indexes = np.array(range(0, len(temperatures[0])))
         start_index = np.argwhere(np.array(time_series[0]) == np.array(startdate))
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
@@ -660,8 +660,9 @@ def apply_uniform_filter(data):
             indi = u
     for depth in depths[:-1]:
         series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])].dropna(), size=240),
-                               index=df[str(depth) + "-" + str(depths[i])].dropna().index, columns=[str(depth) + "-" + str(depths[i])]).reindex(data[indi]['time'])
-        #series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
+                               index=df[str(depth) + "-" + str(depths[i])].dropna().index,
+                               columns=[str(depth) + "-" + str(depths[i])]).reindex(data[indi]['time'])
+        # series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
         #                       index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
         i += 1
         if 'dfdelta' in locals():
@@ -700,6 +701,7 @@ def running_average(data, running=240):
 
     return dfdelta
 
+
 def running_average_special(year_df, running=240):
     """
     Method: running_average_special(data)
@@ -715,7 +717,7 @@ def running_average_special(year_df, running=240):
     arr = []
     df_empty = pd.DataFrame({str(depths[0]): []})
     for depth in depths:
-        #TODO se ha realizado un pequeño cambio aquí revisar si es incompatible con lo anteriormente creado
+        # TODO se ha realizado un pequeño cambio aquí revisar si es incompatible con lo anteriormente creado
         '''
         first_nonnan = year_df[depth].first_valid_index()
         # TODO si hay un hueco muy grande en la serie deberia ignorar ese hueco y no hacer el filtro en el y retomar la serie más adelante
@@ -753,7 +755,7 @@ def running_average_special(year_df, running=240):
         complete_df = pd.DataFrame(complete, columns=[str(depth)], index=nonna_df.index)
         complete_df = pd.concat([complete_df, nan_df[str(depth)]], sort=False).sort_index()
         df_empty[str(depth)] = complete_df[str(depth)]
-    #maxlen = max(len(i) for i in arr)
+    # maxlen = max(len(i) for i in arr)
 
     dfdelta = df_empty.copy()
 
@@ -783,11 +785,10 @@ def running_average_special(year_df, running=240):
 
 
 def convert_to_netCDF(filename, df, consolescreen):
-    #TODO print on console when the netCDF has been create
+    # TODO print on console when the netCDF has been create
     try:
         xarray.Dataset(df.to_xarray()).to_netcdf('../src/output_files/' + filename + '.nc4')
         consolescreen.insert("end", "netCDF file created \n")
         consolescreen.insert("end", "=============\n")
     except Exception as e:
         print(str(e))
-
