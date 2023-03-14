@@ -263,20 +263,21 @@ class tmednet(tk.Frame):
 
             w = evt.widget
             index = int(w.curselection()[0])
-            if index in self.index:
+            if index in self.gui_plot.index:
                 pass
             else:
                 self.value = w.get(index)
                 print(index, self.value)
                 self.console_writer('Plotting: ', 'action', self.value, True)
-                self.index.append(index)
+                self.gui_plot.index.append(index)
                 # Checks if the last plot was a Zoom to delete the data
-                if self.counter:
-                    if self.counter[-1] == 'Zoom':
+                if self.gui_plot.counter:
+                    if self.gui_plot.counter[-1] == 'Zoom':
                         self.clear_plots()
-                self.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
+                self.gui_plot.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
                 # dibuixem un cop seleccionat
-                self.plot_ts(index)
+                self.gui_plot.plot_ts(self.mdata, self.files, index)
+
         except IndexError:
             pass  # Not knowing why this error raises when Saving the file but doesn't affect the code. Should check.
 
