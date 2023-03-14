@@ -136,11 +136,11 @@ class tmednet(tk.Frame):
 
         # Contingut de F2
         # Definir aspectes dibuix
-        self.gui_plot = gp.GUIPlot(f2)
+        self.gui_plot = gp.GUIPlot(f2, self.console_writer)
         self.fig, self.plot, self.plot1, self.plot2, self.cbexists, self.canvas = self.gui_plot.get_args()
         self.toolbar = NavigationToolbar2Tk(self.canvas, f2)
         self.toolbar.children['!button5'].pack_forget()
-        tk.Button(self.toolbar, text="Clear Plot", command=self.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
+        tk.Button(self.toolbar, text="Clear Plot", command=self.gui_plot.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
 
         self.toolbar.pack(side=tk.TOP, fill=tk.BOTH, expand=0)
         self.toolbar.update()
@@ -342,58 +342,6 @@ class tmednet(tk.Frame):
                 fm.to_utc(self.mdata)
             except IndexError:
                 self.console_writer('Please, load a file before converting to UTC', 'warning')
-
-    def plot_ts(self, index):
-        """
-        Method: plot_ts(self)
-        Purpose: Plot a time series
-        Require:
-            canvas: reference to canvas widget
-            subplot: plot object
-        Version:
-        01/2021, EGL: Documentation
-        """
-        # If there are subplots, deletes them before creating the plot anew
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        # if self.cbexists:
-        #   self.clear_plots()
-
-        if self.counter[0] == "Hovmoller":
-            self.clear_plots()
-        elif self.counter[0] == 'Cycles':
-            self.clear_plots()
-        elif self.counter[0] == 'Thresholds':
-            self.clear_plots()
-        elif self.counter[0] == 'Filter':
-            self.clear_plots()
-        elif self.counter[0] == 'Difference':
-            self.clear_plots()
-
-        # if self.plotcb.axes:
-        #  plt.Axes.remove(self.plotcb)
-
-        masked_ending_temperatures = np.ma.masked_where(np.array(self.mdata[index]['temp']) == 999,
-                                                        np.array(self.mdata[index]['temp']))
-        if self.plot.axes:
-            # self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
-                           '-', label=str(self.mdata[index]['depth']))
-            self.plot.set(ylabel='Temperature (DEG C)',
-                          title='Multiple depths Site: ' + str(self.mdata[index]['region_name']))
-        else:
-            self.plot = self.fig.add_subplot(111)
-            self.plot.plot(self.mdata[index]['time'], masked_ending_temperatures,
-                           '-', label=str(self.mdata[index]['depth']))
-            self.plot.set(ylabel='Temperature (DEG C)',
-                          title=self.files[index] + "\n" + 'Depth:' + str(
-                              self.mdata[index]['depth']) + " - Site: " + str(
-                              self.mdata[index]['region_name']))
-
-        self.plot.legend(title='Depth (m)')
-        # fig.set_size_inches(14.5, 10.5, forward=True)
-        self.canvas.draw()
 
     def plot_zoom(self, controller=False):
         """

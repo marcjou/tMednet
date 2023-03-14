@@ -25,11 +25,13 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 
 
 class GUIPlot:
+    global cb
 
-    def __init__(self, f2):
+    def __init__(self, f2, console):
         self.__set_args(f2)
         self.counter = []
         self.index = []
+        self.console_writer = console
 
     def __str__(self):
         return "GUIPlot object"
@@ -122,7 +124,7 @@ class GUIPlot:
             plt.Axes.remove(self.plot1)
             plt.Axes.remove(self.plot2)
         if self.cbexists:
-            #cb.remove()
+            cb.remove()
             self.cbexists = False
         # if self.plotcb.axes():
         #  self.plotcb.clear()
