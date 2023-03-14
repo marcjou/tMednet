@@ -368,7 +368,9 @@ class tmednet(tk.Frame):
                 self.recoverindex = [ind]
             # self.tempdataold.append(self.mdata[ind]['temp'].copy())
 
-            if index < 50:
+            # Checks if the cut is done on the first third of the dataset, which would be considered
+            # a cut on the beginning of the data.
+            if index < len(self.mdata[ind]['temp'])/3:
                 for i in range(len(self.mdata[ind]['temp'][:index])):
                     self.mdata[ind]['temp'][i] = 999
             else:

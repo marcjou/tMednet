@@ -113,7 +113,7 @@ class GUIPlot:
         """
         self.clear_plots()
         index = int(list.curselection()[0])
-        time_series, temperatures, indexes, start_index = fm.zoom_data(mdata[index], self.console_writer)
+        time_series, temperatures, indexes, start_index, valid_start = fm.zoom_data(mdata[index], self.console_writer)
 
         self.counter.append(index)
         self.counter.append('Zoom')
@@ -126,10 +126,10 @@ class GUIPlot:
         masked_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
                                                  np.array(mdata[index]['temp']))
 
-        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index):len(time_series[0])],
+        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
                         '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
         self.plot1.legend()
-        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[:int(start_index) + 1],
+        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[valid_start:int(start_index) + 1 + int(valid_start)],
                         '-', color='red', marker='o', label=str(mdata[index]['depth']))
 
         self.plot1.set(ylabel='Temperature (DEG C)',
