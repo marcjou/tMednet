@@ -1,6 +1,7 @@
 import sys
 import time
 import matplotlib
+import GUI_plots as gp
 import numpy as np
 import pandas as pd
 import tkinter as tk
@@ -135,25 +136,13 @@ class tmednet(tk.Frame):
 
         # Contingut de F2
         # Definir aspectes dibuix
-        plt.rc('legend', fontsize='medium')
-        self.fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-        self.plot = self.fig.add_subplot(111)
-        self.plot1 = self.fig.add_subplot(211)
-        self.plot2 = self.fig.add_subplot(212)
-        plt.Axes.remove(self.plot1)
-        plt.Axes.remove(self.plot2)
-        plt.Axes.remove(self.plot)
-
-        self.cbexists = False  # Control for the colorbar of the Hovmoller
-
-        self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
-        self.canvas.draw()
+        self.gui_plot = gp.GUIPlot(f2)
+        self.fig, self.plot, self.plot1, self.plot2, self.cbexists, self.canvas = self.gui_plot.get_args()
         self.toolbar = NavigationToolbar2Tk(self.canvas, f2)
         self.toolbar.children['!button5'].pack_forget()
         tk.Button(self.toolbar, text="Clear Plot", command=self.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
 
         self.toolbar.pack(side=tk.TOP, fill=tk.BOTH, expand=0)
-        self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
         self.toolbar.update()
 
         # Contingut de F1
