@@ -113,7 +113,7 @@ class GUIPlot:
         """
         self.clear_plots()
         index = int(list.curselection()[0])
-        time_series, temperatures, indexes, start_index, valid_start = fm.zoom_data(mdata[index], self.console_writer)
+        time_series, temperatures, indexes, start_index, valid_start, valid_end = fm.zoom_data(mdata[index], self.console_writer)
 
         self.counter.append(index)
         self.counter.append('Zoom')

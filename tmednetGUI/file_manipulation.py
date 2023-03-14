@@ -578,8 +578,9 @@ def zoom_data(data, consolescreen):
     # Gets the first and last 72h of operation to look for the possible errors.
     # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
     valid_start = np.where(np.array(data['temp']) != 999)[0][0]
-    time_series = [data['time'][valid_start:72 + valid_start], data['time'][-72:]]
-    temperatures = [data['temp'][valid_start:72 + valid_start], data['temp'][-72:]]
+    valid_end = np.where(np.array(data['temp']) != 999)[0][-1]
+    time_series = [data['time'][valid_start:72 + valid_start], data['time'][valid_end-72:valid_end]]
+    temperatures = [data['temp'][valid_start:72 + valid_start], data['temp'][valid_end-72:valid_end]]
     if np.argwhere(np.array(time_series[1]) == np.array(enddate)).size == 0:
         time_series[1] = data['time'][data['time'].index(enddate) - 72:]
         temperatures[1] = data['temp'][data['time'].index(enddate) - 72:]
@@ -611,9 +612,9 @@ def zoom_data(data, consolescreen):
             else:
                 indexes = np.array(range(int(indexes[0]), len(temperatures[1])))
             # start_index = np.array(range(int(start_index), len(temperatures[0])))
-            return time_series, temperatures, indexes, start_index, valid_start
+            return time_series, temperatures, indexes, start_index, valid_start, valid_end
         # start_index = np.array(range(int(start_index), len(temperatures[0])))
-        return time_series, temperatures, indexes, start_index, valid_start
+        return time_series, temperatures, indexes, start_index, valid_start, valid_end
     except TypeError:
         consolescreen("WARNING, day of end of operation "
                       + str((data['time'][-1] - enddate).days) + " days earlier than the last recorded data.",
