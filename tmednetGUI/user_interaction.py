@@ -1001,30 +1001,30 @@ class tmednet(tk.Frame):
         """
         try:  # If there is no plot, it shows an error message
 
-            if self.counter[-1] == 'Zoom':
-                zoom = self.counter.pop()
+            if self.gui_plot.counter[-1] == 'Zoom':
+                zoom = self.gui_plot.counter.pop()
             else:
                 zoom = ''
 
-            if len(self.counter) == 1:  # Writes the default name of the image file according to the original file
-                if self.counter[0] == "Hovmoller":
+            if len(self.gui_plot.counter) == 1:  # Writes the default name of the image file according to the original file
+                if self.gui_plot.counter[0] == "Hovmoller":
                     filename = str(self.value[:-7]) + " Hovmoller"
-                elif self.counter[0] == 'Cycles':
+                elif self.gui_plot.counter[0] == 'Cycles':
                     filename = self.savefilename
-                elif self.counter[0] == 'Thresholds':
+                elif self.gui_plot.counter[0] == 'Thresholds':
                     filename = self.savefilename
-                elif self.counter[0] == 'Filter':
+                elif self.gui_plot.counter[0] == 'Filter':
                     filename = str(self.value[:-7]) + " filtered differences"
-                elif self.counter[0] == 'Difference':
+                elif self.gui_plot.counter[0] == 'Difference':
                     filename = str(self.value[:-7]) + " differences"
-                elif self.counter[0] == 'Stratification':
+                elif self.gui_plot.counter[0] == 'Stratification':
                     filename = self.savefilename
                 else:
                     filename = self.value[:-4] + ' ' + zoom
-            if len(self.counter) > 1:
+            if len(self.gui_plot.counter) > 1:
 
                 filename = ""
-                for n in self.counter:
+                for n in self.gui_plot.counter:
                     filename = filename + "_" + self.files[n][-6:-4]
                 filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
                            + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename + ' ' + zoom
@@ -1033,9 +1033,9 @@ class tmednet(tk.Frame):
                                      filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
                                      defaultextension='.png', initialfile=filename, title="Save as")
             if zoom == 'Zoom':
-                self.counter.append(zoom)
+                self.gui_plot.counter.append(zoom)
             if file:
-                self.fig.savefig(file)
+                self.gui_plot.fig.savefig(file)
                 self.mdata[0]['images'].append(
                     file)  # Stores the path of the created images to print them on the report
                 self.console_writer('Saving plot in: ', 'action', file, True)
