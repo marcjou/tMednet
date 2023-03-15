@@ -461,6 +461,106 @@ class GUIPlot:
         except TypeError:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
+    def plot_annual_T_cycle(self, historical, year):
+        self.clear_plots()
+        self.counter.append("Cycles")
+
+        histdf = pd.read_csv(historical, sep='\t')
+        depths = histdf.columns[2:]
+        histdf['day'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).day
+        histdf['month'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).month
+        histdf['day_month'] = histdf['day'].astype(str) + '-' + histdf['month'].astype(str)
+        histdf['day_month'] = histdf['day_month'] + '-' + year
+        histdf['day_month'] = pd.DatetimeIndex(histdf['day_month'], dayfirst=True)
+
+        orderedhist_df = histdf.groupby('day_month')[depths].mean()
+        orderedhist_df.sort_index(inplace=True)
+
+        year_df, hismintemp, hismaxtemp, minyear = fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df.index = year_df.index.strftime('%Y-%m-%d %H:%M:%S')
+        if '0' in year_df.columns:
+            year_df.drop('0', axis=1, inplace=True)
+
+        year_df = fm.running_average_special(year_df, running=360)
+        orderedhist_df = fm.running_average_special(orderedhist_df, running=15)
+        orderedhist_df.index = pd.DatetimeIndex(orderedhist_df.index)
+        # dfdelta = fm.running_average(self.mdata, running=360)
+
+        # All this block serves only to transform the data from hourly to daily. It should be inside its own method
+        daylist = []
+        # Converts the index from timestamp to string
+        daylist = []
+        for time in year_df.index:
+            if str(time) == 'nan':
+                pass
+            else:
+                old = datetime.strftime(datetime.strptime(time, '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d')
+                new = datetime.strptime(old, '%Y-%m-%d')
+            daylist.append(new)
+        year_df['day'] = daylist
+
+        newdf = None
+        # Changed dfdelta here for year_df, if wrong, revert
+        for depth in year_df.columns:
+            if depth != 'day':
+                if newdf is not None:
+                    newdf = pd.merge(newdf, year_df.groupby('day')[depth].mean(), right_index=True, left_index=True)
+                else:
+                    newdf = pd.DataFrame(year_df.groupby('day')[depth].mean())
+        idx = pd.date_range(newdf.index[0], newdf.index[-1])
+        newdf = newdf.reindex(idx, fill_value=np.nan)
+
+        # BLOCK ENDS HERE!!!!!!!
+
+        # Creates the subplots and deletes the old plot
+        if self.plot1.axes:
+            plt.Axes.remove(self.plot1)
+            plt.Axes.remove(self.plot2)
+
+        self.plot = self.fig.add_subplot(111)
+
+        color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
+                      '30': '#a7d6e7',
+                      '35': '#9ec6de', '40': '#3a6daf', '45': '#214f8a', '50': '#0a3164'}
+        # Checks if there is empty depths to delete them and make them not show on the legend
+        for depth in newdf.columns:
+            if newdf[depth].isnull().all():
+                del newdf[depth]
+        newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
+
+        leg = self.plot.legend(title='Depth (m)')
+
+        if str(minyear) != year:
+            oldepth = 0
+            for depth in orderedhist_df.columns:
+                if oldepth != 0:
+                    self.plot.fill_between(np.unique(orderedhist_df.index), orderedhist_df[oldepth],
+                                           orderedhist_df[depth], facecolor='lightgrey', zorder=0)
+                oldepth = depth
+                orderedhist_df.plot(kind='line', ax=self.plot, color='#e9e8e8', label='_nolegend_', legend=False,
+                                    zorder=5)
+
+        self.plot.set(ylabel='Temperature (ºC) smoothed',
+                      title=historical.split('_')[4] + ' year ' + year)
+        self.plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
+        self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
+
+        savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
+
+        # Sets the X axis as the initials of the months
+        locator = mdates.MonthLocator()
+        self.plot.xaxis.set_major_locator(locator)
+        fmt = mdates.DateFormatter('%b')
+        self.plot.xaxis.set_major_formatter(fmt)
+
+        self.plot.xaxis.set_label_text('foo').set_visible(False)
+        # fig.set_size_inches(14.5, 10.5, forward=True)
+
+        self.plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
+        self.canvas.draw()
+
+        return savefilename
+
     def clear_plots(self, clear_thresholds=True):
         """
         Method: clear_plots(self)
