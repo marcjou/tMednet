@@ -169,7 +169,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.mdata))
         self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.mdata))
         self.right_menu.add_separator()
-        self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
+        self.right_menu.add_command(label="Plot Hovmoller", command=lambda: self.gui_plot.plot_hovmoller(self.mdata))
         self.right_menu.add_command(label="Plot Stratification",
                                     command=lambda: self.window_browser('Select historical file and year',
                                                                         self.plot_stratification, 'Historical: ',
@@ -379,52 +379,6 @@ class tmednet(tk.Frame):
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
             return
-
-    def plot_hovmoller(self):
-        """
-        Method: plot_hovmoller(self)
-        Purpose: Plot a Hovmoller Diagram of the loaded files
-        Require:
-        Version: 05/2021, MJB: Documentation
-        """
-        try:
-
-            global cb
-            self.clear_plots()
-            self.counter.append("Hovmoller")
-            df, depths, _ = fm.list_to_df(self.mdata)
-            depths = np.array(depths)
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-            self.plot = self.fig.add_subplot(111)
-
-            levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
-            # df.resample(##) if we want to filter the results in a direct way
-            # Draws a contourn line. Right now looks messy
-            # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-            cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
-
-            cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
-            self.cbexists = True
-            self.plot.set(ylabel='Depth (m)',
-                          title='Stratification Site: ' + self.mdata[0]['region_name'])
-
-            # Sets the X axis as the initials of the months
-            locator = mdates.MonthLocator()
-            self.plot.xaxis.set_major_locator(locator)
-            fmt = mdates.DateFormatter('%b')
-            self.plot.xaxis.set_major_formatter(fmt)
-            # Sets the x axis on the top
-            self.plot.xaxis.tick_top()
-
-            self.canvas.draw()
-
-            self.console_writer('Plotting the HOVMOLLER DIAGRAM at region: ', 'action', self.mdata[0]['region'], True)
-        except IndexError:
-            self.console_writer('Load several files before creating a diagram', 'warning')
-        except TypeError:
-            self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def plot_stratification(self):
         """
