@@ -392,131 +392,8 @@ class tmednet(tk.Frame):
         year = self.secondInput.get()
         self.newwindow.destroy()
 
-        df, hismintemp, hismaxtemp, bad = fm.historic_to_df(historical, year)
-        try:
-            global cb
-            self.clear_plots()
-            self.counter.append("Stratification")
-            depths = np.array(list(map(float, list(df.columns))))
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-            self.plot = self.fig.add_subplot(111)
+        self.savefilename = self.gui_plot.plot_stratification(historical, year)
 
-            if depths[-1] < 40:
-                self.plot.set_ylim(0, -40)
-                self.plot.set_yticks(-np.insert(depths, [0, -1], [0, 40]))
-            else:
-                self.plot.set_ylim(0, -depths[-1])
-                self.plot.set_yticks(-np.insert(depths, 0, 0))
-
-            self.plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
-                               datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
-            # self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
-
-            # self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
-            self.plot.invert_yaxis()
-            # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
-            #levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
-            #levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
-
-            # Checks the historic min and max values to use in the colourbar, if they are too outlandish
-            # over 5 degrees of difference, it uses its own max and min for this year.
-            # We use percentile 99% and 1% to decide the upper and lower levels and trim outlandish data
-            dfcopy = df.copy()
-            dfcopy.index = pd.to_datetime(dfcopy.index)
-            dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
-            # Quantile changes with the amount of data available, with less data is possible to have a higher outlier
-            # We only take into account the quantile for all the years to make it correct.
-            '''
-            if hismaxtemp < round(np.nanmax(dfcopy.quantile(0.99))) + 1:
-                hismaxtemp = round(np.nanmax(dfcopy.quantile(0.99))) + 1
-            if hismintemp > np.round(np.nanmin(dfcopy.quantile(0.01))) - 1:
-                hismintemp = round(np.nanmin(dfcopy.quantile(0.01))) - 1
-            '''
-            levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
-            levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
-
-
-            # Draws a contourn line.
-            # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-            df_datetime = pd.to_datetime(df.index)
-            old = df_datetime[0]
-            index_cut = None
-            df_cuts = []
-            for i in df_datetime[1:]:
-                new = i
-                diff = new - old
-                old = new
-                if diff.days > 0:
-                    index_old = 0
-                    index_cut = df_datetime.get_loc(i)
-                    df_cuts.append(df[index_old:index_cut])
-                    index_old = index_cut
-                    # df_second = df[index_cut:]
-            # Checks how many depths the file has, if there is only one depth it creates a new one 1 meter above
-            if len(depths) == 1:
-                depths = np.insert(depths, 1, depths[0] + 2.5)
-                depths = np.insert(depths, 0, depths[0] - 2.5)
-                df.insert(0, str(depths[0]), df[str(depths[1])])
-                df.insert(2, str(depths[2]), df[str(depths[1])])
-            if index_cut:
-                df_cuts.append(df[index_cut:])
-                cf = []
-                for i in range(0, len(df_cuts)):
-                    cf.append(self.plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
-                                                 extend='both',
-                                                 cmap='RdYlBu_r', levels=levels2))
-                cb = plt.colorbar(cf[0], ax=self.plot, label='Temperature (ºC)', ticks=levels)
-            else:
-                # Checks if there is a vertical gap bigger than 5 meters and if so instead of interpolating
-                # Plots two different plots to keep the hole inbetween
-                str_depths = [f'{x:g}' for x in depths]
-                vertical_split = []
-                for i in range(0, len(depths)):
-                    if i < len(depths) - 1:
-                        res = depths[i + 1] - depths[i]
-                        if res > 10.:
-                            vertical_split.append(i)
-                if vertical_split:
-                    old_index = 0
-                    for i in vertical_split:
-                        cf = self.plot.contourf(df_datetime, -depths[old_index: i + 1],
-                                                df.filter(items=str_depths[old_index:i + 1]).values.T, 256, extend='both',
-                                                cmap='RdYlBu_r',
-                                                levels=levels2)
-                        old_index = i + 1
-                    cf = self.plot.contourf(df_datetime, -depths[old_index:],
-                                            df.filter(items=str_depths[old_index:]).values.T, 256, extend='both',
-                                            cmap='RdYlBu_r',
-                                            levels=levels2)
-                else:
-                    cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
-                                            levels=levels2)
-
-                cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
-            self.cbexists = True
-            self.plot.set(ylabel='Depth (m)',
-                          title=historical.split('_')[4] + ' year ' + year)
-            self.savefilename = historical.split('_')[3] + '_1_' + year + '_' + historical.split('_')[4]
-            # Sets the X axis as the initials of the months
-            locator = mdates.MonthLocator()
-            self.plot.xaxis.set_major_locator(locator)
-            fmt = mdates.DateFormatter('%b')
-            self.plot.xaxis.set_major_formatter(fmt)
-            # Sets the x axis on the top
-            self.plot.xaxis.tick_top()
-            # Sets the ticks only for the whole depths, the ones from the file
-            tick_depths = [-i for i in depths if i.is_integer()]
-            self.plot.set_yticks(tick_depths)
-
-            self.canvas.draw()
-
-            self.console_writer('Plotting the HOVMOLLER DIAGRAM at region: ', 'action', historical.split('_')[3], True)
-        except IndexError:
-            self.console_writer('Load several files before creating a diagram', 'warning')
-        except TypeError:
-            self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def plot_annualTCycle(self):
         """
@@ -1115,7 +992,6 @@ class tmednet(tk.Frame):
             self.console_writer('Found duplicity between '
                                 + str(len(duplicity)) + ' dates. First occurrence at '
                                 + str(duplicity[0]) + ' last at ' + str(duplicity[-1]), 'warning')
-
 
     def write_excel(self):
         """
