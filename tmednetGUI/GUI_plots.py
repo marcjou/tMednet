@@ -27,11 +27,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 class GUIPlot:
     global cb
 
-    def __init__(self, f2, console):
+    def __init__(self, f2, console, reportlogger):
         self.__set_args(f2)
         self.counter = []
         self.index = []
         self.console_writer = console
+        self.reportlogger = reportlogger
 
     def __str__(self):
         return "GUIPlot object"
@@ -221,6 +222,82 @@ class GUIPlot:
             self.canvas.draw()
         self.console_writer('Plotting zoom of depths: ', 'action', depths)
         self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+
+
+    def plot_dif(self, mdata):
+        """
+        Method: plot_dif(self)
+        Purpose: Plot time series of differences
+        Require:
+            canvas: refrence to canvas widget
+            subplot: axis object
+        Version: 05/2021, MJB: Documentation
+        """
+
+        self.clear_plots()
+        depths = ""
+        try:
+            dfdelta, _ = fm.temp_difference(mdata)
+            self.counter.append('Difference')
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.console_writer('Plotting zoom of depths: ', 'action', depths)
+            self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+        except UnboundLocalError:
+            self.console_writer('Load more than a file for plotting the difference', 'warning')
+
+    def plot_dif_filter1d(self, mdata):
+        """
+        Method: plot_dif_filter1d(self)
+        Purpose: Plot time series of differences filtered with a 10 day running
+        Require:
+        Version: 05/2021, MJB: Documentation
+        """
+
+        self.clear_plots()
+        depths = ""
+        try:
+            dfdelta = fm.apply_uniform_filter(mdata)
+            self.counter.append("Filter")
+            # Creates the subplots and deletes the old plot
+            if self.plot1.axes:
+                plt.Axes.remove(self.plot1)
+                plt.Axes.remove(self.plot2)
+            for _, rows in dfdelta.iterrows():  # Checks if there is an erroneous value and if there is, logs it.
+                for row in rows:
+                    if float(row) <= -0.2:
+                        self.console_writer('Attention, value under -0.2 threshold', 'warning')
+                        self.reportlogger.append('Attention, value under -0.2 threshold')
+                        break
+                else:
+                    continue
+                break
+
+            self.plot = self.fig.add_subplot(111)
+            dfdelta.plot(ax=self.plot)
+            self.plot.set(ylabel='Temperature (DEG C)',
+                          title='Temperature differences filtered')
+
+            self.plot.legend()
+
+            # fig.set_size_inches(14.5, 10.5, forward=True)
+            self.canvas.draw()
+            self.console_writer('Plotting zoom of depths: ', 'action', depths)
+            self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+        except UnboundLocalError:
+            self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def clear_plots(self, clear_thresholds=True):
         """

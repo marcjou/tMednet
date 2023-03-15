@@ -136,7 +136,7 @@ class tmednet(tk.Frame):
 
         # Contingut de F2
         # Definir aspectes dibuix
-        self.gui_plot = gp.GUIPlot(f2, self.console_writer)
+        self.gui_plot = gp.GUIPlot(f2, self.console_writer, self.reportlogger)
         self.fig, self.plot, self.plot1, self.plot2, self.cbexists, self.canvas = self.gui_plot.get_args()
         self.toolbar = NavigationToolbar2Tk(self.canvas, f2)
         self.toolbar.children['!button5'].pack_forget()
@@ -166,8 +166,8 @@ class tmednet(tk.Frame):
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.mdata, self.files, self.list, self.cut_data_manually))
         self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.mdata, self.list))  # Placeholders
-        self.right_menu.add_command(label="Plot difference", command=self.plot_dif)
-        self.right_menu.add_command(label="Plot filter", command=self.plot_dif_filter1d)
+        self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.mdata))
+        self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.mdata))
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=self.plot_hovmoller)
         self.right_menu.add_command(label="Plot Stratification",
@@ -379,81 +379,6 @@ class tmednet(tk.Frame):
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
             return
-
-    def plot_dif(self):
-        """
-        Method: plot_dif(self)
-        Purpose: Plot time series of differences
-        Require:
-            canvas: refrence to canvas widget
-            subplot: axis object
-        Version: 05/2021, MJB: Documentation
-        """
-
-        self.clear_plots()
-        depths = ""
-        try:
-            dfdelta, _ = fm.temp_difference(self.mdata)
-            self.counter.append('Difference')
-            # Creates the subplots and deletes the old plot
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-
-            self.plot = self.fig.add_subplot(111)
-            dfdelta.plot(ax=self.plot)
-            self.plot.set(ylabel='Temperature (DEG C)',
-                          title='Temperature differences')
-
-            self.plot.legend()
-
-            # fig.set_size_inches(14.5, 10.5, forward=True)
-            self.canvas.draw()
-            self.console_writer('Plotting zoom of depths: ', 'action', depths)
-            self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
-        except UnboundLocalError:
-            self.console_writer('Load more than a file for plotting the difference', 'warning')
-
-    def plot_dif_filter1d(self):
-        """
-        Method: plot_dif_filter1d(self)
-        Purpose: Plot time series of differences filtered with a 10 day running
-        Require:
-        Version: 05/2021, MJB: Documentation
-        """
-
-        self.clear_plots()
-        depths = ""
-        try:
-            dfdelta = fm.apply_uniform_filter(self.mdata)
-            self.counter.append("Filter")
-            # Creates the subplots and deletes the old plot
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-            for _, rows in dfdelta.iterrows():  # Checks if there is an erroneous value and if there is, logs it.
-                for row in rows:
-                    if float(row) <= -0.2:
-                        self.console_writer('Attention, value under -0.2 threshold', 'warning')
-                        self.reportlogger.append('Attention, value under -0.2 threshold')
-                        break
-                else:
-                    continue
-                break
-
-            self.plot = self.fig.add_subplot(111)
-            dfdelta.plot(ax=self.plot)
-            self.plot.set(ylabel='Temperature (DEG C)',
-                          title='Temperature differences filtered')
-
-            self.plot.legend()
-
-            # fig.set_size_inches(14.5, 10.5, forward=True)
-            self.canvas.draw()
-            self.console_writer('Plotting zoom of depths: ', 'action', depths)
-            self.console_writer(' at site ', 'action', self.mdata[0]['region'], True)
-        except UnboundLocalError:
-            self.console_writer('Load more than a file for plotting the difference', 'warning')
 
     def plot_hovmoller(self):
         """
