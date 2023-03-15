@@ -210,13 +210,11 @@ class tmednet(tk.Frame):
         self.mdata = []
         self.index = []
         self.newfiles = 0
-        self.counter = []
         self.recoverindex = None
         self.recoverindexpos = None
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
-        self.savefilename = ''
 
     def console_writer(self, msg, mod, var=False, liner=False):
         """
@@ -391,8 +389,7 @@ class tmednet(tk.Frame):
         historical = self.openfileinput.get()
         year = self.secondInput.get()
         self.newwindow.destroy()
-
-        self.savefilename = self.gui_plot.plot_stratification(historical, year)
+        self.gui_plot.plot_stratification(historical, year)
 
 
     def plot_annualTCycle(self):
@@ -407,8 +404,7 @@ class tmednet(tk.Frame):
         historical = self.openfileinput.get()
         year = self.secondInput.get()
         self.newwindow.destroy()
-
-        self.savefilename = self.gui_plot.plot_annual_T_cycle(historical, year)
+        self.gui_plot.plot_annual_T_cycle(historical, year)
 
     def plot_thresholds(self):
         """
@@ -419,176 +415,8 @@ class tmednet(tk.Frame):
        Version: 11/2021, MJB: Documentation
        """
         historical = self.openfileinput.get()
-        # Deprecating region input as it can be gotten automatically from the filename (self.mdata[0]['region_name'])
-        # region = self.regioninput.get()
         self.newwindow.destroy()
-        self.clear_plots()
-        self.counter.append("Thresholds")
-        excel_object = fw.Excel(historical, write_excel=False, console=self.consolescreen)  # returns an excel object
-        df = excel_object.mydf3
-
-        # Converts Number of operation days [N] = 0 to np.nan
-        df['N'].replace(0, np.nan, inplace=True)
-
-        dfhist_control = pd.read_csv(historical, sep='\t', dayfirst=True)
-        dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
-        dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
-        dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date']).month
-        dfhist_summer = dfhist_control.loc[
-            (dfhist_control['month'] == 7) | (dfhist_control['month'] == 8) | (
-                        dfhist_control['month'] == 9)]
-
-        # Check if any depth is all nan which means there are no data for said depth
-        depths = df['depth(m)'].unique()
-
-        for depth in depths:
-            for year in df['year'].unique():
-                if (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].isnull().all()) | (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].count() / 24 < 30):
-                    for i in range(23, 29):
-                        df.loc[(df['year'] == str(year)) & (df['depth(m)'] == depth), 'Ndays>=' + str(i)] = np.nan
-                else:
-                    print('not all na')
-
-
-
-
-
-        # Creates the subplots and deletes the old plot
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        self.plot = self.fig.add_subplot(111)
-
-        # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
-
-        # TODO esto se puede cambiar por un Cycler y entonces no dependeria del trozo de codigo extraño de más abajo
-        # Setting the properties of the line as lists to be used on a for loop depending on the year
-        markers = ['+', 'o', 'x', 's', 'd', '^', 'v', 'p', 'h', '*']
-        colors = ['b', 'b', 'k', 'k']
-        lines = ['solid', 'dotted', 'solid', 'dotted']
-
-        # Loop to decide each year which style has
-        # TODO check code in 2030 to change this method
-        # We get all the years on the dataset
-        years = df['year'].unique()
-        years = years[years != 0]
-
-        # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
-        maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
-        maxdays = 0  # Used to set the maximum number of days to point in the X axis
-        temperatures = {23: [], 24: [], 25: [], 26: [], 28: []}
-        year_dict = {}
-        # Check df to see if a given depth has less records than the next
-        # Establish a max difference of records of 10 days (240 records)
-        # Whole records is 2208
-        # Overriding the above criteria, now established that the records cannot be different than 240 from the max one
-        legend_years = years.copy()
-        for year in years:
-            '''
-            for ni in df.loc[df['year'] == year].index:
-                if ni != df.loc[df['year'] == year].index[-1]:
-                    if df['N'][ni] != 0 and df['N'][ni] < df['N'][ni + 1] - 240:
-                        df['N'][ni] = np.nan
-                        for j in range(23, 29):
-                            df['Ndays>=' + str(j)][ni] = np.nan
-            '''
-            maxndays = np.nanmax(df.loc[df['year'] == year]['N'])
-            check = False
-            for ni in df.loc[df['year'] == year].index:
-                if maxndays - df['N'][ni] > 240:
-                    df['N'][ni] = np.nan
-                    for j in range(23, 29):
-                        df['Ndays>=' + str(j)][ni] = np.nan
-                # Check if a year has an incomplete season (under 2208 records, 92 days)
-                if df['N'][ni] < 2208:
-                    check = True
-                else:
-                    check = False
-            if check == True:
-                # Adds asterisk to year
-                legend_years[np.where(legend_years == year)[0][0]] = year + '*'
-                check = False
-            for i in range(23, 29):
-                yearly_plot = np.column_stack(
-                    (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
-                #if yearly_plot != np.nan:
-                yearly_plot[pd.isnull(yearly_plot)] = -999
-                yearly_plot = yearly_plot.astype(int)
-                if yearly_plot[-1, -1] > maxdepth:
-                    maxdepth = yearly_plot[-1, -1]
-                if np.max(yearly_plot[:, 0]) > maxdays:
-                    maxdays = np.max(yearly_plot[:, 0])
-                temperatures[i] = np.ma.masked_where(yearly_plot == -999, yearly_plot)
-            year_dict[year] = temperatures.copy()
-            self.plot.set(ylim=(0, maxdepth + 2))
-            if maxdays >= 30:
-                ticks = 10
-            elif maxdays >=20:
-                ticks = 5
-            else:
-                ticks = 2
-            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
-            # Remove asterisks (if any) on years
-            seq_type = type(year)
-            int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
-            if int_year < 2000:
-                color = colors[0]
-                if year == years[-1]:
-                    color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 1990]
-                               , color=color, linestyle=lines[0])
-            elif int_year >= 2000 and int_year < 2010:
-                color = colors[1]
-                if year == years[-1]:
-                    color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2000],
-                               color=color, linestyle=lines[1])
-            elif int_year >= 2010 and int_year < 2020:
-                color = colors[2]
-                if year == years[-1]:
-                    color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2010],
-                               color=color, linestyle=lines[2])
-            elif int_year >= 2020 and int_year < 2030:
-                color = colors[3]
-                if year == years[-1]:
-                    color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2020],
-                               color=color, linestyle=lines[3])
-
-            self.plot.invert_yaxis()
-            self.plot.xaxis.tick_top()
-            self.canvas.draw()
-        # Shrink the axis a bit to fit the legend outside of it
-        box = self.plot.get_position()
-        self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-        # Draws the legend for the different years
-        legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
-        self.plot.set(ylabel='Depth (m)',
-                      title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
-        self.plot.xaxis.grid(True, linestyle='dashed')
-
-        p = self.plot.get_window_extent()
-        self.plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
-                  va="center", ha="left",
-                  bbox=dict(boxstyle="round", fc="w"))
-
-        self.canvas.draw()
-        # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
-        for i in range(23, 29):
-            tab = {}
-            btn = tk.Button(self.toolbar, text=i,
-                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth,
-                                                                                                  year_dict, markers,
-                                                                                                  colors, lines, years,
-                                                                                                  maxdays, historical, legend_years))
-            btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
-            tab['id'] = i
-            tab['btn'] = btn
-            self.tabs[i] = tab
-        self.curtab = 23
-        print('Ayo')
-        self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
+        self.gui_plot.plot_thresholds(historical, self.toolbar, self.consolescreen)
 
     def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
         """
@@ -605,70 +433,7 @@ class tmednet(tk.Frame):
                 region: The name of the region to be plotted to use as the title of the graph
            Version: 11/2021, MJB: Documentation
            """
-        print(i)
-        print("curtab" + str(self.curtab))
-        if self.curtab != None and self.curtab != i and len(self.tabs) > 1:
-            # Plot the Thresholds here and clean the last one
-            self.clear_plots(clear_thresholds=False)
-            self.counter.append('Thresholds')
-            self.plot = self.fig.add_subplot(111)
-            if maxdays >= 30:
-                ticks = 10
-            elif maxdays >=20:
-                ticks = 5
-            else:
-                ticks = 2
-            self.plot.set(ylim=(0, maxdepth + 2))
-            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
-            for year in years:
-                # Remove asterisks (if any) on years
-                seq_type = type(year)
-                int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
-                if int_year < 2000:
-                    color = colors[0]
-                    if year == years[-1]:
-                        color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 1990]
-                                   , color=color, linestyle=lines[0])
-                elif int_year >= 2000 and int_year < 2010:
-                    color = colors[1]
-                    if year == years[-1]:
-                        color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2000],
-                                   color=color, linestyle=lines[1])
-                elif int_year >= 2010 and int_year < 2020:
-                    color = colors[2]
-                    if year == years[-1]:
-                        color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2010],
-                                   color=color, linestyle=lines[2])
-                elif int_year >= 2020 and int_year < 2030:
-                    color = colors[3]
-                    if year == years[-1]:
-                        color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2020],
-                                   color=color, linestyle=lines[3])
 
-            self.plot.invert_yaxis()
-            self.plot.xaxis.tick_top()
-            # Shrink the axis a bit to fit the legend outside of it
-            box = self.plot.get_position()
-            self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-            legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
-            self.plot.set(ylabel='Depth (m)',
-                          title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
-            self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
-
-            p = legend.get_window_extent()
-            self.plot.annotate('*Recorded period not complete', xy=(0, -0.1), xycoords=p, xytext=(0.1, 0),
-                               textcoords="offset points",
-                               va="center", ha="left",
-                               bbox=dict(boxstyle="round", fc="w"))
-            self.plot.xaxis.grid(True, linestyle='dashed')
-            self.canvas.draw()
-
-        self.curtab = i
-        self.console_writer("Plotting for over " + str(i) + " degrees", "action")
 
     def go_back(self):
         """
@@ -733,15 +498,15 @@ class tmednet(tk.Frame):
                 if self.gui_plot.counter[0] == "Hovmoller":
                     filename = str(self.value[:-7]) + " Hovmoller"
                 elif self.gui_plot.counter[0] == 'Cycles':
-                    filename = self.savefilename
+                    filename = self.gui_plot.savefilename
                 elif self.gui_plot.counter[0] == 'Thresholds':
-                    filename = self.savefilename
+                    filename = self.gui_plot.savefilename
                 elif self.gui_plot.counter[0] == 'Filter':
                     filename = str(self.value[:-7]) + " filtered differences"
                 elif self.gui_plot.counter[0] == 'Difference':
                     filename = str(self.value[:-7]) + " differences"
                 elif self.gui_plot.counter[0] == 'Stratification':
-                    filename = self.savefilename
+                    filename = self.gui_plot.savefilename
                 else:
                     filename = self.value[:-4] + ' ' + zoom
             if len(self.gui_plot.counter) > 1:
