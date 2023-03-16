@@ -391,7 +391,6 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         self.gui_plot.plot_stratification(historical, year)
 
-
     def plot_annualTCycle(self):
         """
         Method: annualTCycle(self)
@@ -417,23 +416,6 @@ class tmednet(tk.Frame):
         historical = self.openfileinput.get()
         self.newwindow.destroy()
         self.gui_plot.plot_thresholds(historical, self.toolbar, self.consolescreen)
-
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
-        """
-           Method: raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, region))
-           Purpose: Changes the tab being plotted for the thresholds between the different temperatures needed
-           Require:
-                i: Temperature to be plotted
-                maxdepth: The maximum depth to plot on the y-axis
-                year_dict: The dictionary with the data for all the years
-                markers: The dictionary of markers
-                colors: The dictionary of colors
-                lines: The dictionary of lines
-                years: A list with all the years on the data
-                region: The name of the region to be plotted to use as the title of the graph
-           Version: 11/2021, MJB: Documentation
-           """
-
 
     def go_back(self):
         """

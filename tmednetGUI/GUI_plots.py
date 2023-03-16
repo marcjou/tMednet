@@ -25,6 +25,19 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 
 
 class GUIPlot:
+    """
+    Creates an object containing all the information necessary to create the different plots that will
+    be shown on the GUI.
+
+    ...
+
+    Attributes
+    ----------
+    counter : list
+        List containing information about the type of plot that is being created
+    index : list
+        List containing the index
+    """
     global cb
 
     def __init__(self, f2, console, reportlogger):
@@ -709,7 +722,7 @@ class GUIPlot:
         for i in range(23, 29):
             tab = {}
             btn = tk.Button(toolbar, text=i,
-                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.raiseTab(i, maxdepth,
+                            command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.__raiseTab(i, maxdepth,
                                                                                                   year_dict, markers,
                                                                                                   colors, lines, years,
                                                                                                   maxdays, historical, legend_years))
@@ -721,7 +734,7 @@ class GUIPlot:
         print('Ayo')
         self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
 
-    def raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
+    def __raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
         print(i)
         print("curtab" + str(self.curtab))
         if self.curtab != None and self.curtab != i and len(self.tabs) > 1:
@@ -777,7 +790,7 @@ class GUIPlot:
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
 
             p = self.plot.get_window_extent()
-            self.plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0),
+            self.plot.annotate('*Recorded period not complete', xy=(0.61, 0.03), xycoords=p, xytext=(0.1, 0),
                                textcoords="offset points",
                                va="center", ha="left",
                                bbox=dict(boxstyle="round", fc="w"))
