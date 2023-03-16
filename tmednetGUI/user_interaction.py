@@ -110,10 +110,6 @@ class tmednet(tk.Frame):
         menubar.add_cascade(label="Help", menu=helpmenu)
         self.master.config(menu=menubar)
 
-        # Tabs to manipulate Thresholds Plots (refer to addTab() and raiseTab())
-        self.curtab = None
-        self.tabs = {}
-
         # General container
         fr = tk.Frame(self.master, width=1000, height=100)
         fr.grid(row=0, column=0, sticky='nsew')
@@ -137,8 +133,7 @@ class tmednet(tk.Frame):
         # Contingut de F2
         # Definir aspectes dibuix
         self.gui_plot = gp.GUIPlot(f2, self.console_writer, self.reportlogger)
-        self.fig, self.plot, self.plot1, self.plot2, self.cbexists, self.canvas = self.gui_plot.get_args()
-        self.toolbar = NavigationToolbar2Tk(self.canvas, f2)
+        self.toolbar = NavigationToolbar2Tk(self.gui_plot.canvas, f2)
         self.toolbar.children['!button5'].pack_forget()
         tk.Button(self.toolbar, text="Clear Plot", command=self.gui_plot.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
 

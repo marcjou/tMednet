@@ -36,9 +36,12 @@ class GUIPlot:
     counter : list
         List containing information about the type of plot that is being created
     index : list
-        List containing the index
+        List containing the pointer to the selected file on the list box
+    savefilename : str
+        Name under which the plot will be saved
+    
+
     """
-    global cb
 
     def __init__(self, f2, console, reportlogger):
         self.__set_args(f2)
@@ -47,6 +50,7 @@ class GUIPlot:
         self.console_writer = console
         self.reportlogger = reportlogger
         self.savefilename = ""
+        self.cb = ""
 
     def __str__(self):
         return "GUIPlot object"
@@ -54,33 +58,28 @@ class GUIPlot:
     def __set_args(self, f2):
         # Contingut de F2
         # Definir aspectes dibuix
-        self.curtab = None
-        self.tabs = {}
+        self.__curtab = None
+        self.__tabs = {}
         plt.rc('legend', fontsize='medium')
-        self.fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-        self.plot = self.fig.add_subplot(111)
-        self.plot1 = self.fig.add_subplot(211)
-        self.plot2 = self.fig.add_subplot(212)
-        plt.Axes.remove(self.plot1)
-        plt.Axes.remove(self.plot2)
-        plt.Axes.remove(self.plot)
+        self.__fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
+        self.__plot = self.__fig.add_subplot(111)
+        self.__plot1 = self.__fig.add_subplot(211)
+        self.__plot2 = self.__fig.add_subplot(212)
+        plt.Axes.remove(self.__plot1)
+        plt.Axes.remove(self.__plot2)
+        plt.Axes.remove(self.__plot)
 
-        self.cbexists = False  # Control for the colorbar of the Hovmoller
+        self.__cbexists = False  # Control for the colorbar of the Hovmoller
 
-        self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
+        self.canvas = FigureCanvasTkAgg(self.__fig, master=f2)
         self.canvas.draw()
         self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-    def get_args(self):
-        return self.fig, self.plot, self.plot1, self.plot2, self.cbexists, self.canvas
-
     def plot_ts(self, mdata, files, index):
         # If there are subplots, deletes them before creating the plot anew
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        # if self.cbexists:
-        #   self.clear_plots()
+        if self.__plot1.axes:
+            plt.Axes.remove(self.__plot1)
+            plt.Axes.remove(self.__plot2)
 
         if self.counter[0] == "Hovmoller":
             self.clear_plots()
@@ -93,27 +92,24 @@ class GUIPlot:
         elif self.counter[0] == 'Difference':
             self.clear_plots()
 
-        # if self.plotcb.axes:
-        #  plt.Axes.remove(self.plotcb)
-
         masked_ending_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
                                                         np.array(mdata[index]['temp']))
-        if self.plot.axes:
-            # self.plot = self.fig.add_subplot(111)
-            self.plot.plot(mdata[index]['time'], masked_ending_temperatures,
+        if self.__plot.axes:
+            # self.__plot = self.__fig.add_subplot(111)
+            self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
-            self.plot.set(ylabel='Temperature (DEG C)',
+            self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Multiple depths Site: ' + str(mdata[index]['region_name']))
         else:
-            self.plot = self.fig.add_subplot(111)
-            self.plot.plot(mdata[index]['time'], masked_ending_temperatures,
+            self.__plot = self.__fig.add_subplot(111)
+            self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
-            self.plot.set(ylabel='Temperature (DEG C)',
+            self.__plot.set(ylabel='Temperature (DEG C)',
                           title=files[index] + "\n" + 'Depth:' + str(
                               mdata[index]['depth']) + " - Site: " + str(
                               mdata[index]['region_name']))
 
-        self.plot.legend(title='Depth (m)')
+        self.__plot.legend(title='Depth (m)')
         # fig.set_size_inches(14.5, 10.5, forward=True)
         self.canvas.draw()
 
@@ -134,54 +130,54 @@ class GUIPlot:
         self.counter.append('Zoom')
 
         # Creates the subplots and deletes the old plot
-        if not self.plot1.axes:
-            self.plot1 = self.fig.add_subplot(211)
-            self.plot2 = self.fig.add_subplot(212)
+        if not self.__plot1.axes:
+            self.__plot1 = self.__fig.add_subplot(211)
+            self.__plot2 = self.__fig.add_subplot(212)
 
         masked_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
                                                  np.array(mdata[index]['temp']))
 
-        self.plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
+        self.__plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
                         '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
-        self.plot1.legend()
-        self.plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[valid_start:int(start_index) + 1 + int(valid_start)],
+        self.__plot1.legend()
+        self.__plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[valid_start:int(start_index) + 1 + int(valid_start)],
                         '-', color='red', marker='o', label=str(mdata[index]['depth']))
 
-        self.plot1.set(ylabel='Temperature (DEG C)',
+        self.__plot1.set(ylabel='Temperature (DEG C)',
                        title=files[index] + "\n" + 'Depth:' + str(
                            mdata[index]['depth']) + " - Region: " + str(
                            mdata[index]['region']))
         if indexes.size != 0:
             if indexes[0] + 1 == len(time_series[0]):
-                self.plot2.plot(time_series[1][:int(indexes[0])],
+                self.__plot2.plot(time_series[1][:int(indexes[0])],
                                 masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
                                 '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
             else:
-                self.plot2.plot(time_series[1][:int(indexes[0] + 1)],
+                self.__plot2.plot(time_series[1][:int(indexes[0] + 1)],
                                 masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
                                 '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
-            self.plot2.legend()
+            self.__plot2.legend()
             # Plots in the same graph the last part which represents the errors in the data from removing the sensors
-            self.plot2.plot(time_series[1][int(indexes[0]):],
+            self.__plot2.plot(time_series[1][int(indexes[0]):],
                             masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
                             '-', color='red', marker='o', label=str(mdata[index]['depth']))
-            self.plot2.set(ylabel='Temperature (DEG C)',
+            self.__plot2.set(ylabel='Temperature (DEG C)',
                            title=files[index] + "\n" + 'Depth:' + str(
                                mdata[index]['depth']) + " - Region: " + str(
                                mdata[index]['region']))
         else:
-            self.plot2.plot(time_series[1],
+            self.__plot2.plot(time_series[1],
                             masked_temperatures[-len(time_series[1]):],
                             '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
-            self.plot2.legend()
-            self.plot2.set(ylabel='Temperature (DEG C)',
+            self.__plot2.legend()
+            self.__plot2.set(ylabel='Temperature (DEG C)',
                            title=files[index] + "\n" + 'Depth:' + str(
                                mdata[index]['depth']) + " - Region: " + str(
                                mdata[index]['region']))
         # fig.set_size_inches(14.5, 10.5, forward=True)
         # Controls if we are accesing the event handler through a real click or it loops.
         if not controller:
-            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: cut_data_manually(event, index))
+            cid = self.__fig.canvas.mpl_connect('button_press_event', lambda event: cut_data_manually(event, index))
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', mdata[0]['depth'])
@@ -205,9 +201,9 @@ class GUIPlot:
 
         depths = ""
         # Creates the subplots and deletes the old plot
-        if not self.plot1.axes:
-            self.plot1 = self.fig.add_subplot(211)
-            self.plot2 = self.fig.add_subplot(212)
+        if not self.__plot1.axes:
+            self.__plot1 = self.__fig.add_subplot(211)
+            self.__plot2 = self.__fig.add_subplot(212)
 
         for i in index:
             time_series, temperatures, _, bad, bad2, bad3 = fm.zoom_data(mdata[i], self.console_writer)
@@ -218,19 +214,19 @@ class GUIPlot:
 
             masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
                                                             np.array(temperatures[1]))
-            self.plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
+            self.__plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
                             '-', label=str(mdata[i]['depth']))
-            self.plot1.set(ylabel='Temperature (DEG C)',
+            self.__plot1.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
                                mdata[i]['region']))
-            self.plot1.legend()
+            self.__plot1.legend()
 
-            self.plot2.plot(time_series[1], masked_temperatures[-len(time_series[1]):],
+            self.__plot2.plot(time_series[1], masked_temperatures[-len(time_series[1]):],
                             '-', label=str(mdata[i]['depth']))
-            self.plot2.set(ylabel='Temperature (DEG C)',
+            self.__plot2.set(ylabel='Temperature (DEG C)',
                            title='Temperature at depths:' + depths + " - Region: " + str(
                                mdata[i]['region']))
-            self.plot2.legend()
+            self.__plot2.legend()
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
@@ -253,16 +249,16 @@ class GUIPlot:
             dfdelta, _ = fm.temp_difference(mdata)
             self.counter.append('Difference')
             # Creates the subplots and deletes the old plot
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
+            if self.__plot1.axes:
+                plt.Axes.remove(self.__plot1)
+                plt.Axes.remove(self.__plot2)
 
-            self.plot = self.fig.add_subplot(111)
-            dfdelta.plot(ax=self.plot)
-            self.plot.set(ylabel='Temperature (DEG C)',
+            self.__plot = self.__fig.add_subplot(111)
+            dfdelta.plot(ax=self.__plot)
+            self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences')
 
-            self.plot.legend()
+            self.__plot.legend()
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
@@ -285,9 +281,9 @@ class GUIPlot:
             dfdelta = fm.apply_uniform_filter(mdata)
             self.counter.append("Filter")
             # Creates the subplots and deletes the old plot
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
+            if self.__plot1.axes:
+                plt.Axes.remove(self.__plot1)
+                plt.Axes.remove(self.__plot2)
             for _, rows in dfdelta.iterrows():  # Checks if there is an erroneous value and if there is, logs it.
                 for row in rows:
                     if float(row) <= -0.2:
@@ -298,12 +294,12 @@ class GUIPlot:
                     continue
                 break
 
-            self.plot = self.fig.add_subplot(111)
-            dfdelta.plot(ax=self.plot)
-            self.plot.set(ylabel='Temperature (DEG C)',
+            self.__plot = self.__fig.add_subplot(111)
+            dfdelta.plot(ax=self.__plot)
+            self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences filtered')
 
-            self.plot.legend()
+            self.__plot.legend()
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
@@ -324,29 +320,29 @@ class GUIPlot:
             self.counter.append("Hovmoller")
             df, depths, _ = fm.list_to_df(mdata)
             depths = np.array(depths)
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-            self.plot = self.fig.add_subplot(111)
+            if self.__plot1.axes:
+                plt.Axes.remove(self.__plot1)
+                plt.Axes.remove(self.__plot2)
+            self.__plot = self.__fig.add_subplot(111)
 
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             # df.resample(##) if we want to filter the results in a direct way
             # Draws a contourn line. Right now looks messy
-            # ct = self.plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-            cf = self.plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+            # ct = self.__plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
+            cf = self.__plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
-            cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
-            self.cbexists = True
-            self.plot.set(ylabel='Depth (m)',
+            self.cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
+            self.__cbexists = True
+            self.__plot.set(ylabel='Depth (m)',
                           title='Stratification Site: ' + mdata[0]['region_name'])
 
             # Sets the X axis as the initials of the months
             locator = mdates.MonthLocator()
-            self.plot.xaxis.set_major_locator(locator)
+            self.__plot.xaxis.set_major_locator(locator)
             fmt = mdates.DateFormatter('%b')
-            self.plot.xaxis.set_major_formatter(fmt)
+            self.__plot.xaxis.set_major_formatter(fmt)
             # Sets the x axis on the top
-            self.plot.xaxis.tick_top()
+            self.__plot.xaxis.tick_top()
 
             self.canvas.draw()
 
@@ -362,24 +358,24 @@ class GUIPlot:
             self.clear_plots()
             self.counter.append("Stratification")
             depths = np.array(list(map(float, list(df.columns))))
-            if self.plot1.axes:
-                plt.Axes.remove(self.plot1)
-                plt.Axes.remove(self.plot2)
-            self.plot = self.fig.add_subplot(111)
+            if self.__plot1.axes:
+                plt.Axes.remove(self.__plot1)
+                plt.Axes.remove(self.__plot2)
+            self.__plot = self.__fig.add_subplot(111)
 
             if depths[-1] < 40:
-                self.plot.set_ylim(0, -40)
-                self.plot.set_yticks(-np.insert(depths, [0, -1], [0, 40]))
+                self.__plot.set_ylim(0, -40)
+                self.__plot.set_yticks(-np.insert(depths, [0, -1], [0, 40]))
             else:
-                self.plot.set_ylim(0, -depths[-1])
-                self.plot.set_yticks(-np.insert(depths, 0, 0))
+                self.__plot.set_ylim(0, -depths[-1])
+                self.__plot.set_yticks(-np.insert(depths, 0, 0))
 
-            self.plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
+            self.__plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
                                datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
-            # self.plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
+            # self.__plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
 
-            # self.plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
-            self.plot.invert_yaxis()
+            # self.__plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
+            self.__plot.invert_yaxis()
             # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             #levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
             #levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
@@ -420,10 +416,10 @@ class GUIPlot:
                 df_cuts.append(df[index_cut:])
                 cf = []
                 for i in range(0, len(df_cuts)):
-                    cf.append(self.plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
+                    cf.append(self.__plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
                                                  extend='both',
                                                  cmap='RdYlBu_r', levels=levels2))
-                cb = plt.colorbar(cf[0], ax=self.plot, label='Temperature (ºC)', ticks=levels)
+                self.cb = plt.colorbar(cf[0], ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             else:
                 # Checks if there is a vertical gap bigger than 5 meters and if so instead of interpolating
                 # Plots two different plots to keep the hole inbetween
@@ -437,34 +433,34 @@ class GUIPlot:
                 if vertical_split:
                     old_index = 0
                     for i in vertical_split:
-                        cf = self.plot.contourf(df_datetime, -depths[old_index: i + 1],
+                        cf = self.__plot.contourf(df_datetime, -depths[old_index: i + 1],
                                                 df.filter(items=str_depths[old_index:i + 1]).values.T, 256, extend='both',
                                                 cmap='RdYlBu_r',
                                                 levels=levels2)
                         old_index = i + 1
-                    cf = self.plot.contourf(df_datetime, -depths[old_index:],
+                    cf = self.__plot.contourf(df_datetime, -depths[old_index:],
                                             df.filter(items=str_depths[old_index:]).values.T, 256, extend='both',
                                             cmap='RdYlBu_r',
                                             levels=levels2)
                 else:
-                    cf = self.plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
+                    cf = self.__plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
                                             levels=levels2)
 
-                cb = plt.colorbar(cf, ax=self.plot, label='Temperature (ºC)', ticks=levels)
-            self.cbexists = True
-            self.plot.set(ylabel='Depth (m)',
+                self.cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
+            self.__cbexists = True
+            self.__plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' year ' + year)
             self.savefilename = historical.split('_')[3] + '_1_' + year + '_' + historical.split('_')[4]
             # Sets the X axis as the initials of the months
             locator = mdates.MonthLocator()
-            self.plot.xaxis.set_major_locator(locator)
+            self.__plot.xaxis.set_major_locator(locator)
             fmt = mdates.DateFormatter('%b')
-            self.plot.xaxis.set_major_formatter(fmt)
+            self.__plot.xaxis.set_major_formatter(fmt)
             # Sets the x axis on the top
-            self.plot.xaxis.tick_top()
+            self.__plot.xaxis.tick_top()
             # Sets the ticks only for the whole depths, the ones from the file
             tick_depths = [-i for i in depths if i.is_integer()]
-            self.plot.set_yticks(tick_depths)
+            self.__plot.set_yticks(tick_depths)
 
             self.canvas.draw()
 
@@ -527,11 +523,11 @@ class GUIPlot:
         # BLOCK ENDS HERE!!!!!!!
 
         # Creates the subplots and deletes the old plot
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
+        if self.__plot1.axes:
+            plt.Axes.remove(self.__plot1)
+            plt.Axes.remove(self.__plot2)
 
-        self.plot = self.fig.add_subplot(111)
+        self.__plot = self.__fig.add_subplot(111)
 
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
                       '30': '#a7d6e7',
@@ -540,37 +536,37 @@ class GUIPlot:
         for depth in newdf.columns:
             if newdf[depth].isnull().all():
                 del newdf[depth]
-        newdf.plot(ax=self.plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
+        newdf.plot(ax=self.__plot, zorder=10, color=[color_dict.get(x, '#333333') for x in newdf.columns])
 
-        leg = self.plot.legend(title='Depth (m)')
+        leg = self.__plot.legend(title='Depth (m)')
 
         if str(minyear) != year:
             oldepth = 0
             for depth in orderedhist_df.columns:
                 if oldepth != 0:
-                    self.plot.fill_between(np.unique(orderedhist_df.index), orderedhist_df[oldepth],
+                    self.__plot.fill_between(np.unique(orderedhist_df.index), orderedhist_df[oldepth],
                                            orderedhist_df[depth], facecolor='lightgrey', zorder=0)
                 oldepth = depth
-                orderedhist_df.plot(kind='line', ax=self.plot, color='#e9e8e8', label='_nolegend_', legend=False,
+                orderedhist_df.plot(kind='line', ax=self.__plot, color='#e9e8e8', label='_nolegend_', legend=False,
                                     zorder=5)
 
-        self.plot.set(ylabel='Temperature (ºC) smoothed',
+        self.__plot.set(ylabel='Temperature (ºC) smoothed',
                       title=historical.split('_')[4] + ' year ' + year)
-        self.plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
-        self.plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
+        self.__plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
+        self.__plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
 
         self.savefilename = historical.split('_')[3] + '_2_' + year + '_' + historical.split('_')[4]
 
         # Sets the X axis as the initials of the months
         locator = mdates.MonthLocator()
-        self.plot.xaxis.set_major_locator(locator)
+        self.__plot.xaxis.set_major_locator(locator)
         fmt = mdates.DateFormatter('%b')
-        self.plot.xaxis.set_major_formatter(fmt)
+        self.__plot.xaxis.set_major_formatter(fmt)
 
-        self.plot.xaxis.set_label_text('foo').set_visible(False)
+        self.__plot.xaxis.set_label_text('foo').set_visible(False)
         # fig.set_size_inches(14.5, 10.5, forward=True)
 
-        self.plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
+        self.__plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
         self.canvas.draw()
 
     def plot_thresholds(self, historical, toolbar, consolescreen):
@@ -606,10 +602,10 @@ class GUIPlot:
                     print('not all na')
 
         # Creates the subplots and deletes the old plot
-        if self.plot1.axes:
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        self.plot = self.fig.add_subplot(111)
+        if self.__plot1.axes:
+            plt.Axes.remove(self.__plot1)
+            plt.Axes.remove(self.__plot2)
+        self.__plot = self.__fig.add_subplot(111)
 
         # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
@@ -664,14 +660,14 @@ class GUIPlot:
                     maxdays = np.max(yearly_plot[:, 0])
                 temperatures[i] = np.ma.masked_where(yearly_plot == -999, yearly_plot)
             year_dict[year] = temperatures.copy()
-            self.plot.set(ylim=(0, maxdepth + 2))
+            self.__plot.set(ylim=(0, maxdepth + 2))
             if maxdays >= 30:
                 ticks = 10
             elif maxdays >=20:
                 ticks = 5
             else:
                 ticks = 2
-            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
+            self.__plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
             # Remove asterisks (if any) on years
             seq_type = type(year)
             int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
@@ -679,41 +675,41 @@ class GUIPlot:
                 color = colors[0]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 1990]
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 1990]
                                , color=color, linestyle=lines[0])
             elif int_year >= 2000 and int_year < 2010:
                 color = colors[1]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2000],
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2000],
                                color=color, linestyle=lines[1])
             elif int_year >= 2010 and int_year < 2020:
                 color = colors[2]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2010],
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2010],
                                color=color, linestyle=lines[2])
             elif int_year >= 2020 and int_year < 2030:
                 color = colors[3]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2020],
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2020],
                                color=color, linestyle=lines[3])
 
-            self.plot.invert_yaxis()
-            self.plot.xaxis.tick_top()
+            self.__plot.invert_yaxis()
+            self.__plot.xaxis.tick_top()
             self.canvas.draw()
         # Shrink the axis a bit to fit the legend outside of it
-        box = self.plot.get_position()
-        self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        box = self.__plot.get_position()
+        self.__plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
-        legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
-        self.plot.set(ylabel='Depth (m)',
+        legend = self.__plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+        self.__plot.set(ylabel='Depth (m)',
                       title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
-        self.plot.xaxis.grid(True, linestyle='dashed')
+        self.__plot.xaxis.grid(True, linestyle='dashed')
 
-        p = self.plot.get_window_extent()
-        self.plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
+        p = self.__plot.get_window_extent()
+        self.__plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
                   va="center", ha="left",
                   bbox=dict(boxstyle="round", fc="w"))
 
@@ -729,27 +725,27 @@ class GUIPlot:
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
-            self.tabs[i] = tab
-        self.curtab = 23
+            self.__tabs[i] = tab
+        self.__curtab = 23
         print('Ayo')
         self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
 
     def __raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
         print(i)
-        print("curtab" + str(self.curtab))
-        if self.curtab != None and self.curtab != i and len(self.tabs) > 1:
+        print("curtab" + str(self.__curtab))
+        if self.__curtab != None and self.__curtab != i and len(self.__tabs) > 1:
             # Plot the Thresholds here and clean the last one
             self.clear_plots(clear_thresholds=False)
             self.counter.append('Thresholds')
-            self.plot = self.fig.add_subplot(111)
+            self.__plot = self.__fig.add_subplot(111)
             if maxdays >= 30:
                 ticks = 10
             elif maxdays >= 20:
                 ticks = 5
             else:
                 ticks = 2
-            self.plot.set(ylim=(0, maxdepth + 2))
-            self.plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
+            self.__plot.set(ylim=(0, maxdepth + 2))
+            self.__plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
             for year in years:
                 # Remove asterisks (if any) on years
                 seq_type = type(year)
@@ -758,46 +754,46 @@ class GUIPlot:
                     color = colors[0]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 1990]
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 1990]
                                    , color=color, linestyle=lines[0])
                 elif int_year >= 2000 and int_year < 2010:
                     color = colors[1]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2000],
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2000],
                                    color=color, linestyle=lines[1])
                 elif int_year >= 2010 and int_year < 2020:
                     color = colors[2]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2010],
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2010],
                                    color=color, linestyle=lines[2])
                 elif int_year >= 2020 and int_year < 2030:
                     color = colors[3]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2020],
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2020],
                                    color=color, linestyle=lines[3])
 
-            self.plot.invert_yaxis()
-            self.plot.xaxis.tick_top()
+            self.__plot.invert_yaxis()
+            self.__plot.xaxis.tick_top()
             # Shrink the axis a bit to fit the legend outside of it
-            box = self.plot.get_position()
-            self.plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-            legend = self.plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
-            self.plot.set(ylabel='Depth (m)',
+            box = self.__plot.get_position()
+            self.__plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+            legend = self.__plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
+            self.__plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
 
-            p = self.plot.get_window_extent()
-            self.plot.annotate('*Recorded period not complete', xy=(0.61, 0.03), xycoords=p, xytext=(0.1, 0),
+            p = self.__plot.get_window_extent()
+            self.__plot.annotate('*Recorded period not complete', xy=(0.61, 0.03), xycoords=p, xytext=(0.1, 0),
                                textcoords="offset points",
                                va="center", ha="left",
                                bbox=dict(boxstyle="round", fc="w"))
-            self.plot.xaxis.grid(True, linestyle='dashed')
+            self.__plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
 
-        self.curtab = i
+        self.__curtab = i
         self.console_writer("Plotting for over " + str(i) + " degrees", "action")
 
     def clear_plots(self, clear_thresholds=True):
@@ -813,23 +809,20 @@ class GUIPlot:
         self.console_writer('Clearing Plots', 'action')
         self.index = []
         self.counter = []
-        if self.plot.axes:
-            self.plot.clear()
-            plt.Axes.remove(self.plot)
-        if self.plot1.axes:
-            self.plot1.clear()
-            self.plot2.clear()
-            plt.Axes.remove(self.plot1)
-            plt.Axes.remove(self.plot2)
-        if self.cbexists:
-            cb.remove()
-            self.cbexists = False
-        # if self.plotcb.axes():
-        #  self.plotcb.clear()
-        #  plt.Axes.remove(self.plotcb)
+        if self.__plot.axes:
+            self.__plot.clear()
+            plt.Axes.remove(self.__plot)
+        if self.__plot1.axes:
+            self.__plot1.clear()
+            self.__plot2.clear()
+            plt.Axes.remove(self.__plot1)
+            plt.Axes.remove(self.__plot2)
+        if self.__cbexists:
+            self.cb.remove()
+            self.__cbexists = False
         if clear_thresholds:
-            for tab in self.tabs:
-                self.tabs[tab]['btn'].destroy()
-            self.tabs = {}
-            self.curtab = None
+            for tab in self.__tabs:
+                self.__tabs[tab]['btn'].destroy()
+            self.__tabs = {}
+            self.__curtab = None
         self.canvas.draw()
