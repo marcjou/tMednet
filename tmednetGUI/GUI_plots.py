@@ -481,6 +481,9 @@ class GUIPlot:
         histdf['month'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).month
         histdf['day_month'] = histdf['day'].astype(str) + '-' + histdf['month'].astype(str)
         histdf['day_month'] = histdf['day_month'] + '-' + year
+        # Check if the selected year is a leap year
+        if pd.to_datetime(year).is_leap_year == False:
+            histdf.drop(histdf['day_month'].loc[histdf['day_month'] == '29-2-2021'].index, inplace=True)
         histdf['day_month'] = pd.DatetimeIndex(histdf['day_month'], dayfirst=True)
 
         orderedhist_df = histdf.groupby('day_month')[depths].mean()
@@ -492,7 +495,8 @@ class GUIPlot:
             year_df.drop('0', axis=1, inplace=True)
 
         year_df = fm.running_average_special(year_df, running=360)
-        orderedhist_df = fm.running_average_special(orderedhist_df, running=15)
+        # TODO discuss with Nat how many days for the running average of the climatology
+        orderedhist_df = fm.running_average_special(orderedhist_df, running=30)
         orderedhist_df.index = pd.DatetimeIndex(orderedhist_df.index)
         # dfdelta = fm.running_average(self.mdata, running=360)
 
