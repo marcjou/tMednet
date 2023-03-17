@@ -39,43 +39,82 @@ class GUIPlot:
         List containing the pointer to the selected file on the list box
     savefilename : str
         Name under which the plot will be saved
-    
 
+    Methods
+    -------
+    plot_ts(self, mdata, files, index)
+        Plots the selected time series from the list of loaded files
+    plot_zoom(self, mdata, files, list, cut_data_manually, controller=False)
+        Plots a zoomed version of the selected time series from the list of loaded files
+    plot_all_zoom(self, mdata, list)
+        Plots a zoom version of multiple selected time series from the list of loaded files
+    plot_dif(self, mdata)
+        Plots the difference between consecutive depths of all the loaded files
+    plot_dif_filter1d(self, mdata)
+        Plots the filtered difference between consecutive depths of all the loaded files
+    plot_hovmoller(self, mdata)
+        Creates a hovmoller plot with only the time series loaded
+    plot_stratification(self, historical, year)
+        Creates the stratification plot of a given dataset and year
+    plot_annual_T_cycle(self, historical, year)
+        Creates the annual T cycle plot of a given dataset and year
+    plot_thresholds(self, historical, toolbar, consolescreen)
+        Creates the thresholds plot of a given dataset
+    clear_plots(self, clear_thresholds=True)
+        Deletes all current plots and plot related attributes
+
+    Version: 03/2023 MJB: Documentation
     """
 
     def __init__(self, f2, console, reportlogger):
+        """
+        Parameters
+        ----------
+        f2 : tKinter Frame
+            Frame of the GUI where the plots will be placed
+        console: function
+            Function able to write on the GUI console
+        reportlogger : function
+            Function able to write on the report screen on the GUI
+        """
         self.__set_args(f2)
         self.counter = []
         self.index = []
         self.console_writer = console
         self.reportlogger = reportlogger
         self.savefilename = ""
-        self.cb = ""
+        self.__cb = ""
 
     def __str__(self):
         return "GUIPlot object"
 
     def __set_args(self, f2):
-        # Contingut de F2
-        # Definir aspectes dibuix
+        # Starts and sets the attributes of the plot and defines the aspects of the figure
         self.__curtab = None
         self.__tabs = {}
         plt.rc('legend', fontsize='medium')
-        self.__fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
-        self.__plot = self.__fig.add_subplot(111)
-        self.__plot1 = self.__fig.add_subplot(211)
-        self.__plot2 = self.__fig.add_subplot(212)
+        self.fig = Figure(figsize=(5, 4), dpi=100, constrained_layout=True)
+        self.__plot = self.fig.add_subplot(111)
+        self.__plot1 = self.fig.add_subplot(211)
+        self.__plot2 = self.fig.add_subplot(212)
         plt.Axes.remove(self.__plot1)
         plt.Axes.remove(self.__plot2)
         plt.Axes.remove(self.__plot)
-
         self.__cbexists = False  # Control for the colorbar of the Hovmoller
-
-        self.canvas = FigureCanvasTkAgg(self.__fig, master=f2)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
         self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
     def plot_ts(self, mdata, files, index):
+        """
+        Plots the selected time series from the list of loaded files
+
+        ...
+
+        Parameters
+        ----------
+        mdata : pandas
+        """
         # If there are subplots, deletes them before creating the plot anew
         if self.__plot1.axes:
             plt.Axes.remove(self.__plot1)
@@ -95,13 +134,13 @@ class GUIPlot:
         masked_ending_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
                                                         np.array(mdata[index]['temp']))
         if self.__plot.axes:
-            # self.__plot = self.__fig.add_subplot(111)
+            # self.__plot = self.fig.add_subplot(111)
             self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Multiple depths Site: ' + str(mdata[index]['region_name']))
         else:
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
             self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
@@ -131,8 +170,8 @@ class GUIPlot:
 
         # Creates the subplots and deletes the old plot
         if not self.__plot1.axes:
-            self.__plot1 = self.__fig.add_subplot(211)
-            self.__plot2 = self.__fig.add_subplot(212)
+            self.__plot1 = self.fig.add_subplot(211)
+            self.__plot2 = self.fig.add_subplot(212)
 
         masked_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
                                                  np.array(mdata[index]['temp']))
@@ -177,7 +216,7 @@ class GUIPlot:
         # fig.set_size_inches(14.5, 10.5, forward=True)
         # Controls if we are accesing the event handler through a real click or it loops.
         if not controller:
-            cid = self.__fig.canvas.mpl_connect('button_press_event', lambda event: cut_data_manually(event, index))
+            cid = self.fig.canvas.mpl_connect('button_press_event', lambda event: cut_data_manually(event, index))
 
         self.canvas.draw()
         self.console_writer('Plotting zoom of depth: ', 'action', mdata[0]['depth'])
@@ -202,8 +241,8 @@ class GUIPlot:
         depths = ""
         # Creates the subplots and deletes the old plot
         if not self.__plot1.axes:
-            self.__plot1 = self.__fig.add_subplot(211)
-            self.__plot2 = self.__fig.add_subplot(212)
+            self.__plot1 = self.fig.add_subplot(211)
+            self.__plot2 = self.fig.add_subplot(212)
 
         for i in index:
             time_series, temperatures, _, bad, bad2, bad3 = fm.zoom_data(mdata[i], self.console_writer)
@@ -253,7 +292,7 @@ class GUIPlot:
                 plt.Axes.remove(self.__plot1)
                 plt.Axes.remove(self.__plot2)
 
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.__plot)
             self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences')
@@ -294,7 +333,7 @@ class GUIPlot:
                     continue
                 break
 
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.__plot)
             self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Temperature differences filtered')
@@ -323,7 +362,7 @@ class GUIPlot:
             if self.__plot1.axes:
                 plt.Axes.remove(self.__plot1)
                 plt.Axes.remove(self.__plot2)
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
 
             levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
             # df.resample(##) if we want to filter the results in a direct way
@@ -331,7 +370,7 @@ class GUIPlot:
             # ct = self.__plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
             cf = self.__plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
 
-            self.cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
+            self.__cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             self.__cbexists = True
             self.__plot.set(ylabel='Depth (m)',
                           title='Stratification Site: ' + mdata[0]['region_name'])
@@ -361,7 +400,7 @@ class GUIPlot:
             if self.__plot1.axes:
                 plt.Axes.remove(self.__plot1)
                 plt.Axes.remove(self.__plot2)
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
 
             if depths[-1] < 40:
                 self.__plot.set_ylim(0, -40)
@@ -419,7 +458,7 @@ class GUIPlot:
                     cf.append(self.__plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
                                                  extend='both',
                                                  cmap='RdYlBu_r', levels=levels2))
-                self.cb = plt.colorbar(cf[0], ax=self.__plot, label='Temperature (ºC)', ticks=levels)
+                self.__cb = plt.colorbar(cf[0], ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             else:
                 # Checks if there is a vertical gap bigger than 5 meters and if so instead of interpolating
                 # Plots two different plots to keep the hole inbetween
@@ -446,7 +485,7 @@ class GUIPlot:
                     cf = self.__plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
                                             levels=levels2)
 
-                self.cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
+                self.__cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             self.__cbexists = True
             self.__plot.set(ylabel='Depth (m)',
                           title=historical.split('_')[4] + ' year ' + year)
@@ -477,13 +516,15 @@ class GUIPlot:
 
         histdf = pd.read_csv(historical, sep='\t')
         depths = histdf.columns[2:]
+        # Drop the Nan date rows
+        histdf.drop(histdf.loc[histdf['Date'].isnull()].index, inplace=True)
         histdf['day'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).day
         histdf['month'] = pd.DatetimeIndex(histdf['Date'], dayfirst=True).month
         histdf['day_month'] = histdf['day'].astype(str) + '-' + histdf['month'].astype(str)
         histdf['day_month'] = histdf['day_month'] + '-' + year
         # Check if the selected year is a leap year
         if pd.to_datetime(year).is_leap_year == False:
-            histdf.drop(histdf['day_month'].loc[histdf['day_month'] == '29-2-2021'].index, inplace=True)
+            histdf.drop(histdf['day_month'].loc[histdf['day_month'] == '29-2-' + str(year)].index, inplace=True)
         histdf['day_month'] = pd.DatetimeIndex(histdf['day_month'], dayfirst=True)
 
         orderedhist_df = histdf.groupby('day_month')[depths].mean()
@@ -508,7 +549,7 @@ class GUIPlot:
             if str(time) == 'nan':
                 pass
             else:
-                old = datetime.strftime(datetime.strptime(time, '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d')
+                old = datetime.strftime(time, '%Y-%m-%d')
                 new = datetime.strptime(old, '%Y-%m-%d')
             daylist.append(new)
         year_df['day'] = daylist
@@ -531,7 +572,7 @@ class GUIPlot:
             plt.Axes.remove(self.__plot1)
             plt.Axes.remove(self.__plot2)
 
-        self.__plot = self.__fig.add_subplot(111)
+        self.__plot = self.fig.add_subplot(111)
 
         color_dict = {'5': '#d4261d', '10': '#f58e6e', '15': '#fca95a', '20': '#fde5a3', '25': '#e4f4f8',
                       '30': '#a7d6e7',
@@ -609,7 +650,7 @@ class GUIPlot:
         if self.__plot1.axes:
             plt.Axes.remove(self.__plot1)
             plt.Axes.remove(self.__plot2)
-        self.__plot = self.__fig.add_subplot(111)
+        self.__plot = self.fig.add_subplot(111)
 
         # TODO matplotlib no tiene los mismos markers que matlab, se comprometen los 3 ultimos
 
@@ -741,7 +782,7 @@ class GUIPlot:
             # Plot the Thresholds here and clean the last one
             self.clear_plots(clear_thresholds=False)
             self.counter.append('Thresholds')
-            self.__plot = self.__fig.add_subplot(111)
+            self.__plot = self.fig.add_subplot(111)
             if maxdays >= 30:
                 ticks = 10
             elif maxdays >= 20:
@@ -822,7 +863,7 @@ class GUIPlot:
             plt.Axes.remove(self.__plot1)
             plt.Axes.remove(self.__plot2)
         if self.__cbexists:
-            self.cb.remove()
+            self.__cb.remove()
             self.__cbexists = False
         if clear_thresholds:
             for tab in self.__tabs:

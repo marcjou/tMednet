@@ -553,6 +553,9 @@ def big_merge(filename1, filename2, output):
         # Check if there is duplicity
         df1['dates'] = df1['Date'] + ' ' + df1['Time']
         df2['dates'] = df2['Date'] + ' ' + df2['Time']
+        # Drop old duplicated rows that could come from older Datasets
+        df1.drop(df1.loc[df1.duplicated(['dates'])].index, inplace=True)
+        df2.drop(df2.loc[df2.duplicated(['dates'])].index, inplace=True)
         df1_in = df1.set_index('dates')
         df2_in = df2.set_index('dates')
         df = pd.concat([df1_in, df2_in], axis=1, keys=['df1', 'df2'], join='inner')

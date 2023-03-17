@@ -749,6 +749,7 @@ def running_average_special(year_df, running=240):
         total_time_diff = day_diff + hour_diff
         index_shifts = total_time_diff.loc[total_time_diff > running].index
         nan_df = year_df[year_df[str(depth)].isnull()]
+        nan_df.index = pd.to_datetime(nan_df.index)
         if len(index_shifts) > 0:
             complete = np.empty(0)
             old_index = 0
@@ -758,7 +759,7 @@ def running_average_special(year_df, running=240):
             complete = np.append(complete, uniform_filter1d(nonna_df[old_index:], size=running))
         else:
             complete = uniform_filter1d(nonna_df, size=running)
-        nonna_df.index = nonna_df.index.strftime('%Y-%m-%d %H:%M:%S')
+        # nonna_df.index = nonna_df.index.strftime('%Y-%m-%d %H:%M:%S')
         complete_df = pd.DataFrame(complete, columns=[str(depth)], index=nonna_df.index)
         complete_df = pd.concat([complete_df, nan_df[str(depth)]], sort=False).sort_index()
         df_empty[str(depth)] = complete_df[str(depth)]
