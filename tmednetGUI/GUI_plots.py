@@ -113,7 +113,12 @@ class GUIPlot:
 
         Parameters
         ----------
-        mdata : pandas
+        mdata : list
+            Contains all the information that is stored in the database files
+        files:  list
+            Contains the names of the files that are being plot
+        index:  int
+            If there are multiple files loaded, this parameter refers to the one being plot
         """
         # If there are subplots, deletes them before creating the plot anew
         if self.__plot1.axes:
@@ -154,12 +159,21 @@ class GUIPlot:
 
     def plot_zoom(self, mdata, files, list, cut_data_manually, controller=False):
         """
-            Method: plot_zoom(self)
-            Purpose: Plot a zoom of the begining and ending of the data
-            Require:
-                canvas: reference to canvas widget
-                subplot: plot object
-            Version: 05/2021, MJB: Documentation
+        Plots a zoomed section of the beginning and ending of a selected
+        time series from the list of loaded files
+
+        ...
+
+        Parameters
+        ----------
+        mdata : list
+            Contains all the information that is stored in the database files
+        files:  list
+            Contains the names of the files that are being plot
+        list:  tkinter Listbox
+            Object that contains the list of loaded files
+        cut_data_manually: function
+            Allows to remove from mdata the points selected on the plot by the user
         """
         self.clear_plots()
         index = int(list.curselection()[0])
@@ -224,12 +238,16 @@ class GUIPlot:
 
     def plot_all_zoom(self, mdata, list):
         """
-            Method: plot_all_zoom(self)
-            Purpose: Plot a zoom of the begining and ending of all the data loaded in the list
-            Require:
-                canvas: reference to canvas widget
-                subplot: plot object
-            Version: 05/2021, MJB: Documentation
+        Plots a zoomed section of the beginning and ending of multiple selected
+        time series from the list of loaded files
+        ...
+
+        Parameters
+        ----------
+        mdata : list
+            Contains all the information that is stored in the database files
+        list:  tkinter Listbox
+            Object that contains the list of loaded files
         """
         self.clear_plots()
         index = list.curselection()
@@ -274,12 +292,13 @@ class GUIPlot:
 
     def plot_dif(self, mdata):
         """
-        Method: plot_dif(self)
-        Purpose: Plot time series of differences
-        Require:
-            canvas: refrence to canvas widget
-            subplot: axis object
-        Version: 05/2021, MJB: Documentation
+        Plots the difference between consecutive depths of all the loaded files
+        ...
+
+        Parameters
+        ----------
+        mdata : list
+            Contains all the information that is stored in the database files
         """
 
         self.clear_plots()
@@ -308,11 +327,14 @@ class GUIPlot:
 
     def plot_dif_filter1d(self, mdata):
         """
-        Method: plot_dif_filter1d(self)
-        Purpose: Plot time series of differences filtered with a 10 day running
-        Require:
-        Version: 05/2021, MJB: Documentation
-        """
+         Plots the filtered difference between consecutive depths of all the loaded files
+         ...
+
+         Parameters
+         ----------
+         mdata : list
+             Contains all the information that is stored in the database files
+         """
 
         self.clear_plots()
         depths = ""
@@ -349,11 +371,14 @@ class GUIPlot:
 
     def plot_hovmoller(self, mdata):
         """
-        Method: plot_hovmoller(self)
-        Purpose: Plot a Hovmoller Diagram of the loaded files
-        Require:
-        Version: 05/2021, MJB: Documentation
-        """
+         Creates a hovmoller plot with only the time series loaded
+         ...
+
+         Parameters
+         ----------
+         mdata : list
+             Contains all the information that is stored in the database files
+         """
         try:
             self.clear_plots()
             self.counter.append("Hovmoller")
@@ -392,6 +417,17 @@ class GUIPlot:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def plot_stratification(self, historical, year):
+        """
+        Creates the stratification plot of a given dataset and year
+        ...
+
+        Parameters
+        ----------
+        historical : str
+            Path of the dataset to be loaded
+        year : str
+            Year which wants to be plotted
+        """
         df, hismintemp, hismaxtemp, bad = fm.historic_to_df(historical, year)
         try:
             self.clear_plots()
@@ -511,6 +547,18 @@ class GUIPlot:
             self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
 
     def plot_annual_T_cycle(self, historical, year):
+        """
+        Creates the annual T cycle plot of a given dataset and year
+
+        ...
+
+        Parameters
+        ----------
+        historical : str
+            Path of the dataset to be loaded
+        year : str
+            Year which wants to be plotted
+        """
         self.clear_plots()
         self.counter.append("Cycles")
 
@@ -615,10 +663,21 @@ class GUIPlot:
         self.canvas.draw()
 
     def plot_thresholds(self, historical, toolbar, consolescreen):
+        """
+        Creates the thresholds plot of a given dataset
 
-        # Deprecating region input as it can be gotten automatically from the filename (self.mdata[0]['region_name'])
-        # region = self.regioninput.get()
+        ...
 
+        Parameters
+        ----------
+        historical : str
+            Path of the dataset to be loaded
+        toolbar : tkinter NavigationToolbar2Tk
+            Object able to create a series of buttons over the threshold plot to change
+            between temperatures
+        consolescreen : tkinter Text
+            Object that contains the contents of the console screen
+        """
         self.clear_plots()
         self.counter.append("Thresholds")
         excel_object = fw.Excel(historical, write_excel=False, console=consolescreen)  # returns an excel object
@@ -776,6 +835,7 @@ class GUIPlot:
         self.savefilename = historical.split('_')[3] + '_3_23_' + year + '_' + historical.split('_')[4]
 
     def __raiseTab(self, i, maxdepth, year_dict, markers, colors, lines, years, maxdays, historical, legend_years):
+        # Change between the threshold plots for different thresholds temperatures
         print(i)
         print("curtab" + str(self.__curtab))
         if self.__curtab != None and self.__curtab != i and len(self.__tabs) > 1:
@@ -843,13 +903,15 @@ class GUIPlot:
 
     def clear_plots(self, clear_thresholds=True):
         """
-        Method: clear_plots(self)
-        Purpose: Clear plot
-        Require:
-            canvas: reference to canvas widget
-            subplot: plot object
-        Version:
-        01/2021, EGL: Documentation
+        Deletes all current plots and plot related attributes
+
+        ...
+
+        Parameters
+        ----------
+        clear_thresholds : bool
+            Bool that controls if the thresholds have been plotted to know that
+            the toolbar created with them must be erased
         """
         self.console_writer('Clearing Plots', 'action')
         self.index = []
