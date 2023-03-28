@@ -228,7 +228,7 @@ class MHWMapper:
             ax.remove()
         return filenames
 
-    def map_temperature(self, mode: _MODES = 'intensity'):
+    def map_temperature(self, mode):
         """
         Given the kind of map that wants to be plotted starts the methods to plot them and creates and saves
         a gif containing the given period of operation.
@@ -244,9 +244,20 @@ class MHWMapper:
         filenames = self.__create_image_by_type(lons, lats, mode, filenames)
         dt = datetime.strptime(self.ds_time.values[0], '%Y-%m-%d')
         year = dt.year
-        month = calendar.month_name[dt.month]
+        month = calendar.month_abbr[dt.month]
+
+        # Check modes to select name of the final file
+        if mode == 'intensity':
+            extra = 'MHW'
+            type = 'imax'
+        elif mode == 'temperature':
+            extra = 'MHW'
+            type = 'days'
+        elif mode == 'temperature':
+            extra = ''
+            type = 'SST'
         # build gif
-        with imageio.get_writer('../src/output_images/' + str(mode) + '_' + month + '_' + str(year) + '.gif', mode='I',
+        with imageio.get_writer('../src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
                                 duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
