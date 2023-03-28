@@ -6,18 +6,12 @@ import calendar
 import numpy as np
 import xarray as xr
 import pandas as pd
-import seaborn as sns
-import shapefile as shp
+from sys import _getframe
 import cartopy.crs as ccrs
-from netCDF4 import num2date
 import cartopy.feature as cf
-from datetime import datetime, date
-import marineHeatWaves as mhw
-from pandas import ExcelWriter
 import matplotlib.pyplot as plt
-from scipy import io, interpolate
-from mpl_toolkits.basemap import Basemap
-from netCDF4 import Dataset as NetCDFFile
+from datetime import datetime, date
+from typing import Literal, get_args, get_origin
 
 os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
 
@@ -44,7 +38,7 @@ class MHWMapper:
     lon : xarray DataArray
         array containing the longitude coordinates
     ds_time : xarray DataArray
-        array that containsthe dates of the period being plotted
+        array that contains the dates of the period being plotted
     ds_MHW_sliced : xarray DataArray
         array with the intensity of the MHW of the period being plotted
     ds_MHW_days_sliced : xarray DataArray
@@ -53,16 +47,29 @@ class MHWMapper:
     Methods
     -------
 
+=======
+    map_temperature(mode)
+        saves a gif of the selected mode to be mapped
+
+
     Version: 02/2023, MJB: Documentation
     """
+
+    _MODES = ['intensity', 'duration']
 
     def __init__(self, dataset_path, start_period=str(date.today().year) + '-06-01',
                  end_period=str(date.today().year) + '-06-30'):
         """
-        Method: __init__(self)
-        Purpose: Plots the Annual T Cycles plot for the loaded files
-        Require:
-        Version: 09/2021, MJB: Documentation
+        Parameters
+        ----------
+        dataset_path : str
+            complete path to the netcdf file to be open
+        start_period: str, optional
+            date in yyyy-mm-dd format that marks the start of the period to be plotted
+            (default is the first of July of the current year)
+        end_period: str, optional
+            date in yyyy-mm-dd format that marks the end of the period to be plotted
+            (default is the thirtieth of July of the current year)
         """
         # Set up the Netcdf satellite data using the xarray library
         with xr.open_dataset(dataset_path) as self.ds:
@@ -79,6 +86,7 @@ class MHWMapper:
         return "<MHWMapper object>"
 
     def __set_sliced_ds(self, start_period, end_period):
+        # Sets the dataset of the given period
         start_time = pd.to_datetime(start_period)
         try:
             end_time = pd.to_datetime(end_period)
@@ -91,6 +99,15 @@ class MHWMapper:
 
     @staticmethod
     def ax_setter():
+        """
+        Creates the axes where the map will be plotted selecting the coordinates to properly represent
+        the Mediterranean sea and plots and colors the land and sea.
+
+        Returns
+        -------
+        ax : Axes matplotlib
+            the axes in which the data will be plotted
+        """
         ax = plt.axes(projection=ccrs.Mercator())
         ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
         ax.add_feature(cf.OCEAN)
@@ -99,8 +116,21 @@ class MHWMapper:
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
         return ax
 
-    def get_duration(self, lats, lons):
-        # TODO muy ineficiente, buscar la manera de comprobar si hay un hueco de dos dias o menos entre datos o si empieza el mes con datos del anterior de manera más eficiente. Ahora 16s por loop de lat, 127 loops igual a 33min de procesado
+    @staticmethod
+    def __enforce_literals(function):
+        # Enforces that the correct options are selected on a given function
+        kwargs = _getframe(1).f_locals
+        for name, type_ in function.__annotations__.items():
+            value = kwargs.get(name)
+            options = get_args(type_)
+            if get_origin(type_) is Literal and name in kwargs and value not in options:
+                raise AssertionError(f"'{value}' is not in {options} for '{name}'")
+
+    def __get_duration(self, lats, lons):
+        # Returns the duration array on a way that each day shows the cumulative duration
+        # TODO muy ineficiente, buscar la manera de comprobar si hay un hueco de dos dias
+        #  o menos entre datos o si empieza el mes con datos del anterior de manera más eficiente.
+        #  Ahora 16s por loop de lat, 127 loops igual a 33min de procesado
         raw_duration = self.ds_MHW_days_sliced
         proc_duration = raw_duration.copy()
         for i in range(0, len(lats)):
@@ -154,6 +184,8 @@ class MHWMapper:
         return proc_duration
 
     def __create_image_by_type(self, lons, lats, mode, filenames):
+        # Plots the given map and returns the filenames of the temporary images
+        # created to be used for the gif
         start = time.time()
         if mode == 'temperature':
             ds = self.ds_asst_interpolated
@@ -162,7 +194,7 @@ class MHWMapper:
             cmap = 'RdYlBu_r'
             ylabel = 'Temperature (ºC)'
         elif mode == 'duration':
-            ds = self.get_duration(lats, lons)
+            ds = self.__get_duration(lats, lons)
             levels = np.arange(0, 31, 5)
             cmap = 'Purples'
             ylabel = 'Duration (Nº days)'
@@ -196,7 +228,17 @@ class MHWMapper:
             ax.remove()
         return filenames
 
-    def map_temperature(self, mode):
+    def map_temperature(self, mode: _MODES = 'intensity'):
+        """
+        Given the kind of map that wants to be plotted starts the methods to plot them and creates and saves
+        a gif containing the given period of operation.
+
+        Parameters
+        ----------
+        mode : str
+            the type of map that needs to be plotted. The current options are: 'intensity' and 'duration'
+        """
+        self.__enforce_literals(self.map_temperature)
         lons, lats = self.lon, self.lat
         filenames = []
         filenames = self.__create_image_by_type(lons, lats, mode, filenames)
@@ -213,5 +255,3 @@ class MHWMapper:
         # Remove files
         for filename in set(filenames):
             os.remove(filename)
-
-
