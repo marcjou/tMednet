@@ -52,7 +52,7 @@ class MHWMapper:
 
     Methods
     -------
-    
+
     Version: 02/2023, MJB: Documentation
     """
 
