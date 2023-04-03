@@ -7,11 +7,13 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 from sys import _getframe
+import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cf
 import matplotlib.pyplot as plt
 from datetime import datetime, date
 from typing import Literal, get_args, get_origin
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
 
@@ -108,13 +110,36 @@ class MHWMapper:
         ax : Axes matplotlib
             the axes in which the data will be plotted
         """
+        plt.figure(figsize=(15/2.54, 10/2.54))
+
         ax = plt.axes(projection=ccrs.Mercator())
         ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)
         ax.coastlines(resolution='10m')
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
-        return ax
+
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=2, color='black', alpha=0.5, linestyle='--',
+                          draw_labels=True)
+        gl.xlabels_top = False
+        gl.ylabels_left = True
+        gl.ylabels_right = False
+        gl.xlines = True
+        #gl.xlocator = mticker.FixedLocator([120, 140, 160, 180, -160, -140, -120])
+        #gl.ylocator = mticker.FixedLocator([0, 20, 40, 60])
+        gl.xformatter = LONGITUDE_FORMATTER
+        gl.yformatter = LATITUDE_FORMATTER
+        # gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
+        p = ax.get_window_extent()
+        plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
+                    xy=(0.2, -0.3), xycoords=p, xytext=(0.1, 0),
+                    textcoords="offset points",
+                    va="center", ha="left")
+        plt.annotate('t-mednet.org', xy=(0.2, 0.3), xycoords=p, xytext=(0.1, 0),
+                     textcoords="offset points",
+                     va="center", ha="left")
+
+        return ax, gl
 
     @staticmethod
     def __enforce_literals(function):
@@ -209,7 +234,7 @@ class MHWMapper:
         print('after levels')
 
         for i in range(0, ds.shape[0]):
-            ax = self.ax_setter()
+            ax, gl = self.ax_setter()
             print('Loop i: ' + str(i))
             start = time.time()
             temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
@@ -218,8 +243,13 @@ class MHWMapper:
             timu = end - start
             print('Time to create temp: ' + str(timu))
             # if i == 0:
-            cb = plt.colorbar(temp, location="bottom", ticks=levels, label=ylabel)
-            plt.title(str(self.ds_time[i].values))
+            cb = plt.colorbar(temp, location="right", ticks=levels, label=ylabel)
+            if mode == 'duration':
+                tit = 'days'
+            elif mode == 'intensity':
+                tit = mode
+            plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=1.05, fontsize=18)
+            plt.title('reference period 1982-2011', fontsize=10)
             # plt.show()
             print('hey')
             plt.savefig('../src/output_images/image_' + str(i) + '.png')
