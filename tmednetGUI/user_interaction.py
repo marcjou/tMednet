@@ -28,7 +28,7 @@ version = "0.8"
 build = "Mars 2022"
 matplotlib.use("TkAgg")
 
-
+import file_manipulation2 as fm2
 class tmednet(tk.Frame):
 
     def __init__(self, master=None):
@@ -41,7 +41,6 @@ class tmednet(tk.Frame):
         """
 
         tk.Frame.__init__(self, master)  # This defines self.master
-
         self.master = master
         self.master.geometry("2000x1000")
         self.master.option_add('*tearOff', 'FALSE')  # menus no detaching
@@ -210,6 +209,8 @@ class tmednet(tk.Frame):
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
+        self.dm = fm2.DataManager(self.console_writer)
+        print('hmn')
 
     def console_writer(self, msg, mod, var=False, liner=False):
         """
@@ -288,10 +289,13 @@ class tmednet(tk.Frame):
         files = askopenfilenames(initialdir='../src', title="Open files",
                                  filetypes=[("All files", "*.*")])
         try:
-            filesname, self.path = fm.openfile(self, files, self.consolescreen)
+            #filesname, self.path = fm.openfile(self, files, self.consolescreen)
+            filesname = self.dm.openfile(files, self.textBox, self.list)
             for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
-                self.files.append(file)
-            fm.load_data(self, self.consolescreen)  # Llegim els fitxers
+                self.dm.files.append(file)
+            #fm.load_data(self, self.consolescreen)  # Llegim els fitxers
+            self.dm.load_data()
+            print('hahahahahhah')
         except TypeError as e:
             self.console_writer('Unable to read file', 'warning')
             print(str(e))
