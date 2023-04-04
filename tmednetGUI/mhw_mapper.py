@@ -109,6 +109,8 @@ class MHWMapper:
         -------
         ax : Axes matplotlib
             the axes in which the data will be plotted
+        gl : Gridlines
+            the gridlines of the plot featured to divide the latitude and longitude
         """
         plt.figure(figsize=(15/2.54, 10/2.54))
 
