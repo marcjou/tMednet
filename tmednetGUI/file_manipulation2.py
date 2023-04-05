@@ -281,3 +281,73 @@ class DataManager:
 
             return textbox, PDF_DATA
 
+    def zoom_data(self, data):
+        """
+        Method: zoom_data(data)
+        Purpose: Gets the first and last day of operation data
+        Require:
+            data: The mdata dictionary
+        Version: 05/2021, MJB: Documentation
+        """
+
+        enddate = data["datafin"]  # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
+        startdate = data["datainici"]  # - timedelta(hours=int(data["GMT"][1:]))
+
+        # Gets the first and last 72h of operation to look for the possible errors.
+        # TODO maybe choose if we want to see 24h of operation or 72h depending on the case. Automatically
+        valid_start = np.where(np.array(data['df']['Temp']) != 999)[0][0]
+        valid_end = np.where(np.array(data['df']['Temp']) != 999)[0][-1]
+        time_series = [data['df'].index[valid_start:72 + valid_start], data['df'].index[valid_end - 72:valid_end]]
+        temperatures = [data['df']['Temp'][valid_start:72 + valid_start], data['df']['Temp'][valid_end - 72:valid_end]]
+        if np.argwhere(np.array(time_series[1]) == np.array(enddate)).size == 0:
+            time_series[1] = data['df'].index[int(data['df'].index.get_indexer([enddate])) - 72:]
+            temperatures[1] = data['df']['Temp'][int(data['df'].index.get_indexer([enddate])) - 72:]
+
+        ftimestamp = [item.timestamp() for item in time_series[1]]
+        finaldydx = diff(temperatures[1]) / diff(ftimestamp)
+        indexes = np.argwhere(finaldydx > 0.0006) + 1  # Gets the indexes in which the variation is too big (removing)
+        # Checks whether if the error values begin before the declarated time of removal or later.
+        # If later, the time of removal is the marked time to be removed
+
+        # Checks if the declared date is earlier than the real date, if so, uses the real date as start date
+        # Old chunk and (time_series[0][0] - startdate).total_seconds() < 7200
+        if (time_series[0][0] - startdate).total_seconds() > 0:
+            startdate = time_series[0][0]
+        # If the removal time is way earlier than 72h from the last registered data, a warning is raised
+        try:
+            control = time_series[0] == np.array(startdate)
+            if np.all(~control):
+                idx = int(np.argwhere(data['df'].index == startdate))
+                time_series[0] = data['df'].index[int(idx) - 72:int(idx) + 1]
+                start_index = np.argwhere(time_series[0] == startdate)
+            else:
+                start_index = np.argwhere(time_series[0] == startdate)
+
+            if indexes.size != 0:
+                if enddate < data['df'].index[int(indexes[0]) - len(temperatures[1])]:
+                    index = np.argwhere(time_series[1] == enddate)
+                    indexes = np.array(range(int(index), len(temperatures[1])))
+                else:
+                    indexes = np.array(range(int(indexes[0]), len(temperatures[1])))
+                # start_index = np.array(range(int(start_index), len(temperatures[0])))
+                return time_series, temperatures, indexes, start_index, valid_start, valid_end
+            # start_index = np.array(range(int(start_index), len(temperatures[0])))
+            return time_series, temperatures, indexes, start_index, valid_start, valid_end
+        except TypeError:
+            self.console_writer("WARNING, day of end of operation "
+                          + str((data['df'].index[-1] - enddate).days) + " days earlier than the last recorded data.",
+                          'warning')
+            indexes = np.array(range(0, len(temperatures[0])))
+            start_index = np.argwhere(time_series[0] == startdate)
+            # start_index = np.array(range(int(start_index), len(temperatures[0])))
+            return time_series, temperatures, indexes, start_index, valid_start, valid_end
+        
+    def zoom_data_loop(self):
+        for data in self.mdata:
+            # self.tempdataold.append(data['df']['Temp'].copy())
+            time_series, temperatures, indexes, start_index, valid_start, valid_end = self.zoom_data(data)
+            for i in indexes:
+                data['df']['Temp'][int(i) - len(np.array(temperatures[1]))] = 999
+            for i in range(0, int(np.argwhere(np.array(data['df'].index) == time_series[0][int(start_index)]))):
+                data['df']['Temp'][int(i)] = 999
+

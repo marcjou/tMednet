@@ -140,13 +140,13 @@ class GUIPlot:
                                                         np.array(mdata[index]['df']['Temp']))
         if self.__plot.axes:
             # self.__plot = self.fig.add_subplot(111)
-            self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
+            self.__plot.plot(mdata[index]['df'].index, masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
                           title='Multiple depths Site: ' + str(mdata[index]['region_name']))
         else:
             self.__plot = self.fig.add_subplot(111)
-            self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
+            self.__plot.plot(mdata[index]['df'].index, masked_ending_temperatures,
                            '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
                           title=files[index] + "\n" + 'Depth:' + str(

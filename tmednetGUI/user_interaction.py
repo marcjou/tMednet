@@ -158,12 +158,12 @@ class tmednet(tk.Frame):
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
         self.right_menu = Menu(frame1, tearoff=0)
-        self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.mdata, self.files, self.list, self.cut_data_manually))
-        self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.mdata, self.list))  # Placeholders
-        self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.mdata))
-        self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.mdata))
+        self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.dm.mdata, self.files, self.list, self.cut_data_manually))
+        self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.dm.mdata, self.list))  # Placeholders
+        self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.dm.mdata))
+        self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.dm.mdata))
         self.right_menu.add_separator()
-        self.right_menu.add_command(label="Plot Hovmoller", command=lambda: self.gui_plot.plot_hovmoller(self.mdata))
+        self.right_menu.add_command(label="Plot Hovmoller", command=lambda: self.gui_plot.plot_hovmoller(self.dm.mdata))
         self.right_menu.add_command(label="Plot Stratification",
                                     command=lambda: self.window_browser('Select historical file and year',
                                                                         self.plot_stratification, 'Historical: ',
@@ -201,7 +201,6 @@ class tmednet(tk.Frame):
         # DEFINIR VARIABLES
         self.path = ""
         self.files = []
-        self.mdata = []
         self.index = []
         self.newfiles = 0
         self.recoverindex = None
@@ -270,10 +269,10 @@ class tmednet(tk.Frame):
                         self.gui_plot.clear_plots()
                 self.gui_plot.counter.append(index)  # Keeps track of how many plots there are and the index of the plotted files
                 # dibuixem un cop seleccionat
-                self.gui_plot.plot_ts(self.mdata, self.files, index)
+                self.gui_plot.plot_ts(self.dm.mdata, self.dm.files, index)
 
-        except IndexError:
-            pass  # Not knowing why this error raises when Saving the file but doesn't affect the code. Should check.
+        except IndexError as e:
+            print(e)  # Not knowing why this error raises when Saving the file but doesn't affect the code. Should check.
 
         # fm.load_data(self)  Que fa això aquí???? Investigar [[DEPRECATED??]]
 
@@ -329,11 +328,13 @@ class tmednet(tk.Frame):
         Require:
         Version: 01/2021, EGL: Documentation
         """
-        if not self.mdata:
+        #TODO DEPRECATED erase this method from existence, now 
+        #   the time is automatically converted to utc on load
+        if not self.dm.mdata:
             self.console_writer('Please, load a file before converting to UTC', 'warning')
         else:
             try:
-                fm.to_utc(self.mdata)
+                fm.to_utc(self.dm.mdata)
             except IndexError:
                 self.console_writer('Please, load a file before converting to UTC', 'warning')
 
@@ -351,25 +352,25 @@ class tmednet(tk.Frame):
             xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
                 hours=xtime.minute // 30)
             xtime_rounded = xtime_rounded.replace(tzinfo=None)
-            index = self.mdata[ind]['time'].index(xtime_rounded)
+            index = self.dm.mdata[ind]['time'].index(xtime_rounded)
             print('Cutting data')
-            self.console_writer('Cutting data at depth: ', 'action', self.mdata[ind]['depth'])
-            self.console_writer(' at site ', 'action', self.mdata[ind]['region'], True)
+            self.console_writer('Cutting data at depth: ', 'action', self.dm.mdata[ind]['depth'])
+            self.console_writer(' at site ', 'action', self.dm.mdata[ind]['region'], True)
 
             if self.recoverindex:
                 self.recoverindex.append(ind)
             else:
                 self.recoverindex = [ind]
-            # self.tempdataold.append(self.mdata[ind]['temp'].copy())
+            # self.tempdataold.append(self.dm.mdata[ind]['temp'].copy())
 
             # Checks if the cut is done on the first third of the dataset, which would be considered
             # a cut on the beginning of the data.
-            if index < len(self.mdata[ind]['temp'])/3:
-                for i in range(len(self.mdata[ind]['temp'][:index])):
-                    self.mdata[ind]['temp'][i] = 999
+            if index < len(self.dm.mdata[ind]['temp'])/3:
+                for i in range(len(self.dm.mdata[ind]['temp'][:index])):
+                    self.dm.mdata[ind]['temp'][i] = 999
             else:
-                for i in range(1, len(self.mdata[ind]['temp'][index:])):
-                    self.mdata[ind]['temp'][i + index] = 999
+                for i in range(1, len(self.dm.mdata[ind]['temp'][index:])):
+                    self.dm.mdata[ind]['temp'][i + index] = 999
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
             return
@@ -423,12 +424,12 @@ class tmednet(tk.Frame):
         try:
             if self.recoverindex:
                 for i in self.recoverindex:
-                    self.mdata[i]['temp'] = self.tempdataold[i]['temp'].copy()
+                    self.dm.mdata[i]['temp'] = self.tempdataold[i]['temp'].copy()
                 self.recoverindex = None
                 # self.tempdataold = None
             else:
                 i = 0
-                for data in self.mdata:
+                for data in self.dm.mdata:
                     data['temp'] = self.tempdataold[i]['temp'].copy()
                     i += 1
             self.console_writer('Recovering old data', 'action')
@@ -443,15 +444,9 @@ class tmednet(tk.Frame):
         Require:
         Version: 05/2021, MJB: Documentation
         """
-        if self.mdata:
+        if self.dm.mdata:
             # self.tempdataold = []
-            for data in self.mdata:
-                # self.tempdataold.append(data['temp'].copy())
-                time_series, temperatures, indexes, start_index, valid_start, valid_end = fm.zoom_data(data, self.consolescreen)
-                for i in indexes:
-                    data['temp'][int(i) - len(np.array(temperatures[1]))] = 999
-                for i in range(0, int(np.argwhere(np.array(data['time']) == time_series[0][int(start_index)]))):
-                    data['temp'][int(i)] = 999
+            self.dm.zoom_data_loop()
             self.console_writer('Endings of all the files cut', 'action', liner=True)
             self.reportlogger.append('Endings and start automatically cut')
         else:
@@ -492,8 +487,8 @@ class tmednet(tk.Frame):
                 filename = ""
                 for n in self.gui_plot.counter:
                     filename = filename + "_" + self.files[n][-6:-4]
-                filename = self.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
-                           + self.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename + ' ' + zoom
+                filename = self.dm.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
+                           + self.dm.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename + ' ' + zoom
 
             file = asksaveasfilename(initialdir='../src/output_images',
                                      filetypes=(("PNG Image", "*.png"), ("JPG Image", "*.jpg"), ("All Files", "*.*")),
@@ -502,7 +497,7 @@ class tmednet(tk.Frame):
                 self.gui_plot.counter.append(zoom)
             if file:
                 self.gui_plot.fig.savefig(file)
-                self.mdata[0]['images'].append(
+                self.dm.mdata[0]['images'].append(
                     file)  # Stores the path of the created images to print them on the report
                 self.console_writer('Saving plot in: ', 'action', file, True)
         except (AttributeError, UnboundLocalError, IndexError):
@@ -518,7 +513,7 @@ class tmednet(tk.Frame):
         """
 
         try:
-            if not self.mdata[0]['time']:
+            if not self.dm.mdata[0]['time']:
                 self.console_writer('First select \'To UTC\' option', 'warning')
             else:
                 self.console_writer('Creating Geojson', 'action')
@@ -527,8 +522,8 @@ class tmednet(tk.Frame):
                     self.console_writer('Load more than a file for merging, creating an output of only a file instead',
                                         'warning')
                 start_time = time.time()
-                fm.df_to_geojson(df, depths, SN, self.mdata[0]['latitude'], self.mdata[0]['longitude'])
-                fm.df_to_txt(df, self.mdata[0], SN)
+                fm.df_to_geojson(df, depths, SN, self.dm.mdata[0]['latitude'], self.dm.mdata[0]['longitude'])
+                fm.df_to_txt(df, self.dm.mdata[0], SN)
                 self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                         time.time() - start_time) + "\n =============\n")
                 self.reportlogger.append('Geojson and CSV file created')

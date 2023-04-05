@@ -160,7 +160,7 @@ def interpolate_hours(data):
                 dat['time'] = daterange.to_pydatetime().tolist()
                 break
 
-
+# TODO DEPRECATED
 def convert_round_hour(data):
     """
     Method: convert_round_hour(data)
@@ -185,7 +185,7 @@ def convert_round_hour(data):
                     # round down
                     dat['timegmt'][i] = dt_start_of_hour
 
-
+# TODO DEPRECATED
 def check_hour_interval(data):
     """
     Method: check_hour_interval(data)
