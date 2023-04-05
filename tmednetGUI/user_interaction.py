@@ -131,7 +131,7 @@ class tmednet(tk.Frame):
 
         # Contingut de F2
         # Definir aspectes dibuix
-        self.gui_plot = gp.GUIPlot(f2, self.console_writer, self.reportlogger)
+        self.gui_plot = gp.GUIPlot(f2, self.console_writer, self.reportlogger, self.dm)
         self.toolbar = NavigationToolbar2Tk(self.gui_plot.canvas, f2)
         self.toolbar.children['!button5'].pack_forget()
         tk.Button(self.toolbar, text="Clear Plot", command=self.gui_plot.clear_plots).pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
@@ -158,7 +158,7 @@ class tmednet(tk.Frame):
         self.list.bind("<<ListboxSelect>>", self.select_list)
 
         self.right_menu = Menu(frame1, tearoff=0)
-        self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.dm.mdata, self.files, self.list, self.cut_data_manually))
+        self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.dm.mdata, self.dm.files, self.list, self.cut_data_manually))
         self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.dm.mdata, self.list))  # Placeholders
         self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.dm.mdata))
         self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.dm.mdata))
@@ -209,7 +209,6 @@ class tmednet(tk.Frame):
         self.tempdataold = []
         self.controlevent = False
         self.dm = fm2.DataManager(self.console_writer, self.reportlogger)
-        print('hmn')
 
     def console_writer(self, msg, mod, var=False, liner=False):
         """
@@ -352,7 +351,7 @@ class tmednet(tk.Frame):
             xtime_rounded = xtime.replace(second=0, microsecond=0, minute=0, hour=xtime.hour) + timedelta(
                 hours=xtime.minute // 30)
             xtime_rounded = xtime_rounded.replace(tzinfo=None)
-            index = self.dm.mdata[ind]['time'].index(xtime_rounded)
+            index = int(self.dm.mdata[0]['df'].index.get_indexer([xtime_rounded]))
             print('Cutting data')
             self.console_writer('Cutting data at depth: ', 'action', self.dm.mdata[ind]['depth'])
             self.console_writer(' at site ', 'action', self.dm.mdata[ind]['region'], True)
@@ -365,12 +364,12 @@ class tmednet(tk.Frame):
 
             # Checks if the cut is done on the first third of the dataset, which would be considered
             # a cut on the beginning of the data.
-            if index < len(self.dm.mdata[ind]['temp'])/3:
-                for i in range(len(self.dm.mdata[ind]['temp'][:index])):
-                    self.dm.mdata[ind]['temp'][i] = 999
+            if index < len(self.dm.mdata[ind]['df'])/3:
+                for i in range(len(self.dm.mdata[ind]['df'][:index])):
+                    self.dm.mdata[ind]['df']['Temp'][i] = 999
             else:
-                for i in range(1, len(self.dm.mdata[ind]['temp'][index:])):
-                    self.dm.mdata[ind]['temp'][i + index] = 999
+                for i in range(1, len(self.dm.mdata[ind]['df'][index:])):
+                    self.dm.mdata[ind]['df']['Temp'][i + index] = 999
         except ValueError:
             self.console_writer('Select value that is not the start or ending', 'warning')
             return

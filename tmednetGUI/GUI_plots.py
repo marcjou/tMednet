@@ -66,7 +66,7 @@ class GUIPlot:
     Version: 03/2023 MJB: Documentation
     """
 
-    def __init__(self, f2, console, reportlogger):
+    def __init__(self, f2, console, reportlogger, dm):
         """
         Parameters
         ----------
@@ -82,6 +82,7 @@ class GUIPlot:
         self.index = []
         self.console_writer = console
         self.reportlogger = reportlogger
+        self.dm = dm
         self.savefilename = ""
         self.__cb = ""
 
@@ -177,7 +178,7 @@ class GUIPlot:
         """
         self.clear_plots()
         index = int(list.curselection()[0])
-        time_series, temperatures, indexes, start_index, valid_start, valid_end = fm.zoom_data(mdata[index], self.console_writer)
+        time_series, temperatures, indexes, start_index, valid_start, valid_end = self.dm.zoom_data(mdata[index])
 
         self.counter.append(index)
         self.counter.append('Zoom')
@@ -263,7 +264,7 @@ class GUIPlot:
             self.__plot2 = self.fig.add_subplot(212)
 
         for i in index:
-            time_series, temperatures, _, bad, bad2, bad3 = fm.zoom_data(mdata[i], self.console_writer)
+            time_series, temperatures, _, bad, bad2, bad3 = self.dm.zoom_data(mdata[i], self.console_writer)
             depths = depths + " " + str(mdata[i]['depth'])
 
             masked_temperatures = np.ma.masked_where(np.array(mdata[i]['df']['Temp']) == 999,
