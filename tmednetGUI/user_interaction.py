@@ -209,7 +209,7 @@ class tmednet(tk.Frame):
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
-        self.dm = fm2.DataManager(self.console_writer)
+        self.dm = fm2.DataManager(self.console_writer, self.reportlogger)
         print('hmn')
 
     def console_writer(self, msg, mod, var=False, liner=False):
@@ -289,13 +289,10 @@ class tmednet(tk.Frame):
         files = askopenfilenames(initialdir='../src', title="Open files",
                                  filetypes=[("All files", "*.*")])
         try:
-            #filesname, self.path = fm.openfile(self, files, self.consolescreen)
             filesname = self.dm.openfile(files, self.textBox, self.list)
             for file in filesname:  # Itera toda la lista de archivos para añadirlos a la listbox
                 self.dm.files.append(file)
-            #fm.load_data(self, self.consolescreen)  # Llegim els fitxers
             self.dm.load_data()
-            print('hahahahahhah')
         except TypeError as e:
             self.console_writer('Unable to read file', 'warning')
             print(str(e))
@@ -310,7 +307,7 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
 
-        fm.report(self, self.textBox)
+        self.dm.report(self.textBox)
 
     def reset(self):
         """

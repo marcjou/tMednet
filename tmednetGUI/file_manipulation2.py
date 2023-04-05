@@ -17,7 +17,7 @@ import progressbar as pb
 
 class DataManager:
 
-    def __init__(self, console):
+    def __init__(self, console, reportlogger):
         self.path = ""
         self.files = []
         self.mdata = []
@@ -29,6 +29,7 @@ class DataManager:
         self.tempdataold = []
         self.controlevent = False
         self.console_writer = console
+        self.reportlogger = reportlogger
         print('hello')
 
     def openfile(self, files, textBox, lister):
@@ -200,3 +201,83 @@ class DataManager:
                                range(len(self.mdata[i]['df'].index))]
             self.mdata[i]['datainici'] = self.mdata[i]['datainici'] - timedelta(hours=gmthshift)
             self.mdata[i]['datafin'] = self.mdata[i]['datafin'] - timedelta(hours=gmthshift)
+
+    def report(self, textbox):
+        """
+        Method: report(self)
+        Purpose: List main file characteristics
+        Require:
+            textBox: text object
+        Version: 01/2021, EGL: Documentation
+        """
+        textbox.delete(1.0, "end")
+        # TODO format the PDF file to make it more "elegant"
+        # Creating the same report as a PDF
+        pdf = pdf_creator.pdf_starter()
+        # Dict to store the PDF metadata
+        PDF_DATA = {'Date Data Upload': 0,
+                    'Date data ingestion report': datetime.strftime(datetime.today(), '%Y-%m-%d'),
+                    'Site code': self.mdata[0]['region'], 'Site name': self.mdata[0]['region_name'],
+                    'Sampling depth (m)': [], 'Sampling interval (hh:mm:ss)': '1:00:00',
+                    'Parameter': 'Seawater Temperature in ºC',
+                    'Recording Start Date': datetime.strftime(self.mdata[0]["df"].index[0], '%Y-%m-%d %H:%M:%S'),
+                    'Recording End Date': datetime.strftime(self.mdata[0]["df"].index[-1], '%Y-%m-%d %H:%M:%S'),
+                    'Underwater Start Date': datetime.strftime(self.mdata[0]["datainici"], '%Y-%m-%d %H:%M:%S'),
+                    'Underwater End Date': datetime.strftime(self.mdata[0]['datafin'], '%Y-%m-%d %H:%M:%S'),
+                    'GMT': self.mdata[0]["GMT"], 'Sensors': [],
+                    'NData': []}
+        # ATTENTION THIS HAS BEEN MODIFIED CHECK
+        textbox, PDF_DATA = self.metadata_string_creator(textbox, PDF_DATA)
+        textbox.insert("end", "=========\n")
+        for text in self.reportlogger:
+            textbox.insert("end", text + "\n")
+            textbox.insert("end", "=========\n")
+        with open('../src/output_files/report.txt', 'w') as fr:
+            text = textbox.get('1.0', 'end').splitlines()
+            for line in text:
+                fr.write(line + "\n")
+        n = 0
+        pdf.titles('Metadata')
+        for key in PDF_DATA:
+            if n == 0:
+                pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n', True)
+                n = 1
+            else:
+                pdf.text(key + ': ' + str(PDF_DATA[key]) + '\n')
+        if self.mdata[0]['images'] != []:
+            pdf.titles('Images results')
+            pdf.text('Invisible', color='White')
+            n = 0
+            for images in self.mdata[0]['images']:
+                if n == 0:
+                    pdf.imagex(images, True)
+                    n = 1
+                else:
+                    pdf.imagex(images)
+        pdf.titles('Other info')
+        n = 0
+        for text in self.reportlogger:
+            if n == 0:
+                pdf.text(text, afterTitle=True)
+            else:
+                pdf.text(text)
+        pdf.output('test2.pdf', 'F')
+
+    def metadata_string_creator(self, textbox, PDF_DATA):
+        for item in self.mdata:
+            daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
+            cadena = "=========\n"
+            cadena += "Depth: " + str(item["depth"]) + "\n"
+            cadena += "Init: " + item["datainici"].isoformat() + "\n"
+            cadena += "End: " + item["datafin"].isoformat() + "\n"
+            cadena += "Ndays: " + str(daysinsitu) + "\n"
+            cadena += "GMT: " + item["GMT"] + "\n"
+            cadena += "DInit: " + item["df"].index[0].isoformat() + "\n"
+            cadena += "DEnd: " + item["df"].index[-1].isoformat() + "\n"
+            textbox.insert("end", cadena)
+            PDF_DATA['Sampling depth (m)'].append(item['depth'])
+            PDF_DATA['Sensors'].append(item['S/N'])
+            PDF_DATA['NData'].append(sum(map(lambda x: x != 999, item['df']['Temp'])))
+
+            return textbox, PDF_DATA
+

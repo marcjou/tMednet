@@ -136,8 +136,8 @@ class GUIPlot:
         elif self.counter[0] == 'Difference':
             self.clear_plots()
 
-        masked_ending_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
-                                                        np.array(mdata[index]['temp']))
+        masked_ending_temperatures = np.ma.masked_where(np.array(mdata[index]['df']['Temp']) == 999,
+                                                        np.array(mdata[index]['df']['Temp']))
         if self.__plot.axes:
             # self.__plot = self.fig.add_subplot(111)
             self.__plot.plot(mdata[index]['time'], masked_ending_temperatures,
@@ -187,8 +187,8 @@ class GUIPlot:
             self.__plot1 = self.fig.add_subplot(211)
             self.__plot2 = self.fig.add_subplot(212)
 
-        masked_temperatures = np.ma.masked_where(np.array(mdata[index]['temp']) == 999,
-                                                 np.array(mdata[index]['temp']))
+        masked_temperatures = np.ma.masked_where(np.array(mdata[index]['df']['Temp']) == 999,
+                                                 np.array(mdata[index]['df']['Temp']))
 
         self.__plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
                         '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
@@ -266,8 +266,8 @@ class GUIPlot:
             time_series, temperatures, _, bad, bad2, bad3 = fm.zoom_data(mdata[i], self.console_writer)
             depths = depths + " " + str(mdata[i]['depth'])
 
-            masked_temperatures = np.ma.masked_where(np.array(mdata[i]['temp']) == 999,
-                                                     np.array(mdata[i]['temp']))
+            masked_temperatures = np.ma.masked_where(np.array(mdata[i]['df']['Temp']) == 999,
+                                                     np.array(mdata[i]['df']['Temp']))
 
             masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
                                                             np.array(temperatures[1]))
