@@ -326,7 +326,7 @@ class GUIPlot:
         except UnboundLocalError:
             self.console_writer('Load more than a file for plotting the difference', 'warning')
 
-    def plot_dif_filter1d(self, mdata):
+    def plot_dif_filter1d(self):
         """
          Plots the filtered difference between consecutive depths of all the loaded files
          ...
@@ -340,7 +340,7 @@ class GUIPlot:
         self.clear_plots()
         depths = ""
         try:
-            dfdelta = fm.apply_uniform_filter(mdata)
+            dfdelta = self.dm.apply_uniform_filter()
             self.counter.append("Filter")
             # Creates the subplots and deletes the old plot
             if self.__plot1.axes:
@@ -366,7 +366,7 @@ class GUIPlot:
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
             self.console_writer('Plotting zoom of depths: ', 'action', depths)
-            self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+            self.console_writer(' at site ', 'action', self.dm.mdata[0]['region'], True)
         except UnboundLocalError:
             self.console_writer('Load more than a file for plotting the difference', 'warning')
 
@@ -383,7 +383,7 @@ class GUIPlot:
         try:
             self.clear_plots()
             self.counter.append("Hovmoller")
-            df, depths, _ = fm.list_to_df(mdata)
+            df, depths, _ = self.dm.list_to_df()
             depths = np.array(depths)
             if self.__plot1.axes:
                 plt.Axes.remove(self.__plot1)

@@ -159,7 +159,7 @@ class tmednet(tk.Frame):
         self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.dm.mdata, self.dm.files, self.list, self.cut_data_manually))
         self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.dm.mdata, self.list))  # Placeholders
         self.right_menu.add_command(label="Plot difference", command=self.gui_plot.plot_dif)
-        self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.dm.mdata))
+        self.right_menu.add_command(label="Plot filter", command=self.gui_plot.plot_dif_filter1d)
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=lambda: self.gui_plot.plot_hovmoller(self.dm.mdata))
         self.right_menu.add_command(label="Plot Stratification",

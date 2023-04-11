@@ -479,4 +479,34 @@ class DataManager:
 
         return dfdelta, depths
 
+    def apply_uniform_filter(self):
+        """
+        Method: apply_uniform_filter(data)
+        Purpose: Applies the 10 running day filter to the data
+        Require:
+            data: The mdata dictionary
+        Version: 05/2021, MJB: Documentation
+        """
+        df, depths = self.temp_difference()
+        i = 1
+        longest = 0
+        indi = 0  # Checks the longest time series of all to use it as the base for the plots
+        for u in range(0, len(self.mdata)):
+            if len(self.mdata[u]['df'].index) > longest:
+                longest = len(self.mdata[u]['df'].index)
+                indi = u
+        for depth in depths[:-1]:
+            series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])].dropna(), size=240),
+                                   index=df[str(depth) + "-" + str(depths[i])].dropna().index,
+                                   columns=[str(depth) + "-" + str(depths[i])]).reindex(self.mdata[indi]['df'].index)
+            # series1 = pd.DataFrame(uniform_filter1d(df[str(depth) + "-" + str(depths[i])], size=240),
+            #                       index=data[indi]['time'], columns=[str(depth) + "-" + str(depths[i])])
+            i += 1
+            if 'dfdelta' in locals():
+                dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
+            else:
+                dfdelta = pd.DataFrame(series1)
+
+        return dfdelta
+
 
