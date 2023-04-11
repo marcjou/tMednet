@@ -1,0 +1,1746 @@
+[33mcommit 9316db6d24d6090605b411fb6cbdffe065b9709c[m[33m ([m[1;36mHEAD -> [m[1;32mfilemanipulation[m[33m)[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Apr 5 12:58:15 2023 +0200
+
+    Cut data manually properly working.
+
+[33mcommit 69f4a2e1d65e3ce5dddd43b53f120baf6ffc7cb0[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Apr 5 12:42:20 2023 +0200
+
+    Zoom data metmethod perfectly integrated, cut endings working fine.
+
+[33mcommit 1561e64fd5bb6307b85512668fee0d6c26f8e3ac[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Apr 5 10:51:16 2023 +0200
+
+    Report method working under new refactoring
+
+[33mcommit 41a24895e62c4ec97278198fda07e603affbfdbe[m[33m ([m[1;31morigin/filemanipulation[m[33m)[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Apr 4 13:32:20 2023 +0200
+
+    Started construction of datamanager class under file manipulation. Working on changing all possible dicts to dataframes. Right now working fine until load_data method, it included.
+
+[33mcommit 8b128355d1c846699a7728bad35a051e01dae6cd[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Apr 4 09:12:55 2023 +0200
+
+    Added a line oine of documentation for mhw_mapper ax_setter for gl.
+
+[33mcommit d0a22478ab160abb309e4dc3d1da2945833099e8[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Apr 3 11:32:16 2023 +0200
+
+    Changed the style of the created maps on mhw_mapper, should try out on ICM.
+
+[33mcommit c25b8620a2dad8fc649cb388085775d355d45e94[m
+Merge: 4a683c0 5d0efe4
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 31 11:54:39 2023 +0200
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+    agregando los cambios que hice en ICM
+
+[33mcommit 4a683c038d1926d935f0979ebe056563a5dc7de9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 31 11:54:13 2023 +0200
+
+    Avoiding error
+
+[33mcommit 5d0efe455b9b4108d0ab2a61f0858576e1abf9e4[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 15:08:52 2023 +0200
+
+    Modified the last shell script to perfectly capture yesterdays month.
+
+[33mcommit 49ba7c40f39cd2e40ec7b80f5787c7f02c6ef46a[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 14:57:43 2023 +0200
+
+    Created shell script to upload the files via ftp.
+
+[33mcommit ba46374069ead3427e4ecdea83df9b18da614893[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 14:38:31 2023 +0200
+
+    modified mhw_mapper to properly write the name of the file.
+
+[33mcommit a269944e2bbfcaa6c55a5c953fc5216178fb29d4[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 14:25:35 2023 +0200
+
+    Created a shell script to execute create_maps automatically.
+
+[33mcommit 0a199f02f640e95c6d88edb71b7332d75e3e5cac[m
+Merge: b7c35bb e615370
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 10:41:41 2023 +0200
+
+    Solved merge conflict
+
+[33mcommit b7c35bb2c13824f33249c4982353b6ff7b269a80[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Mar 28 10:35:36 2023 +0200
+
+    unsaved changes.
+
+[33mcommit cba8586a422561b0792bd02af479ab2241dff09d[m[33m ([m[1;31morigin/guiplots[m[33m)[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 23 10:21:18 2023 +0100
+
+    Fully dollysdsly documented the GuiPlot class.
+
+[33mcommit 6a9d596480e5be1f38870062dd969995646f0d0a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 17 12:40:52 2023 +0100
+
+    Updated stability and some bugs. Worked on changing figure 2 method to accomodate change of str to datetime objects. Keep work on it to make it as simple as possible.
+
+[33mcommit d30d5ae882e3f41b5b658a82927cafa8b242dcb7[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 16 12:22:37 2023 +0100
+
+    Modified annual ts plot to actually plot even on non leap years and also tweaked the filter for the climatology.
+
+[33mcommit e09972abdd87b9bf72c2b41ad4fedde9fd119e6b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 16 12:03:45 2023 +0100
+
+    Working on documenting GUIPLOT and also solving some minor issues with the plots
+
+[33mcommit 7e6f15a0586c6c2056549ea1e6e55b51180d2d93[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 16 11:28:49 2023 +0100
+
+    Changed placement of asterisk note on thresholds. Started documenting GUIPLots class.
+
+[33mcommit 12b3115096d69e79da16d05d0a1cdb7a369b2bf9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 11:55:40 2023 +0100
+
+    AnualTCycles method successfully moved to GUIPLOT class.Thresholds
+
+[33mcommit d53af8c726c8ecc0015adab6108d534edb890eb5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 11:38:20 2023 +0100
+
+    AnualTCycles method successfully moved to GUIPLOT class.
+
+[33mcommit 67f092b043c404b21bd9a50daad8b1867bafbcb8[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 10:37:32 2023 +0100
+
+    Stratification method successfully moved to GUIPLOT class.
+
+[33mcommit 5754f6e164e9746dd7cd727d5a4b0c762e16b91f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 10:26:06 2023 +0100
+
+    Save method now working properly with new GUIPLOT class.
+
+[33mcommit a8437d96abc112be5a587e827b24acda58ec5c29[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 10:05:10 2023 +0100
+
+    Plot_hovmoller successfully moved to GUIPLOT class.
+
+[33mcommit 6274a265c50d8df50cba825eb569fe0a7562b472[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 15 09:59:21 2023 +0100
+
+    Plot dif and plot dif filtered methods succesfully moved to GUIPLots class.
+
+[33mcommit 41317b8bc43be6c9d83842b1b833c6c50de1bce2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 15:05:53 2023 +0100
+
+    Cut endings method to automatically cut properly works with starting datasets.
+
+[33mcommit 7991b7c2c1845d05d083134d6932710b9865797d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 14:52:57 2023 +0100
+
+    Plot zoom all added succesfully to GUIPlot class.
+
+[33mcommit 65d243cd3d350467e71bd32c09f8d5f3e8234222[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 14:43:25 2023 +0100
+
+    Made the manually cutting on zoom data properly show the end part as well.
+
+[33mcommit 5c5ac4acac8822a51f1491bab93f008fae50b9af[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 13:11:59 2023 +0100
+
+    Manually cutting data from zoom properly represents the new dataset.
+
+[33mcommit f02411f99273609910bdd7c040e8987bccf95146[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 11:58:53 2023 +0100
+
+    Plot_zoom successfully moved to GUIPlot class.
+
+[33mcommit a024b0b70c0822844dff54c4eb1ee31523b86ca7[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 11:28:48 2023 +0100
+
+    clear_plots method successfully moved to GUIPlot class.
+
+[33mcommit 3a24bf6e922693047768d06b4880afaafab58e6d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 11:14:32 2023 +0100
+
+    plot_ts method moved successfully to GUI_plots.
+
+[33mcommit 8ce7fc61dead05b1f2e16186f53571cb74fdb11b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 14 10:52:49 2023 +0100
+
+    Started work on GUI_plots, the class to move all the plotting logic from user_interaction to make the code cleaner.
+
+[33mcommit e615370a86d341e5cc2c30c0c5d3148c9296cccf[m[33m ([m[1;31morigin/surfaceclass[m[33m)[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 13 15:59:10 2023 +0100
+
+    Modified user_interaction to properly use the new methods and class under surface_temperature. Also modified surface_temperature to set the private methods, private.
+
+[33mcommit 1eb3bb84e68f1e82cd401a045cacf6460d5e21f3[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 10 12:57:57 2023 +0100
+
+    Added documentation and deleted tridepth method for surface_temperature.py
+
+[33mcommit 2676915ffff9d1cf0a79fbc2b4b86773d5167274[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 9 15:27:34 2023 +0100
+
+    Working on the class for surface temperature done, moving to annotating and documenting.
+
+[33mcommit 1eb6f8af40d943b2a1ea517fa18356b3f5b73a7d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 9 09:57:07 2023 +0100
+
+    Created the docstrings for mhw_mapper.
+
+[33mcommit 5c3f4ce7bb55d6685af8f0e7b83a19f59ce7c7df[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Mar 8 15:11:43 2023 +0100
+
+    Started writing documentation as docstrings for mhw_mapper.py Keep working on it
+
+[33mcommit 4cf885ca756c1aff39779b6659a9543cd5adc1d7[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Mar 8 14:34:55 2023 +0100
+
+    Modified the MHWmapper object to properly plot the duration taking into account blank spaces, etc.
+
+[33mcommit 0c331c6c141a6082f324a382a1d071d30dbc65d6[m
+Merge: 3e688cc f468d34
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Mar 8 08:44:42 2023 +0100
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+
+[33mcommit f468d34c71ae8421fcf6a74b79b035b6d8558f63[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Mar 7 16:02:48 2023 +0100
+
+    Modified the annual method to properly plot the climatology daily on the gray area instead of monthly. Need to solve why so much noise even after making a filter.
+
+[33mcommit 112a4f379cc1526b6cb4aa556f3ef7af08d8c81f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 6 13:24:50 2023 +0100
+
+    Changed psitioged position of asterisk disclaimer on thresholds.
+
+[33mcommit 1951300848c5ab8e32f4c4d5f4fe3d8f68a49afd[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 6 11:20:50 2023 +0100
+
+    Updated method from TOBS to log to write an excel table.
+
+[33mcommit 2b05b968a1118792d4e73b1939f58ff84cc84bf2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 3 13:10:04 2023 +0100
+
+    Added methods to Write Log class to check in database files if the difference between depths is bigger than -0.2 and write it to the log.
+
+[33mcommit 0b11437ceb998a29b038d213634bda6d68301ff2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 1 10:42:31 2023 +0100
+
+    Added clas LogWriter to access and modify the tmednet_log.txt under file write_tmednet_log.py
+
+[33mcommit 4dcb998293b04f66e02d97d886fd09f932d3b804[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 28 11:48:14 2023 +0100
+
+    Added script to check all TOBS files and write a log by site stating the last day recorded in local time.
+
+[33mcommit 3e688cc8a6ec5041dc27599dbd667a8c16a60c3f[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Feb 22 12:55:52 2023 +0100
+
+    Modified the way the name of the final gif is created
+
+[33mcommit 526ebc982fdcc2dcbb04fd7323b6e7bfb7d4f439[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Feb 22 12:31:51 2023 +0100
+
+    Created file mhw_mapper.py to plot intensity and duration MHW maps from Justino's data
+
+[33mcommit f0d79b9a165d69210406c8d8f6e7964214346bb6[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 21 12:21:03 2023 +0100
+
+    added white line on the merge historical method to separate different datasets.
+
+[33mcommit 166919c51ddc97081521cfd11262daee92be5b91[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 21 11:20:02 2023 +0100
+
+    Added a duplicity check when calling Historical Merger. Now it displays on the console part a warning telling how many duplicates have been found as well as the first and last occurrence.
+
+[33mcommit 1f5ebce86f274c55eddc57cd7898efc9646411c5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Feb 20 13:06:40 2023 +0100
+
+    Added little box under legends of thresholsd plot explaining the asterisk. Added asterisk to years that have not a complete period, 92 days of records.
+
+[33mcommit 771a2a02df177ee6adc16752c449f80c3a3715df[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Feb 17 13:15:05 2023 +0100
+
+    Solved a ed aed a problem for which the histdf of annualtcycles method could be out of order. Also changed white lines to lighter gray to differenciate from background
+
+[33mcommit 1e02d58543cfbcb13f33a4f1dd3a49f432e4bb79[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Feb 17 10:46:25 2023 +0100
+
+    Changed how the running average method works to properly filter the data when there are gaps bigger than the running average.
+
+[33mcommit 4338f033213c2d8b9ff468eb6c0c1bd3557783f2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Feb 15 17:23:54 2023 +0100
+
+    Deleted ticks of depths not real on data (stratification). Tested Cutin 2011. Stratification: now interpolates maximum of 10m difference (before maximum of 5m). Changed method of selecting and deleting big gaps of vertical data
+
+[33mcommit 90f19f0684e70012ee7e23c8de5777b9a8e02377[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 14 12:52:24 2023 +0100
+
+    Added JAS asfter summer in thresholds plot.
+
+[33mcommit 48f9efa1d474278ea3988b60488dec8fc9dd252c[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 14 12:50:47 2023 +0100
+
+    Added an asterisk to the legend of years on thresholds to indicate which years have incomplete or missing data
+
+[33mcommit 6cd51acbda1fcf6f93258bac745f8e5eded4d51e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 14 12:00:41 2023 +0100
+
+    Changed threshold plot method to add internal coherence. Now it will not plot depths beloq 10 day difference of records than the max one.
+
+[33mcommit 9b9b53bc7998631091c02bb0b1b6b87ad915f26a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Feb 9 10:13:08 2023 +0100
+
+    Modified stratification and historic_to_df methods to allow for double plotting instead of interpolating when there is a vertical hole in the data.
+
+[33mcommit 56efc345361417364ce37d859a32ef062b50b7ab[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 7 15:42:23 2023 +0100
+
+    Up to date update.
+
+[33mcommit 27cfcf0752fcec24d6964ad761262a1f5ba9c495[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Feb 1 12:40:19 2023 +0100
+
+    Added small if to check if there are empty depths on annual T cycles and delete them to not let them be plotted as legend.
+
+[33mcommit ee311f416264e31879cd226fa3a3632b7ba4fbb4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Feb 1 12:35:46 2023 +0100
+
+    Changed annual and historic_to_df to do not plot the multiyear if it is the first year of operation and to not interpolate between columns when calling the annual method.
+
+[33mcommit 8fbd8caf21e82782ab4629b28410eeff2a6f3286[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 31 16:31:47 2023 +0100
+
+    Improved surface_temperature.py to properly plot the y-axis with the same limits for the same site. Also added a way to detect the last year of operation on the dataset. Modified Annual T Cycles so it properly doesn't plot the line if there is a big data gap, instead of interpolating.
+
+[33mcommit d5a6fe2ae96d8a0dc67e6a9f961fbc76da0bbd5a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jan 25 12:44:38 2023 +0100
+
+    Updated the method responsible for the main plots to make them nicer (e.g. Thresholds now has a grid) Updated also the interpolate hours to properly work and override some problematic time frequencies. Other changes may have been made.
+
+[33mcommit 4d588908e3248145ce93c8ee0e5253e214108732[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 17 11:56:38 2023 +0100
+
+    Added script to convert some weirdly shaped .csv data files to the more convenient .txt files.
+
+[33mcommit 4b42b9e5e6e843243908d1c57172b5f8f2e46e73[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Jan 11 14:18:01 2023 +0100
+
+    Changed the name save in mhw_map_creator and added label to the colorbar.
+
+[33mcommit 928fd2cead41aad510dd902c10661fba2609012c[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 10 15:31:13 2023 +0100
+
+    Added tridepth anomaly to menu
+
+[33mcommit f0585cc1e69e562266f2556bbfe2a894fe61fd83[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Dec 9 10:53:10 2022 +0100
+
+    improved write_excel methods to automatically generate the output filename.
+
+[33mcommit f583f0d06df7dafbe450c161c281b624c584da24[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Dec 7 13:20:02 2022 +0100
+
+    Object oriented MHWMapper tested and working.
+
+[33mcommit 1a82061477401c36c74f51b71949c538083feaf5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Dec 2 11:14:57 2022 +0100
+
+    Added the method get_intensity to MHWMapper class to create the intensity df in order to plot it later into a gif. Also restructured the code a bit and made it more readable. Also changed the get_duration method to properly get the duration info of all the period via a loop, instead of just getting the first mhw duration. Don't know why it was like it.
+
+[33mcommit 5fbe2ea374e2447e07a5b8184fbbc2d5c374c078[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Dec 1 14:29:01 2022 +0100
+
+    Created the __create_image_by_type method to make the code more organised.
+
+[33mcommit 30bcb0139dd25d7711549113f27b99c83dba7d0a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Dec 1 14:02:54 2022 +0100
+
+    Created a Class MHWMapper to control the creation of the MHW gifs based on prova and prova2.py
+
+[33mcommit 8cd52ed744413f8942d8ee89888f6f5834ed9da2[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Nov 30 15:58:46 2022 +0100
+
+    Changed prova2 to include the creation of duration array by using only xarray and numpy libraries, making it significally faster. Time to work on creating intensity array and plotting them.
+
+[33mcommit 0e5bb4885385471f78169c9151f7735152e5331a[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Nov 30 14:01:09 2022 +0100
+
+    Improved the prova2.py file in which I'm working on creating the mhw gifs with cartopy. Now it properly works using xarray instead of netcdf4 and thus I currently increased the processing speed. More work needs to be done in order to implement the mhw methods.
+
+[33mcommit d7942e8ff70199c243b5d639e7e0bb0164a3a8f4[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Mon Nov 28 15:54:17 2022 +0100
+
+    Corrected the anomalies creator aswell as the spike plot creator to properly filter the data.
+
+[33mcommit 8ec528f3126ca00a55743773f9e05c2e4f004395[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 25 16:29:10 2022 +0100
+
+    Improved the plot_thresholds method to take into account only the summer months (July to September) to fill with nans if no data or data under 30 days.
+
+[33mcommit dcf8ae4f71ba31dbb78b12bb5fa4b9a93eef24b7[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 25 12:49:55 2022 +0100
+
+    Added to surface_temperature.py a new method that can create multi-depth anomaly plots.
+
+[33mcommit ce48cfdb11b9884f04bdd25a070c099ca296b478[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 24 13:29:41 2022 +0100
+
+    Changed the way the plot works for stratification when there is only 1 depth, instead of going 1 meter above it goes 2.5m above and below.
+
+[33mcommit 601adfb54c19ad78ea1006fc9b58b3b29a5f896f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 24 13:13:23 2022 +0100
+
+    Added a step on the plot_stratification method to properly plot those sites that only have one depth by duplicating its data one meter above.
+
+[33mcommit 8a3405393c3ae3c77b651eac383675cba049bb32[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 24 12:30:09 2022 +0100
+
+    Avoided a Future Warning by changing pd.read_csv methods to be keyword-only except for the path.
+
+[33mcommit 1d158c6d2569b0626d85c1e08e4655387f730855[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 24 12:25:51 2022 +0100
+
+    Changed the file_writer file to eliminate deprecated methods (pandas.append) and replaced them for pandas.concat(axis=0, join='outer').
+
+[33mcommit 4ee0d743073ba80a61a814285bb7ba55d2d287d3[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 23 12:04:23 2022 +0100
+
+    Updated the user_interaction file the threshold plot function to properly mask the data points that have no real data.
+
+[33mcommit efbc761b1d95618c99648502aada5897087a2830[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Nov 22 16:49:12 2022 +0100
+
+    Added more functions to the write excel module for which it now creates data for the historics and also properly calculates the number of days over a certain temperature.
+
+[33mcommit e68cf921471da7a34776d739b3a8debd54302037[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 18 17:47:02 2022 +0100
+
+    Changed file_manipulation average_running_special to properly work for creating the tCycles plot. Now it is more optimized and can plot discontinuous data!
+
+[33mcommit 8c67a79c66d0e4deb28287aa3d266fb1a812053b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 16 13:17:16 2022 +0100
+
+    Improved the cut endings method, now works better and more properly taking into account the end date even if it is much earlier than 72h before the real end date. Also upgraded the scaling of the stratification method to use only min and max from may to december and use the percentile p99 and p01 to take those values.
+
+[33mcommit 3bc459114af253b7c77a5e88ad77708130892a82[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Nov 15 11:34:52 2022 +0100
+
+    Added some changes to the main code such as improving how the colourbar is displayed and created on the stratification plot.
+
+[33mcommit 6fb7b4e0488fcd1e0fad4eed0bee3ce9a3c2cf5b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 4 13:34:12 2022 +0100
+
+    Changed the running average special function under File Manipulation to properly order the data if there's a chunk missing at the beginning.
+
+[33mcommit c3f509bef1c7e3192cf807a9594746549d57b968[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Oct 31 12:53:04 2022 +0100
+
+    Improved the visibility of the anomalies plot.
+
+[33mcommit 8be3f0d0cae90e6a186d784699b9e3c8d5a226e5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Oct 28 14:00:15 2022 +0200
+
+    Actualizado el plotter de anomalies para poder generar lineas sobre los máximos y mínimos históricos.
+
+[33mcommit ddd7e63193ee357529a4119472d23dea798049a9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Oct 26 11:51:15 2022 +0200
+
+    Refactored surface_temperature.py and improved the readability of the code dividing into multiple methods the plotter methods.
+
+[33mcommit 4225aef4f576b1f85ce1000a90bb9f0eb66e14df[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Oct 21 17:01:39 2022 +0200
+
+    Added multiyear plotting for spikes and anomalies.
+
+[33mcommit 42060c7940884e1e554aef3a863da58cd99af376[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Oct 21 14:04:35 2022 +0200
+
+    Added to the spikes and anomalies method the possibility to create zoomed versions of the plots for the months of summer.
+
+[33mcommit c7a7d9a4cb03ef62a63bf65a094b1e994cbc7b72[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Oct 20 13:59:26 2022 +0200
+
+    Working on improving the code.
+
+[33mcommit e7813ba68c801011708aa0881827ccfa1e4df695[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Oct 20 11:47:35 2022 +0200
+
+    Added the anomaly method to the code and it has been completely integrated with the GUI. Working on improving the readability of the code.
+
+[33mcommit f6884cb5bac9561421a7c64251d30a2e588b3871[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Oct 18 13:55:49 2022 +0200
+
+    Added cold spikes (though they got commented out) and added the categories for the spikes as well. Should focus on creating the anomalies now.
+
+[33mcommit 6c501d241f4cc5625b4c292aad482caff46fd038[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Oct 18 11:15:32 2022 +0200
+
+    Improved the readability of the code
+
+[33mcommit 38ea2f6d35461f5fabf9c08a317e1c343c7ec271[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Oct 17 19:07:17 2022 +0200
+
+    Added the new method to the GUI and it works wonders.
+
+[33mcommit 68e94b727d773fe005d1cd90eb9a35bfe1808a3a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Oct 17 13:06:10 2022 +0200
+
+    Updated surface_temperature method to be able to plot the graph for all of the depths."
+
+[33mcommit a50ca7cac485816ea901191372fe62c2b41d82b3[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Oct 17 10:40:44 2022 +0200
+
+    Started the work to make the heatwave individual site graphs more visual.
+
+[33mcommit 8a6116337d953abe79d5b136a2accc7004a721c3[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Oct 14 13:37:30 2022 +0200
+
+    Started the work on the surface temperature method, tho is not surface but all depths.
+
+[33mcommit d6bb404d5504521b282cd4a263733aee4e47d5f1[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Thu Oct 13 15:31:10 2022 +0200
+
+    Changing from basemap to cartopy.
+
+[33mcommit 57b99fbeadd7292c1fa42ef2bed7f52ad421b555[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Oct 4 15:35:51 2022 +0200
+
+    Updated the mhw prova file to finally map the duration. Working on solving some visualization problems AKA white background and no tick showing con colorbar.
+
+[33mcommit 956cf999a2958606a627334933354130f7decffb[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Fri Aug 5 15:27:31 2022 +0200
+
+    Fixed small error on returning mhw where the new and bad climatology was overwriting Nats one.
+
+[33mcommit 4c9cfee26307a08b94b9a35b84935ee33582a9b3[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Fri Aug 5 15:25:38 2022 +0200
+
+    Code for MHW perfectly working. Now working on implementing duration and intensity arrays to plot a map.
+
+[33mcommit ff03296fc862a672b379d72331c9e5a1dc72bd00[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Fri Aug 5 10:22:42 2022 +0200
+
+    Updating the MHW map code with lots of changes, lost the logs due to network failure on the center.
+
+[33mcommit 051ec6af831538d31c0d86887458c4218540ea5a[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Jul 12 15:52:48 2022 +0200
+
+    1 problem solved, now 2-100
+
+[33mcommit a9d2c6d3d60c4ad4d4856b9adee3e9d29a9d1025[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Jul 12 14:53:48 2022 +0200
+
+    Solved the interpolation problem, got to think which kind of interpolation is best suited for it.
+
+[33mcommit 0ea1cb01bea70e97136efee80adfa97e2941ff62[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Thu Jun 30 12:33:24 2022 +0200
+
+    Adding changes to prova for tests.
+
+[33mcommit c8fdfb715832682925f4881398db9c1a3ff5db07[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 19:14:29 2022 +0200
+
+    Version solved
+
+[33mcommit 31ff43f3d7190207d7ef4f091d7101f37d71a4c5[m
+Merge: 150b674 3acfc97
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 19:08:08 2022 +0200
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+
+[33mcommit 150b674d4397349aaeb70f12d1b7bcd7e7cc084a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 19:01:05 2022 +0200
+
+    Version conflicts
+
+[33mcommit 83d69962f2cad279feca91d6693d9d5bbcb58146[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 16:05:12 2022 +0200
+
+    Tryout
+
+[33mcommit ea37bf030891c91776b5c2c0369d7331fd654bf2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 16:05:03 2022 +0200
+
+    Tryout
+
+[33mcommit 3182aece0c421346ef39de30eb33fe2dc2eb983c[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 29 16:03:49 2022 +0200
+
+    Hoping it works
+
+[33mcommit 3acfc97db2832d701baec75fc5f3f32d9ee07a62[m
+Merge: 03b3ee7 5a5c6b0
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue Jun 28 15:58:10 2022 +0200
+
+    Minor changes to the code, major to the file structure.
+
+[33mcommit 5a5c6b0095b27f6cad4e7adad696bef7d288e197[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jun 22 15:33:28 2022 +0200
+
+    Improved the code for mapping, added first steps to calculate mhw. Modified Oliver's code to accept a previous Climatology. FInd the climatology (Nathaniel) and load it to pass it to the code.
+
+[33mcommit a129a5b9680c20ce3bd46c6de5d54e8363f9d44e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 21 16:54:21 2022 +0200
+
+    Improved the method and started working for the mhw functionality. Tomorrow should be done.
+
+[33mcommit 7f5844d9aa044685a8595bd024879ceb2f610edb[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 21 16:00:13 2022 +0200
+
+    Created in prova2 code able to map the temperature of the mediterranean as a gif given the netcdf data from copernicus. Time to transform it into MHW
+
+[33mcommit 05f4452042947c545374ee21ec9248b18835e876[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 21 10:09:43 2022 +0200
+
+    Modified excel_writer to made it more readable. Starting work on MHW gif.
+
+[33mcommit 976fd0cfecde289d235335744e3fc45c908ebadd[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 21 09:46:08 2022 +0200
+
+    Improved the excel writer method by reducing its loading time 70 times. Efficency greatly improved, reduced from 300+ lines to ~100.
+
+[33mcommit 4278211f6fe6793450bba0dace551e7a591cbf53[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Jun 20 21:34:54 2022 +0200
+
+    Modified prova, tomorrow should be definetely updated!
+
+[33mcommit 03b3ee7e43457d660dbed13dfc5f1f29174a2b25[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Thu Jun 16 07:38:58 2022 +0200
+
+    Modified script rapido to converter
+
+[33mcommit 1205c09fa7f648048b1658d1a97151fdd27b84dc[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 14 10:06:53 2022 +0200
+
+    Created new section under Excel Writer to add a new sheet with MHW information per site.
+
+[33mcommit 16d5125802ae83da33304531472bb82d00857014[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jun 7 09:46:36 2022 +0200
+
+    Safety commit.
+
+[33mcommit 31c3ef61650653f7c3f2c4912f53327fce332f65[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 31 14:11:44 2022 +0200
+
+    Minor changes and updates to the code.
+
+[33mcommit 54ae1c8564156e4594a017a7b42b6cd4e9657e79[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 27 13:21:14 2022 +0200
+
+    Improved the code
+
+[33mcommit a119e2e0552a711c1dbf15db131ed0a295bcb6ac[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu May 26 16:10:07 2022 +0200
+
+    Updated the additional script to convert tobs to database. Now it has been optimized to less lines. Efficency improved more than 110 times.
+
+[33mcommit c6c7b5a2897f6fe7409b0ab93b91ae2183185f82[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed May 25 12:31:05 2022 +0200
+
+    Added script to convert tobs nat files to normal database files. Needs lots of optimization, runs very slow.
+
+[33mcommit 76bd30c356a92a2c55f3fa3035e812462a57627d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon May 16 11:26:34 2022 +0200
+
+    netcdf now informs on console screen when it has been created.
+
+[33mcommit f4eb9d26e81d9f3b4c28c4b71932f8b5f54608da[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 13 14:17:26 2022 +0200
+
+    Reformatted code and changed to delete duplicate browse methods and wrap them into a single one.
+
+[33mcommit 4cb3f66548517f9c77dd52ef5f0837a8de3d4f5b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu May 12 16:58:40 2022 +0200
+
+    Added method to create a netCDM from the GUI.
+
+[33mcommit 14e190f63ad534955a8b91c60cfc4bc3b4284e5b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu May 12 12:01:00 2022 +0200
+
+    Added method to create a netCDF in file manipulation.
+
+[33mcommit c93ce62d23f519801d7e685666c21e3870847e29[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed May 11 12:42:43 2022 +0200
+
+    Added a way for or stratification to plot multiple plots if there is a gap in data in between the series. No matter how many gaps.
+
+[33mcommit d5cc76845c38a4cbdbdedf4296e64e31ad6baaf3[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Tue May 10 13:47:04 2022 +0200
+
+    Right now working on the TODO in stratification.
+
+[33mcommit 55c132aff7c94b2639b5f984a2eb4332399ae05d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 6 13:15:21 2022 +0200
+
+    New images processed and made the code more stable.
+
+[33mcommit f07b82920d111b1d16f7079bcd2671cdf4f2d27e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 6 11:25:50 2022 +0200
+
+    Made the running_average_special method 6 times more efficient
+
+[33mcommit 6286fa84fdc56d9b73621d5892936ea4c632c0da[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu May 5 17:31:09 2022 +0200
+
+    Changes need to be made in order to discover why annual cycles takes so long to create.
+
+[33mcommit b3e5da64be1d5693204143b1d7385f426e051da5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu May 5 11:39:07 2022 +0200
+
+    Now the code can create a historical file from scratch and properly plots the stratification of only a depth.
+
+[33mcommit a786411bc890ec1b65f3e99923e2f0e277be7acb[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed May 4 16:12:24 2022 +0200
+
+    All the main figures updated to look similar to t-mednet.
+
+[33mcommit 255d76b021aaf657c8c0964179a2fdd433ce70eb[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 3 20:36:19 2022 +0200
+
+    Improved Annual T Cycles to work with only the Database file as well as creating new methods for this purpose.
+
+[33mcommit cf5622402ca03c1faad201a8a952e6ca4561b692[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 3 13:34:40 2022 +0200
+
+    Improved the Stratification routine and the save method.
+
+[33mcommit 8fa1c8b3dc0623274825dd9e91d0856dd9d9064c[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Mon May 2 15:43:58 2022 +0200
+
+    Added a method to interpolate verticallly when doing stratification
+
+[33mcommit 74f172cda083a59ac3233436c63c44762f03ab96[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Thu Apr 28 15:28:54 2022 +0200
+
+    Improved the stratification function. Now fully works and shows all the wanted information.
+
+[33mcommit 9f87a1f1f695bd5f93f6189fd81b9b913df60644[m
+Merge: b411964 642b5a1
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Apr 27 12:48:53 2022 +0200
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+
+[33mcommit b4119648838b7b54f72280bf012166de355a3fd1[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Apr 27 12:47:24 2022 +0200
+
+    Added method to create stratification based on the year.
+
+[33mcommit 642b5a10ff586cc5ebe573cc2ec17ce5362992b3[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Mon Apr 4 11:51:38 2022 +0200
+
+    Solved a bug for which under certain circumstances the annual t cycles plot wasn't showed correctly.
+
+[33mcommit 9bb1a1d7dce06ef257e04543c22b22625f430f2f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Apr 1 13:25:06 2022 +0200
+
+    Added new images for Touloun (plots) and corrected a bug for which if the start date and real start date where different for less than 2 hours it crashed when zooming.
+
+[33mcommit 6d2e7a04d78fe7e6c20eaa96e8202161221f7c96[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 31 11:21:30 2022 +0200
+
+    Added to the cut_endings method the possibility to still work if the only bad data is the last one.
+
+[33mcommit 51e18ddefc82e8d4b655d787c453b6f5171a62f4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 30 14:33:47 2022 +0200
+
+    Changed the criteria for cut endings.
+
+[33mcommit 9b52683d676233c19dfae2438205b7c3f3795a47[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 30 10:52:43 2022 +0200
+
+    Changed to_utc to convert initial and final date too. Solved a problem with discarding Enregistré. Interpolate hour now creates a new list of time to match the interpolated temperature.
+
+[33mcommit 9270ec33b88192f4022ea4ff2ebd4fadafe321fe[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 28 12:26:35 2022 +0200
+
+    Cleaned up file_writer.py
+
+[33mcommit 35da53df9efcfb5a795ed647fc0717f518e821e9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 28 12:04:23 2022 +0200
+
+    Cleaning code and improving readibility.
+
+[33mcommit 8375f3588081261caccd7083f4ad7e228f46ab88[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 28 11:46:00 2022 +0200
+
+    Changed class to camelCase
+
+[33mcommit a1b2ca6cbc55c15868b3de4879bd501d07d615c9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 28 11:32:16 2022 +0200
+
+    Progress bar method became its own class.
+
+[33mcommit d8bd36286a44b673e2e8cf61bec951c749598b75[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 25 19:21:57 2022 +0100
+
+    All the parts ported to the Arguments class in publication.py. Arguments class was given its own pyfile.
+
+[33mcommit 9706b2b919ae39e1c9415ae7c96d920a1844e49a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 25 18:20:31 2022 +0100
+
+    Added t cycles plot to the Arguments class under publication.py
+
+[33mcommit dbebd29fba4681bfe13bfca81f4aa81e34c1965b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 25 12:53:11 2022 +0100
+
+    Refactoring and cleaning code. Adding everything from Publication.py to class Arguments to increase readiblity.
+
+[33mcommit 8ff3e524dc13e971828811a094eda7bb118352aa[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 24 18:15:04 2022 +0100
+
+    Now publication.py can even create the excel file. It has been completed, it needs only code revision and trimming it down if possible.
+
+[33mcommit 9c2a56145d1ee30fa6387071c30b43ce2c6f8d13[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 21 17:02:33 2022 +0100
+
+    Publication.py added the ability to merge the historical file with the new merged one. Now its time to refactor and clean the code.
+
+[33mcommit c0480c531ff005b2c9ac2655794818a38f462fc0[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 21 16:22:29 2022 +0100
+
+    Publication.py can now merge the files.
+
+[33mcommit 146b1d9995f1f4c85dbaac95abf7abfbb25a850f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Mar 21 10:56:54 2022 +0100
+
+    Added function to Publication.py to plot and save the Thresholds plot. Now it can plot the three main plots. Next step: make it create the merge and excels.
+
+[33mcommit a970cdd6f8d4c6b6608b42298c031f59a819265b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 18 14:00:46 2022 +0100
+
+    The publication.py can now save the annualTcycles and the code has been improved to support a progress bar on the console!
+
+[33mcommit 57b1a1c3d1d1e6e038e76bbea82bfbc3235cb385[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Mar 18 12:33:30 2022 +0100
+
+    The publication.py is able to save the Hovmoller.
+
+[33mcommit d512d5047d1abd87acdedb833d5cfbb4ca1e632e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 17 16:49:31 2022 +0100
+
+    Added the cut endings function to publication.py
+
+[33mcommit 7f69d7a62fede5b45e7f5cb213f6be22cb130cac[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 17 11:56:44 2022 +0100
+
+    Added new script publication. It can usse thhe load_data fm method for now. Gonna implement all the code though it.
+
+[33mcommit 407945b31cecdb9ca7aebc9c376687f079bd520b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Mar 16 13:27:36 2022 +0100
+
+    test
+
+[33mcommit 3b4d0bc99558b405ad8030724efa70eed3e4c0f6[m
+Author: Marc jou <marcjou@ide-uno.cmima.csic.es>
+Date:   Wed Mar 9 13:41:54 2022 +0100
+
+    Corrected the merge
+
+[33mcommit 13fe31a6eb8e294f0300831388a4d025d6f17e59[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Mar 3 11:25:11 2022 +0100
+
+    Update
+
+[33mcommit a7c622aba127ac7e1e2f10948f53fab434473731[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Feb 8 10:49:11 2022 +0100
+
+    Now the threshold plots at any temperature show the legend on the side.
+
+[33mcommit 8d59bb7e0fccb378e62054dd72c006ebf66c3c92[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Feb 7 13:31:09 2022 +0100
+
+    Corrected Thresholds generation and solved minor bugs. Now Threshold title region appears automatically, no need to insert it.
+
+[33mcommit 1638be71e2e37b6c968d1f026dda76af55a7bd76[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Feb 4 12:04:39 2022 +0100
+
+    Fixed minor bugs.
+
+[33mcommit 8c6b49466a12fe6ba4790f2cece91aec568550a6[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Feb 4 10:45:00 2022 +0100
+
+    Addedthe option to save the zoomed plots and added stability to the software. Minor bugs fixed.
+
+[33mcommit 39ac70791a32f0c13cc26449d40dce7603a76193[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Jan 31 13:37:37 2022 +0100
+
+    Added the possibility to save difference, and filter plots.
+
+[33mcommit 82ffb4fba712f1940353c4a3ba25cd59995ac9d5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jan 28 12:59:09 2022 +0100
+
+    Redefined the titles and axis of all the plots
+
+[33mcommit 78d13a6d341e18e7a9d4dab7fc0523b4f9b3c963[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jan 28 10:25:27 2022 +0100
+
+    Better titles for main plots.
+
+[33mcommit ba449aaf034cf9f319d0fd63f316d04489d933c1[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Jan 27 12:48:41 2022 +0100
+
+    Added Nat's proposed changes to the Metadata part of the PDF. Working on adding the Image changes.
+
+[33mcommit 7d79df5a226a89f44763b3f67ab457f0d08f6d61[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jan 14 15:21:12 2022 +0100
+
+    Now the report prints 'other info' as well like if the ends are cut or a geojson is created
+
+[33mcommit 3dba3e77664605f1b5369c39511bc52ebfb5a432[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Jan 13 13:06:27 2022 +0100
+
+    Creates the PDF with titles now dividing it by sections.
+
+[33mcommit e77bef28ecbd0ccc1837c0544db831eeb8e6ffdf[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jan 12 13:19:52 2022 +0100
+
+    Now the pdf attaches all the images generated AND saved during the quality control process.
+
+[33mcommit b1bdce6fd9eb02c1053e557b76ba8b55dbc45176[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jan 12 11:21:51 2022 +0100
+
+    Now it writes the whole header on data section of the PDF.
+
+[33mcommit 24a58707093b3786e250ea0434d3432a409b2558[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 11 14:04:55 2022 +0100
+
+    Added a dict to write the important pdf metadata.
+
+[33mcommit 69853caba4c66e7dc63f589eaf1010c06404812f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 11 12:16:13 2022 +0100
+
+    Created simple pdf with only the text data that was already on the txt. Working on updating it to a better version as Nat requested.
+
+[33mcommit 508dade5511d546b50f3c9233bb77589f856551b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jan 11 12:11:53 2022 +0100
+
+    Adding the write pdf method to the code in order to generate the report.
+
+[33mcommit 9069936c78b83d0f1048c382827af29da8f68e30[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jan 7 15:47:12 2022 +0100
+
+    Improving the pdf method
+
+[33mcommit 310bf86f6dbf5deb80d1b6c49dc81030570414ae[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu Dec 23 12:09:52 2021 +0100
+
+    Working on creating a pdf report.
+
+[33mcommit 80901ed146d61f7abf7059506abbad9a9ec757d7[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Dec 16 13:48:58 2021 +0100
+
+    Anual TCycles plot now has months as jan feb mar...
+
+[33mcommit bde5dadc8a7eb8243596e3f8b936df929f7dc3c7[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Dec 15 11:19:47 2021 +0100
+
+    Merged file now stored when created under the name 'region_startingtime_endingtime_merged.txt'
+
+[33mcommit a9216bbaf20ffd428d9c2cbd43d1f1f152122057[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Dec 10 12:39:11 2021 +0100
+
+    Now the threshold plot plots daily values not hourly!
+
+[33mcommit 2f13ee0aaeb70c7e021c1386da67a83a2cbd21cc[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Dec 10 11:52:58 2021 +0100
+
+    The excel creates the days over X temperature through the mean of the day. Gonna create a commit version that does it just dividing by 24
+
+[33mcommit f06bf7fc681b2fef290f0603dc364570befe419d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Dec 7 10:43:32 2021 +0100
+
+    Plot filter now can work with NaN.
+
+[33mcommit c4b251ed0acb7d1cdc11c720ad0d3a70e9e36fac[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Dec 7 10:26:49 2021 +0100
+
+    Thresholds plot now has fixed X axis based on the max number of days under a certain temperature to compare between different temperatures.
+
+[33mcommit 090486303ffbff979bc572fb455e623c73a43f8b[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Dec 3 13:48:20 2021 +0100
+
+    Solved problem for which when cutting ends there was impossible to create a uniform filter.
+
+[33mcommit 1afd87d53e7869b22f231c82a166727f113f3b1d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Dec 2 13:42:32 2021 +0100
+
+    Now the filter filters 15 days instead of 10 and the annual t-cycles function ahs been altered to plotdaily data not hourly. Why still is not the same? Maybe it is not being just average but interpolated???.
+
+[33mcommit 0756cc94616a7027a868db7f153e3ec475724902[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Dec 1 21:37:09 2021 +0100
+
+    Now plot anual T-cycles can plot the multiyear in grey and white lines.
+
+[33mcommit c579be6d404faf940370a4af79c2353df19dedce[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Dec 1 20:32:15 2021 +0100
+
+    Code now displays the multi-mean in annual T-cycles. Needs to show in gray the fill-between gaps. Shoul I filter also? Ask Nathaniel.
+
+[33mcommit 2a5eba9b5515150698fd395d9708e4569c683973[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Dec 1 13:07:32 2021 +0100
+
+    Solved problem for which month 04 was not generated. firstmonth needed to be changed once accessed for the last time.
+
+[33mcommit 9862ae2240e06580869a86ba8cc0453165ad44a2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Dec 1 12:31:46 2021 +0100
+
+    Created a multi year annual t cycle function on file_writer. Now solving an issue for which the 04 month is not recorded inside DF's.
+
+[33mcommit f1370cc47ca0bdb4a03de8cbcc20be4ee6f351e4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Nov 29 13:37:41 2021 +0100
+
+    Added some comments and explanations of the new methods.
+
+[33mcommit dd0553300ada48c3a92694c7896b092334509437[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Nov 29 13:30:58 2021 +0100
+
+    Now the plot thresholds is fully functional and also the buttons can be deleted when clearing plots.
+
+[33mcommit e628970c1c23d9f7a63ad47f0080fdf1e6d6e1f9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 26 15:08:16 2021 +0100
+
+    Code now shows different tabs for the temperatures and work.
+
+[33mcommit 5a16bb5f25c95c05c259c3a11e575e876088b25d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 26 13:05:07 2021 +0100
+
+    Thresholds plot fully functional. Trying to solve the issue as for how to plot the different temperatures.
+
+[33mcommit 8da123253afd470e823fa7561c947b1637fd9086[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 26 11:26:36 2021 +0100
+
+    Improving the thresholds function to store in dictionary all the data for the different years and temperature. Also adding markers. Next step, define the lines.
+
+[33mcommit e46e95ea4da843c7fceb60fbbbf85a40c70ea6c8[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 25 14:53:09 2021 +0100
+
+    Threshold plot function created, needs some TODO listed on the code.
+
+[33mcommit b27c4fca8ac39f31f2fcb012e93e54d5fb38afe4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Nov 25 10:38:21 2021 +0100
+
+    Improved the excel writer.
+
+[33mcommit db9565cb5f22765d89603f431572e581152a9a2d[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 24 12:36:15 2021 +0100
+
+    Refactored some code and added commentaries.
+
+[33mcommit ff36ba04f5a9f97adbf3e448430a983cefcb367e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 24 12:06:47 2021 +0100
+
+    Merger of the historical implemented on the GUI under the tools menu.
+
+[33mcommit 2f5bdb1fd5ecd583293373ab582981f51d96e031[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 24 10:58:38 2021 +0100
+
+    Excel writer implemented on the GUI under the Tools menu. Fully functional you can chose file to open and filename to write. Console not displaying that it is writing the excel, should take a look at why not.
+
+[33mcommit 0f2cfb780bb90a616945ad42b00ab609959ce921[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Nov 23 12:58:39 2021 +0100
+
+    The excel writer is now adapted to OOP under file_writer.py
+
+[33mcommit b405daa1d1170ea269a7ca0eded26b84345c6bac[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 17 13:56:26 2021 +0100
+
+    Able to create Seasonal sheet. Must update at the end of season not the end of year. Improve code and reduce redundancy.
+
+[33mcommit b21b37f8994f2aa16260ad33cd176c28dfaa2037[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 17 12:37:56 2021 +0100
+
+    Code now can write the Monthly excel sheet. Upgrading the code to make it easier to read and more robust and adding the yearly sheet.
+
+[33mcommit cbc5d0c9e0fedad5a8e78900b538551de9623bc4[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 17 10:08:28 2021 +0100
+
+    Script now can create the sort by month sheet of the Excel working on creating the season sheet and simplifying the code
+
+[33mcommit 4332bd12e7596cff4eaf94891dd7e1c7187d8c3b[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Mon Nov 15 13:59:27 2021 +0100
+
+    Solved a pillow critical breach by updating Requirements.txt!
+
+[33mcommit 2da4e26ebfed347a4c980a5872ddddb74e8995f0[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Mon Nov 15 12:34:55 2021 +0100
+
+    Script now able to generate the shape and content of one of the sheets for Quim's Excel
+
+[33mcommit effb3b15bcbe7d829559c50e4b20c0c089415f61[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 12 16:43:23 2021 +0100
+
+    Created a function to make the excel and now creates the mean, needing to create more columns.
+
+[33mcommit 920eabb0ef632b390a9d228a6f70fe5c6d8a4c74[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Nov 12 13:21:37 2021 +0100
+
+    Started work towards excel creation as Quim said
+
+[33mcommit 4a12621c3b4a755bb7f5d1feebfd5eb993fcb30e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Nov 10 13:23:22 2021 +0100
+
+    Big merge script working. Debugging and trying to round the results to 3 decimals
+
+[33mcommit 22980d6969ff25a7913a5c5ad9652411b3757ca7[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue Nov 9 14:07:15 2021 +0100
+
+    Creating new method on a script apart to test to merge the final files of the quality assessment with the historic files
+
+[33mcommit fd29417a4e6fdcbd424c8380b7202d75bf83c448[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue Nov 9 12:35:11 2021 +0100
+
+    Updated writing merge to match the official format where depth column indicator is just a number.
+
+[33mcommit becc2589c86b614c44133ed7628553c4dc0b5da6[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue Nov 9 11:32:13 2021 +0100
+
+    Updated reset method, now clears console and report page
+
+[33mcommit d9d5c27e5505aa35aa38fc58d6cb14ea93c1cceb[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue Nov 9 10:37:01 2021 +0100
+
+    Added reset method to user_interaction. Reset can now reinitialize the GUI putting it into a blank state to load a new batch of data. Created the init_variables method to ease the load of variables.
+
+[33mcommit b036fdad0a9c369a09d9c8e058d0f1e8a49da76e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon Nov 8 13:24:09 2021 +0100
+
+    Processed CPN, CPS, ULLASTRES
+
+[33mcommit e02f003734783cf45de2a18cfad5e32c6f6cf475[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu Nov 4 14:07:11 2021 +0100
+
+    Updated Cap de creus files
+
+[33mcommit b8056519875bcd3d03e8e10fbefab46330f8ad92[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 3 12:35:07 2021 +0100
+
+    Now Hovmollers can be saved as images and with special default filename
+
+[33mcommit 3d107378f1290af1278a31f967bd1b722518d42b[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 3 12:20:29 2021 +0100
+
+    Cut endings now cuts starts aswell
+
+[33mcommit 753686632cbaca15ab8c0954f494a7e3a907e85e[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Wed Nov 3 10:36:57 2021 +0100
+
+    Added a check to see if the start date of the title is set prior to the real start date of the sensor and it could cause errors
+
+[33mcommit cfd6404682491d26f26cea65ab7f2ca3532ba6fe[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Oct 21 16:22:51 2021 +0200
+
+    Added a script to correct data that comes with the same date and hour and sets the one of another file.
+
+[33mcommit 186ed7bdbf0b1ded230422926a171466be3858ec[m
+Author: marc <marcjb2@gmail.com>
+Date:   Thu Oct 21 14:07:30 2021 +0200
+
+    Added a check for if a csv is used instead of a txt and also now supports spanish for Registrado instead of Enregistré.
+
+[33mcommit 92565b521b8b68595012d0c438d3f1bd05974d68[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Sep 15 10:12:33 2021 +0200
+
+    Added function to create an Annual TCycle plot via right click. It can accept different running days for its filter. Next step: add Multi-Year Mean.
+
+[33mcommit fbbe669b39fbb76977c096f014a6ad992d55b319[m
+Merge: 49ebc5e 1791b50
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu Sep 2 09:18:31 2021 +0200
+
+    let me pull
+
+[33mcommit 49ebc5e3da0f21f5982cc12fc89dc0858732887a[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu Sep 2 09:09:33 2021 +0200
+
+    Old requirements
+
+[33mcommit 1791b5018e1d3b9e6291591bf9179ab9a39aa7b4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jul 28 12:22:43 2021 +0200
+
+    Minor change in comments.
+
+[33mcommit 8aa1c410d53920a8d386990592a9bc24a0e39112[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jul 28 12:21:22 2021 +0200
+
+    Updated the code to check which time series is longer in order to plot the filter.
+
+[33mcommit 0a92e798615dba37f003e4432a1c70afdd36fee9[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jul 28 12:04:16 2021 +0200
+
+    The code raises a warning if more than 72h have passed since the date of removal and the last registered data. Nevertheless, it still plots the zoom of the last 72h of operation.
+
+[33mcommit 79158ee6890495dfa49ed9553da4a1c689e1f1ec[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jul 28 11:25:35 2021 +0200
+
+    Updated the deletion of Enregistré for only deleting the ones that override temperatures.
+
+[33mcommit d82c485e3e4873418eff9e1637b5cc70ed6f5a68[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed Jul 28 11:13:03 2021 +0200
+
+    Updated version, now the loaded files delete the lines where Enregistré appears, without asuming that it only appears at the end of the file
+
+[33mcommit 87133773ae8c28e7518a7c30c673e9d9a084a0a5[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jul 27 13:00:45 2021 +0200
+
+    Changed the file_manipulation 407 line the index of the data['time]. Further revision may be necessary
+
+[33mcommit 113006762c926abb93aad0028c506c573acd2822[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue Jul 27 12:43:48 2021 +0200
+
+    Added new data sets. Updated code, now it checks for the first and lasts 72h when zooming for errors instead of only 24h.
+
+[33mcommit 25617202d27d034d938897fef42af6037f36727a[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jul 2 12:57:24 2021 +0200
+
+    Using token
+
+[33mcommit 5eb08ce14ea294d7b2d6fd9ec433aa22507dd435[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jul 2 12:51:45 2021 +0200
+
+    Now the software is able to sort the data by depth in the background so it can be easiy manipulated no matter the order it was uploaded. You still need to upload all the data at once
+
+[33mcommit 694d5bfdc3b6bb92a6a88ceefbd8e45ad291a6cd[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri Jul 2 11:36:58 2021 +0200
+
+    Updated the code to work even when there is no obvious erroneous data at the end of the time series
+
+[33mcommit 57b3551da18b16280563418a9bc3520aea2bc3b5[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 12:36:25 2021 +0200
+
+    Fixed the timegmt bug. Fixed a bug when manually cutting the data to stop cutting at the selected point.
+
+[33mcommit 79f1a02b59c6577ce52c5478257ed83477c942b3[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 12:11:50 2021 +0200
+
+    Fixed the code to properly mask the plot when plottin all the zooms. WIP change timegmt for time in cut_data_manually.
+
+[33mcommit 61651aab808ef40a4faf2bf9956a94a3ece805a0[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 12:05:37 2021 +0200
+
+    Program able to manually cut the begining data and go back. Fixed a bug with the masking of the plots for 999 values. WIP fix a bug where the click event is duplicated when using go_back.
+
+[33mcommit 52c70aafa0a671d53ac94e65186b41fa463dc118[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 10:52:38 2021 +0200
+
+    The code now reloads the plot when cutting it manually and clears it when going back.
+
+[33mcommit f1b718a9e906b4d44d8a3eec001b031eb632bbe3[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 10:30:29 2021 +0200
+
+    Added the function to plot in red the begining of the data when it starts way before the time of start declared in the headers of the files.
+
+[33mcommit e7cec74a94fc5c85c8454d2aa4fa96097b92e519[m
+Merge: 56eef4c 345e190
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Thu May 27 09:47:38 2021 +0200
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+    
+    Merging the code updated at home with the one updated at the office.
+
+[33mcommit 345e19054ea8ed3a36ffe69cfb3210bdfdab99cb[m
+Author: marc <marcjb2@gmail.com>
+Date:   Wed May 26 11:56:45 2021 +0200
+
+    Added function to log a warning when the values are under -0.2 in the filtered plot. Those are reported and printed also if selected the option.
+
+[33mcommit 56eef4c0816bf9f50141d031bc96de9c836ab28a[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue May 25 11:25:18 2021 +0200
+
+    Fixed error where you couldn't recover the data when cutting it manually.
+
+[33mcommit 6daa7489a4b330369a902ee73f6c72e476d06665[m
+Author: Marc Jou <marcjou@k41.cmima.csic.es>
+Date:   Tue May 25 09:51:13 2021 +0200
+
+    Now the data zooming and automatic ending cut takes into account the delcarated removal time of the loggers to seklect as bad data. Working on fixing the go back bug when cutting manually.
+
+[33mcommit 6a5663f3bbf73e367ef23ec88bcbb5f0a7a7d36e[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 21 10:09:49 2021 +0200
+
+    Added more parameters for the report and also now it is written into a txt file.
+
+[33mcommit b0fa8a1dba3441c2f9e7b5f3848ce73b0fcd180f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 18 15:18:46 2021 +0200
+
+    Commenting and refactoring the code.
+
+[33mcommit f810c8734689564f069945a3ef274e8bd318b5c2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 18 12:19:21 2021 +0200
+
+    Improved the txt writing function. Now it is called whenever the merge file button is pressed. It can hold as many metadata as needed.
+
+[33mcommit 5133af5da15de0c290282b2560bcc558ae0412c2[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 18 10:09:28 2021 +0200
+
+    Added the file 'metadata.json' to src in order to load the coordinates of the different sites to be used for the final merged geojson.
+
+[33mcommit 2dd803171619f9110f1809635bfb2ca14c20e494[m
+Merge: bc1c4cc 1fa889d
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 18 08:32:15 2021 +0200
+
+    Compatibility issues
+
+[33mcommit bc1c4cca9d6e0de182732ad0eae6ab3a3b6d66c4[m
+Author: marc <marcjb2@gmail.com>
+Date:   Tue May 18 08:26:04 2021 +0200
+
+    Version
+
+[33mcommit 1fa889d1abdac54913e89d85adbb20d1d8a13118[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Mon May 17 12:37:43 2021 +0200
+
+    Added function console writer to wrap all the messages written on the console under a single function.
+
+[33mcommit 54ce976a325e4c31f60c7209ade735f72adfcfa5[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Mon May 17 12:10:58 2021 +0200
+
+    Added functionality to cut the data directly from the plot, and also going back to the original data. Working on reducing the code, refactoring and adding commentary.
+
+[33mcommit 090780b6f4cdc7b6c8f9cfdd6a8a31b25cb470bd[m
+Author: marc <marcjb2@gmail.com>
+Date:   Mon May 17 07:19:58 2021 +0200
+
+    Minor changes
+
+[33mcommit 09c6287879cb2dd27a3dd316b7f0db0ba715df80[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 14 13:38:06 2021 +0200
+
+    Version check.
+
+[33mcommit 99d235f95b8aed7732b8ba05eee3e5441af5174f[m
+Author: marc <marcjb2@gmail.com>
+Date:   Fri May 14 13:25:02 2021 +0200
+
+    Added feature to check if the data is in a round hour and if it is not, it interpolates. Minor bug fixes.
+
+[33mcommit 5eac36be5d5aae1472d8029215fba2cfd61f0bbc[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 16:00:25 2021 +0200
+
+    Now the program works with the new paths. Improving code.
+
+[33mcommit 5fee4d4cd34a2d5a8ebaf93f98762d174b7392bc[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 15:46:59 2021 +0200
+
+    Organization of the project.
+
+[33mcommit 8dbce77de10534a985696a36cf62feb229e62127[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 13:36:00 2021 +0200
+
+    Adding version.txt
+
+[33mcommit e94199138337fc03fe52773d270291b2ba7b76ca[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 13:33:49 2021 +0200
+
+    Probando actualizador de version
+
+[33mcommit 1585efb248dc7b319f9130b56a6e7763bf1e4f0d[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 13:09:50 2021 +0200
+
+    Corrected a bug where the bad endings weren't always cast to 999
+
+[33mcommit 0a13c787f7a131d72f38fda8e521441a964e6282[m
+Merge: 6740ad7 346422b
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 12:16:29 2021 +0200
+
+    Merge branch 'master' of https://github.com/Damyck/tMednet
+
+[33mcommit 6740ad721c2ae326a1b89e44904246b378da514a[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 12:14:57 2021 +0200
+
+    Go back function implemented. Fixed some bugs. Added stability to the code and new console messages
+
+[33mcommit bf3c8a032d6c6feab233c77077616682b8ae25c7[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 13 11:49:42 2021 +0200
+
+    Added the cutting option to the bad endings. Also now the old values are stored, preparing the go back function.
+
+[33mcommit 346422bdfdce111bcd245bbd607f4d9282eb36f4[m
+Merge: 7635332 3b81d6b
+Author: Marc JB <marcjb2@gmail.com>
+Date:   Wed May 12 16:19:42 2021 +0200
+
+    Merge pull request #7 from Damyck/dataquality
+    
+    Dataquality
+
+[33mcommit 3b81d6bd7525273017a14daaf0a4b6e5af1c185e[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Wed May 12 16:18:15 2021 +0200
+
+    Hovmoller created and adjusted to work within the GUI and able to be removed. Next steps: 1.Cut the series manually, 2.Create fake data of move time (1h and 10s e.g.) to test interpolation, 3.Improve GUI
+
+[33mcommit 10f8c0af018ddc60f93d389d2cc884b68c0683b4[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Tue May 11 16:10:26 2021 +0200
+
+    Added filter option to the graph, now the GUI is almost on par with Nathaniel
+
+[33mcommit b1be25e66b812bb4f74cf96e0cbc74644641db83[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Tue May 11 12:12:00 2021 +0200
+
+    Added option to create a plot of the temperature differences
+
+[33mcommit c4bb4b5648dedacee2efd813af7e78fd2114ebd1[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Fri May 7 16:20:29 2021 +0200
+
+    Now the zoom function shows the last part of the data as red signifying where the sensor is removed from the sea.
+
+[33mcommit ef086f052a3157045a9aa341e66b951c49a288ff[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Fri May 7 10:38:09 2021 +0200
+
+    Added function Zoom All which allows the user to select multiple items on the list and plot the zoom of all of them. More bug fixing.
+
+[33mcommit 40732534b4f55e7f1cfea353ad570718ab9a1060[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 6 16:13:26 2021 +0200
+
+    Fixed a bug where the console screen text didn't wrapped properly
+
+[33mcommit 469c2fcf2a65ffa55bcc541e21e41f308e1ecc9e[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 6 16:07:44 2021 +0200
+
+    The GUI is able to plot two additional subplots with the beginning and ending of the data in order to see the errors that could happen. Some bugs fixed.
+
+[33mcommit cb66c4ba0f5ed023233502173f03419ed3223638[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 6 15:33:15 2021 +0200
+
+    Added a right click menu on the list that allows to do various things with the selected items (right now, only zooming on the graph)
+
+[33mcommit 7635332bf4afee3f4be0df313b3ce267302e1159[m
+Merge: 0222473 78f5e8b
+Author: Marc JB <marcjb2@gmail.com>
+Date:   Thu May 6 14:39:22 2021 +0200
+
+    Merge pull request #6 from Damyck/mergefiles
+    
+    Mergefiles
+
+[33mcommit 78f5e8bfe43e1cffdb3be43bca6a51726c170f2e[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Thu May 6 11:47:25 2021 +0200
+
+    Fixed some bugs and improved the stability of the program
+
+[33mcommit 2011cec9cdc4a5a55129f91cbfb2a1c71c7b7480[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Wed May 5 15:35:10 2021 +0200
+
+    File saving in geojson. Merge now takes into account different times and sorts them.
+
+[33mcommit 851f560c93bdf8c4702af500fa9ac9198eaf2f49[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Wed May 5 11:28:09 2021 +0200
+
+    Merge function created, the GUI lets the user choose to generate a geojson file or a txt one. Begins work to make sure that the times are the same for each line
+
+[33mcommit 02224733fe73efe0dee57484f0a2beff4699eaf1[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Tue May 4 10:27:41 2021 +0200
+
+    To_UTC method updated. Now it saves all the files to UTC
+
+[33mcommit e96551960738b150676606fc5ab5c55f774f5617[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Mon May 3 15:48:17 2021 +0200
+
+    Logo añadido a 'About'
+
+[33mcommit b181924b4c51cc57247a3ef71dbdcf5f67140a6a[m
+Merge: d68ea84 a040057
+Author: Marc JB <marcjb2@gmail.com>
+Date:   Mon May 3 13:21:07 2021 +0200
+
+    Merge pull request #5 from Damyck/consoleframe
+    
+    Consoleframe
+
+[33mcommit a040057d8b5e7a598b2d73ff76a7d40fe72186e6[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Mon May 3 13:16:58 2021 +0200
+
+    Console created in GUI. Use of it still not clear.
+
+[33mcommit 611f450050e6a4b71113ddb824275801142f5963[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Fri Apr 30 15:54:24 2021 +0200
+
+    Added setup.py, simple about button and refactored some code
+
+[33mcommit f4f18c375cd996f8484cee6ab90a28a7ca6ce35e[m
+Author: Damyck <marcjb2@gmail.com>
+Date:   Fri Apr 30 15:53:42 2021 +0200
+
+    Added setup.py, simple about button and refactored some code
+
+[33mcommit d68ea84c7732e7d4935bda58beeba4201609b427[m
+Merge: 4ff4caf 7151d38
+Author: Marc JB <marcjb2@gmail.com>
+Date:   Fri Apr 30 12:11:46 2021 +0200
+
+    Merge pull request #4 from Damyck/saveprompt
+    
+    Saveprompt

@@ -351,3 +351,42 @@ class DataManager:
             for i in range(0, int(np.argwhere(np.array(data['df'].index) == time_series[0][int(start_index)]))):
                 data['df']['Temp'][int(i)] = 999
 
+    def merge(self):
+        """
+        Method: merge(data)
+        Purpose: Merges all of the loaded files into a single one
+        Require:
+        Version:
+        01/2021, EGL: Documentation
+        """
+
+        print('merging files')
+        # Merges all the available files while making sure that the times match
+        df1, depths, SN = self.list_to_df()
+        if len(self.mdata) < 2:
+            merging = False
+        else:
+            merging = True
+        return df1, depths, SN, merging
+
+    def list_to_df(self):
+        """
+        Method: list_to_df(data)
+        Purpose: Converts the list mdata to a dataframe
+        Require:
+            data: List mdata
+        Version: 05/2021, MJB: Documentation
+        """
+        df1 = pd.DataFrame(self.mdata[0]['df'].values, index=self.mdata[0]['df'].index, columns=[str(self.mdata[0]['depth'])])
+        depths = [self.mdata[0]['depth']]
+        SN = [self.mdata[0]['S/N']]
+        for dat in self.mdata[1:]:
+            dfi = pd.DataFrame(dat['df'].values, index=dat['df'].index, columns=[str(dat['depth'])])
+            depths.append(dat['depth'])
+            SN.append(dat['S/N'])
+            df1 = pd.merge(df1, dfi, how='outer', left_index=True,
+                           right_index=True)  # Merges by index which is the date
+
+        masked_df = df1.mask((df1 < -50) | (df1 > 50))
+        return masked_df, depths, SN
+

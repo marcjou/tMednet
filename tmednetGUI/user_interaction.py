@@ -512,20 +512,17 @@ class tmednet(tk.Frame):
         """
 
         try:
-            if not self.dm.mdata[0]['time']:
-                self.console_writer('First select \'To UTC\' option', 'warning')
-            else:
-                self.console_writer('Creating Geojson', 'action')
-                df, depths, SN, merging = fm.merge(self)
-                if merging is False:
-                    self.console_writer('Load more than a file for merging, creating an output of only a file instead',
-                                        'warning')
-                start_time = time.time()
-                fm.df_to_geojson(df, depths, SN, self.dm.mdata[0]['latitude'], self.dm.mdata[0]['longitude'])
-                fm.df_to_txt(df, self.dm.mdata[0], SN)
-                self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
-                        time.time() - start_time) + "\n =============\n")
-                self.reportlogger.append('Geojson and CSV file created')
+            self.console_writer('Creating Geojson', 'action')
+            df, depths, SN, merging = self.dm.merge()
+            if merging is False:
+                self.console_writer('Load more than a file for merging, creating an output of only a file instead',
+                                    'warning')
+            start_time = time.time()
+            fm.df_to_geojson(df, depths, SN, self.dm.mdata[0]['latitude'], self.dm.mdata[0]['longitude'])
+            fm.df_to_txt(df, self.dm.mdata[0], SN)
+            self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
+                    time.time() - start_time) + "\n =============\n")
+            self.reportlogger.append('Geojson and CSV file created')
         except IndexError:
             self.console_writer('Please, load a file first', 'warning')
 
