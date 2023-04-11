@@ -291,7 +291,7 @@ class GUIPlot:
         self.console_writer('Plotting zoom of depths: ', 'action', depths)
         self.console_writer(' at site ', 'action', mdata[0]['region'], True)
 
-    def plot_dif(self, mdata):
+    def plot_dif(self):
         """
         Plots the difference between consecutive depths of all the loaded files
         ...
@@ -305,7 +305,7 @@ class GUIPlot:
         self.clear_plots()
         depths = ""
         try:
-            dfdelta, _ = fm.temp_difference(mdata)
+            dfdelta, _ = self.dm.temp_difference()
             self.counter.append('Difference')
             # Creates the subplots and deletes the old plot
             if self.__plot1.axes:
@@ -322,7 +322,7 @@ class GUIPlot:
             # fig.set_size_inches(14.5, 10.5, forward=True)
             self.canvas.draw()
             self.console_writer('Plotting zoom of depths: ', 'action', depths)
-            self.console_writer(' at site ', 'action', mdata[0]['region'], True)
+            self.console_writer(' at site ', 'action', self.dm.mdata[0]['region'], True)
         except UnboundLocalError:
             self.console_writer('Load more than a file for plotting the difference', 'warning')
 

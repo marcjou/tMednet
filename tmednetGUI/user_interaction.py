@@ -14,7 +14,6 @@ import marineHeatWaves as mhw
 import tkinter.font as tkFont
 import surface_temperature as st
 from PIL import Image, ImageTk
-import file_manipulation as fm
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
@@ -159,7 +158,7 @@ class tmednet(tk.Frame):
         self.right_menu = Menu(frame1, tearoff=0)
         self.right_menu.add_command(label="Zoom", command=lambda: self.gui_plot.plot_zoom(self.dm.mdata, self.dm.files, self.list, self.cut_data_manually))
         self.right_menu.add_command(label="Zoom all files", command=lambda: self.gui_plot.plot_all_zoom(self.dm.mdata, self.list))  # Placeholders
-        self.right_menu.add_command(label="Plot difference", command=lambda: self.gui_plot.plot_dif(self.dm.mdata))
+        self.right_menu.add_command(label="Plot difference", command=self.gui_plot.plot_dif)
         self.right_menu.add_command(label="Plot filter", command=lambda: self.gui_plot.plot_dif_filter1d(self.dm.mdata))
         self.right_menu.add_separator()
         self.right_menu.add_command(label="Plot Hovmoller", command=lambda: self.gui_plot.plot_hovmoller(self.dm.mdata))
@@ -271,9 +270,6 @@ class tmednet(tk.Frame):
 
         except IndexError as e:
             print(e)  # Not knowing why this error raises when Saving the file but doesn't affect the code. Should check.
-
-        # fm.load_data(self)  Que fa això aquí???? Investigar [[DEPRECATED??]]
-
     def on_open(self):
         """
         Method: on_open(self)

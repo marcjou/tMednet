@@ -456,4 +456,27 @@ class DataManager:
         except Exception as e:
             print(str(e))
 
+    def temp_difference(self):
+        """
+        Method: temp_difference(data)
+        Purpose: Gets the difference in temperature between levels
+        Require:
+            data: The mdata dictionary
+        Version: 05/2021, MJB: Documentation
+        """
+        # to_utc(data)      Applying it only at the beggining interpolate_hours
+        df, depths, _ = self.list_to_df()
+        i = 1
+        for depth in depths[:-1]:
+            series1 = df[str(depth)] - df[
+                str(depths[i])]  # If fails, raises Key error (depth doesn't exist)
+            series1 = series1.rename(str(depth) + "-" + str(depths[i]))
+            i += 1
+            if 'dfdelta' in locals():
+                dfdelta = pd.merge(dfdelta, series1, right_index=True, left_index=True)
+            else:
+                dfdelta = pd.DataFrame(series1)
+
+        return dfdelta, depths
+
 
