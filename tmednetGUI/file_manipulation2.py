@@ -390,3 +390,62 @@ class DataManager:
         masked_df = df1.mask((df1 < -50) | (df1 > 50))
         return masked_df, depths, SN
 
+    def df_to_geojson(self, df, properties, SN):
+        """
+        Method: df_to_geojson(df, properties, SN, lat, lon)
+        Purpose: Iterates through the DF in order to create the properties for the Geojson file
+        Require:
+            df: The Dataframe to be read
+            properties: The properties of the geojson
+            SN: List of serial numbers
+            lat: The latitude coordinate
+            lon: The longitude coordinate
+        Version: 05/2021, MJB: Documentation
+        """
+        start_time = time.time()
+        df = df.fillna(999)
+        print('writing geojson')
+        props = {'depth': [], 'SN': SN, 'time': df.index.map(str).to_list(), 'temp': []}
+        for prop in properties:
+            props['depth'].append(prop)
+            temp = []
+            for _, row in df.iterrows():
+                temp.append(row[str(prop)])
+            props['temp'].append(temp)
+
+        point = Point((self.mdata[0]['latitude'], self.mdata[0]['longitude']))
+        feature = Feature(geometry=point, properties=props)
+
+        output_filename = '../src/output_files/dataset.geojson'
+        with open(output_filename, 'w') as output_file:  # Crashes when opened with text editor
+            dump(feature, output_file)
+        print('geojson written')
+
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+    def df_to_txt(self, df, SN):
+        """
+        Method: df_to_txt(df, data, SN)
+        Purpose: Writes a txt with the Dataframe values
+        Requires:
+            df: The Dataframe to be read
+            data: List mdata
+            SN: The serial number list
+        Version: 05/2021, MJB: Documentation
+        """
+        print('writing txt')
+        output = '../src/output_files/' + str(self.mdata[0]['region']) + '_' + self.mdata[0]['datainici'].strftime('%Y-%m-%d') + '_' + \
+                 self.mdata[0][
+                     'datafin'].strftime('%Y-%m-%d') + '_merged.txt'
+        with open(output, 'w') as f:
+            f.write('#' * (len(self.mdata[0]['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16))
+            f.write('\n# Site: ' + str(self.mdata[0]['region']))
+            f.write('\n# Start time: ' + self.mdata[0]['datainici'].strftime('%Y-%m-%d, %H:%M:%S'))
+            f.write('\n# End time: ' + self.mdata[0]['datafin'].strftime('%Y-%m-%d, %H:%M:%S'))
+            f.write('\n# Serial Numbers: {}\n'.format(SN))
+            f.write(('#' * (len(self.mdata[0]['datainici'].strftime('%Y-%m-%d, %H:%M:%S')) + 16) + '\n\n\n'))
+            df.to_string(f, col_space=10)
+        print('txt written')
+        return output
+
+

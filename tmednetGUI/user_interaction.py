@@ -518,8 +518,8 @@ class tmednet(tk.Frame):
                 self.console_writer('Load more than a file for merging, creating an output of only a file instead',
                                     'warning')
             start_time = time.time()
-            fm.df_to_geojson(df, depths, SN, self.dm.mdata[0]['latitude'], self.dm.mdata[0]['longitude'])
-            fm.df_to_txt(df, self.dm.mdata[0], SN)
+            self.dm.df_to_geojson(df, depths, SN)
+            self.dm.df_to_txt(df, SN)
             self.consolescreen.insert("end", "--- %s seconds spend to create a geojson ---" % (
                     time.time() - start_time) + "\n =============\n")
             self.reportlogger.append('Geojson and CSV file created')
