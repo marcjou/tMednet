@@ -448,4 +448,12 @@ class DataManager:
         print('txt written')
         return output
 
+    def convert_to_netCDF(self, filename, df):
+        # TODO print on console when the netCDF has been create
+        try:
+            xarray.Dataset(df.to_xarray()).to_netcdf('../src/output_files/' + filename + '.nc4')
+            self.console_writer("netCDF file created", 'action')
+        except Exception as e:
+            print(str(e))
+
 

@@ -79,7 +79,6 @@ class tmednet(tk.Frame):
         menubar.add_cascade(label="File", menu=filemenu)
 
         editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="To UTC", command=self.to_utc)
         editmenu.add_command(label="Get original data", command=self.go_back)
         editmenu.add_command(label="Merge Files", command=self.merge)
         editmenu.add_command(label="Cut Endings", command=self.cut_endings)
@@ -320,22 +319,7 @@ class tmednet(tk.Frame):
         self.consolescreen.delete('1.0', END)
         self.init_variables()
 
-    def to_utc(self):
-        """
-        Method: to_utc(self)
-        Purpose: Shift temporal axis
-        Require:
-        Version: 01/2021, EGL: Documentation
-        """
-        #TODO DEPRECATED erase this method from existence, now 
-        #   the time is automatically converted to utc on load
-        if not self.dm.mdata:
-            self.console_writer('Please, load a file before converting to UTC', 'warning')
-        else:
-            try:
-                fm.to_utc(self.dm.mdata)
-            except IndexError:
-                self.console_writer('Please, load a file before converting to UTC', 'warning')
+
 
     def cut_data_manually(self, event, ind):
         """
@@ -627,7 +611,7 @@ class tmednet(tk.Frame):
         filename = self.openfileinput.get()
         self.newwindow.destroy()
         df = pd.read_csv(filename, sep='\t')
-        fm.convert_to_netCDF('finalCDM', df, self.consolescreen)
+        self.dm.convert_to_netCDF('finalCDM', df, self.consolescreen)
 
     def create_heat_spikes(self):
         filename = self.openfileinput.get()
