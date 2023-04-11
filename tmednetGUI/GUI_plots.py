@@ -429,7 +429,7 @@ class GUIPlot:
         year : str
             Year which wants to be plotted
         """
-        df, hismintemp, hismaxtemp, bad = fm.historic_to_df(historical, year)
+        df, hismintemp, hismaxtemp, bad = self.dm.historic_to_df(historical, year)
         try:
             self.clear_plots()
             self.counter.append("Stratification")
@@ -579,7 +579,7 @@ class GUIPlot:
         orderedhist_df = histdf.groupby('day_month')[depths].mean()
         orderedhist_df.sort_index(inplace=True)
 
-        year_df, hismintemp, hismaxtemp, minyear = fm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, hismintemp, hismaxtemp, minyear = self.dm.historic_to_df(historical, year, start_month='01', end_month='01')
         year_df.index = year_df.index.strftime('%Y-%m-%d %H:%M:%S')
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)

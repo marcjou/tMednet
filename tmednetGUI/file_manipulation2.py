@@ -509,4 +509,87 @@ class DataManager:
 
         return dfdelta
 
+    @staticmethod
+    def historic_to_df(historic, year, start_month='05', end_month='12'):
+        start_time = year + '-' + start_month + '-01 00:00:00'
+        if end_month == '01':
+            end_time = str(int(year) + 1) + '-' + end_month + '-01 00:00:00'
+        else:
+            end_time = year + '-' + end_month + '-01 00:00:00'
+
+        df = pd.read_csv(historic, sep='\t')
+        print('Historic to df:\n')
+        progress_bar = pb.progressBar(len(df['Date']), prefix='Progress:', suffix='Complete', length=50)
+        df['added'] = df['Date'] + ' ' + df['Time']
+        for i in range(0, len(df['Date'])):
+            if str(df['added'][i]) == 'nan':
+                pass
+            else:
+                try:
+                    df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(df['added'][i]), '%d/%m/%Y %H:%M:%S'),
+                                                          '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    splt = df['added'][i].split(':')
+                    splt[-1] = '00'
+                    jn = ':'.join(splt)
+                    df.at[i, 'added'] = datetime.strftime(datetime.strptime(str(jn), '%d/%m/%Y %H:%M:%S'),
+                                                          '%Y-%m-%d %H:%M:%S')
+
+            progress_bar.print_progress_bar(i)
+        df.set_index('added', inplace=True)
+        df.index.name = None
+        del df['Date']
+        del df['Time']
+        if start_time not in df.index:
+            n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
+            # Makes sure to only browse the values that are after the desired month
+            nn = [x for x in n if x >= datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')]
+            start_time = datetime.strftime(
+                min(nn, key=lambda x: abs(x - datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S'))), '%Y-%m-%d %H:%M:%S')
+        if end_time not in df.index:
+            n = [datetime.strptime(str(i), '%Y-%m-%d %H:%M:%S') for i in df.index if str(i) != 'nan']
+            end_time = datetime.strftime(
+                min(n, key=lambda x: abs(x - datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S'))),
+                '%Y-%m-%d %H:%M:%S')
+            filtered_df = df[start_time: end_time]
+        else:
+            filtered_df = df[start_time: end_time]
+        if filtered_df.columns[0] == '5':
+            filtered_df.insert(0, '0', filtered_df['5'], allow_duplicates=True)
+        # TODO add this line of code to the creation of the historical merge
+        # Merges the rows that have the same index
+        filtered_df = filtered_df.groupby(level=0).mean()
+        # Gets the historic min and max values only for the months from May through November
+        dfcopy = df.copy()
+        dfcopy.index = pd.to_datetime(dfcopy.index)
+        dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
+        histmin = round(np.nanmin(dfcopy.quantile(0.01))) - 1
+        histmax = round(np.nanmax(dfcopy.quantile(0.99))) + 1
+        # limit_area='inside' parameter makes that only NaN values inside valid values will be filled
+        # Checks if it has been called by stratification or annual to decide wether interpolate between columns or not
+        # Does not interpolate if there is a gap bigger than 1 days (24h)
+        if start_month == '01':
+            filtered_df.index = pd.to_datetime(filtered_df.index)
+            final_df = filtered_df.interpolate(method='time', axis=0, limit_area='inside', limit=24,
+                                               limit_direction='forward')
+        elif start_month == '05':
+            # Deletes the depths that are all null
+            depths = filtered_df.columns
+            for depth in depths:
+                if filtered_df[depth].isnull().all():
+                    del filtered_df[depth]
+            depths = filtered_df.columns
+            int_depths = [eval(i) for i in depths]
+            depth_diff = [t - s for s, t in zip(int_depths, int_depths[1:])]
+            for i in range(0, len(depth_diff)):
+                if depth_diff[i] > 13:
+                    filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]) + 1, str(int(depths[i + 1]) + 2.5),
+                                       filtered_df[depths[i + 1]])
+                    filtered_df.insert(filtered_df.columns.get_loc(depths[i + 1]), str(int(depths[i + 1]) - 2.5),
+                                       filtered_df[depths[i + 1]])
+            final_df = filtered_df.interpolate(axis=1, limit_area='inside')
+
+        minyear = pd.to_datetime(df.index).year.min()
+        return final_df, histmin, histmax, minyear
+
 
