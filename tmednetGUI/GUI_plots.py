@@ -584,9 +584,9 @@ class GUIPlot:
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)
 
-        year_df = fm.running_average_special(year_df, running=360)
+        year_df = self.dm.running_average_special(year_df, running=360)
         # TODO discuss with Nat how many days for the running average of the climatology
-        orderedhist_df = fm.running_average_special(orderedhist_df, running=30)
+        orderedhist_df = self.dm.running_average_special(orderedhist_df, running=30)
         orderedhist_df.index = pd.DatetimeIndex(orderedhist_df.index)
         # dfdelta = fm.running_average(self.mdata, running=360)
 

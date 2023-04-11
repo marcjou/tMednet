@@ -592,4 +592,48 @@ class DataManager:
         minyear = pd.to_datetime(df.index).year.min()
         return final_df, histmin, histmax, minyear
 
+    @staticmethod
+    def running_average_special(year_df, running=240):
+        """
+        Method: running_average_special(data)
+        Purpose: Applies the 10 running day filter to the data
+        Require:
+            data: The mdata dictionary
+        Version: 05/2021, MJB: Documentation
+        """
+        i = 1
+        longest = 0
+        indi = len(year_df)
+        depths = list(year_df.columns)
+        arr = []
+        df_empty = pd.DataFrame({str(depths[0]): []})
+        for depth in depths:
+            nonna_df = year_df[str(depth)].dropna()
+            nonna_df.index = pd.to_datetime(nonna_df.index)
+            time_diff = nonna_df.index[1:] - nonna_df.index[:-1]
+            day_diff = time_diff.components.days * 24
+            hour_diff = time_diff.components.days
+            total_time_diff = day_diff + hour_diff
+            index_shifts = total_time_diff.loc[total_time_diff > running].index
+            nan_df = year_df[year_df[str(depth)].isnull()]
+            nan_df.index = pd.to_datetime(nan_df.index)
+            if len(index_shifts) > 0:
+                complete = np.empty(0)
+                old_index = 0
+                for i in index_shifts:
+                    complete = np.append(complete, uniform_filter1d(nonna_df[old_index:i], size=running))
+                    old_index = i
+                complete = np.append(complete, uniform_filter1d(nonna_df[old_index:], size=running))
+            else:
+                complete = uniform_filter1d(nonna_df, size=running)
+            # nonna_df.index = nonna_df.index.strftime('%Y-%m-%d %H:%M:%S')
+            complete_df = pd.DataFrame(complete, columns=[str(depth)], index=nonna_df.index)
+            complete_df = pd.concat([complete_df, nan_df[str(depth)]], sort=False).sort_index()
+            df_empty[str(depth)] = complete_df[str(depth)]
+        # maxlen = max(len(i) for i in arr)
+
+        dfdelta = df_empty.copy()
+
+        return dfdelta
+
 
