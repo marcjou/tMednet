@@ -22,35 +22,49 @@ class DataManager:
 
         Attributes
         ----------
-        counter : list
-            List containing information about the type of plot that is being created
+        path : str
+            Path to the files being loaded
+        files : list
+            List containing the names of the files loaded
+        mdata : list of dict
+            List of dictionaries containing all the important data of each loaded file
         index : list
-            List containing the pointer to the selected file on the list box
-        savefilename : str
-            Name under which the plot will be saved
+            List containing the indexes of the loaded files
+        newfiles: int
+            Number of new files loaded into the GUI
+        tempdataold : list of dict
+            Copy of the original mdata for recovery purposes
 
         Methods
         -------
-        plot_ts(self, mdata, files, index)
-            Plots the selected time series from the list of loaded files
-        plot_zoom(self, mdata, files, list, cut_data_manually, controller=False)
-            Plots a zoomed version of the selected time series from the list of loaded files
-        plot_all_zoom(self, mdata, list)
-            Plots a zoom version of multiple selected time series from the list of loaded files
-        plot_dif(self, mdata)
-            Plots the difference between consecutive depths of all the loaded files
-        plot_dif_filter1d(self, mdata)
-            Plots the filtered difference between consecutive depths of all the loaded files
-        plot_hovmoller(self, mdata)
-            Creates a hovmoller plot with only the time series loaded
-        plot_stratification(self, historical, year)
-            Creates the stratification plot of a given dataset and year
-        plot_annual_T_cycle(self, historical, year)
-            Creates the annual T cycle plot of a given dataset and year
-        plot_thresholds(self, historical, toolbar, consolescreen)
-            Creates the thresholds plot of a given dataset
-        clear_plots(self, clear_thresholds=True)
-            Deletes all current plots and plot related attributes
+        openfile(self, files, textBox, lister)
+            Opens the files to be used with the GUI
+        load_data(self)
+            Reads the txt files and stores them on mdata dictionaries
+        report(self, textBox)
+            Creates a report in txt and pdf format
+        zoom_data(self, data)
+            Gets the first and lasts days of operation for a given depth
+        zoom_data_loop(self)
+            Gets the first and lasts days of operation for all the depths
+        merge(self)
+            Merges all of the loaded files into a single one
+        list_to_df(self)
+            Converts the mdata attribute into a single dataframe
+        df_to_geojson(self, df, properties, SN)
+            Iterates through the DF in order to create the properties for the Geojson file
+        df_to_txt(self, df, SN)
+            Converts the dataframe containing the data of all the files loaded into a txt file
+        convert_to_netCDF(self, filename, df)
+            Converts the dataframe containing the data of all the files loaded into a netCDF file
+        temp_difference(self)
+            Gets the difference in temperature between levels
+        apply_uniform_filter(self)
+            Applies the 10 running day filter to the data
+        historic_to_df(historic, year, start_month='05', end_month='12')
+            Converts the loaded historic txt file into a dataframe
+        running_average_special(year_df, running=240)
+            Applies the 10 running day filter to the data
 
         Version: 04/2023 MJB: Documentation
         """
@@ -122,7 +136,7 @@ class DataManager:
             for ifile in self.files[len(self.files) - self.newfiles:]:
                 filein = self.path + ifile
 
-                lat, lon, site_name = self.load_coordinates(int(ifile.split('_')[0]))
+                lat, lon, site_name = self.__load_coordinates(int(ifile.split('_')[0]))
                 # Extraemos campos del nombre del fichero
                 datos = {"df": [], "S/N": "", "GMT": "",
                          "depth": int(ifile.split("_")[3].split(".")[0]), "region": int(ifile.split("_")[0]),
@@ -159,14 +173,14 @@ class DataManager:
                 self.tempdataold.append({'df':datos['df'].copy(), 'depth':datos['depth']})
             self.mdata = sorted(self.mdata, key=lambda k: k['depth'])
             self.tempdataold = sorted(self.tempdataold, key=lambda k: k['depth'])
-            self.to_utc()
-            self.check_start()
-            self.interpolate_hours()  # Interpolates the temperature between different not round hours
+            self.__to_utc()
+            self.__check_start()
+            self.__interpolate_hours()  # Interpolates the temperature between different not round hours
 
         except ValueError:
             self.console_writer("Error, file extension not supported, load a txt",'warning')
 
-    def load_coordinates(self, region):
+    def __load_coordinates(self, region):
         """
         Method: load_coordinates(region)
         Purpose: Loads the coordinates of the file from the 'metadata.json' auxiliary file
@@ -181,7 +195,7 @@ class DataManager:
         name = data['stations'][str(region)]['site_name']
         return lat, lon, name
 
-    def check_start(self):
+    def __check_start(self):
         """
             Method: check_start(data)
             Purpose: Checks that the start time is correct
@@ -196,7 +210,7 @@ class DataManager:
                 self.console_writer("Error, start date on the title of the file set before the start date of the "
                                      "file in depth " + str(dat['depth']), 'warning')
 
-    def interpolate_hours(self):
+    def __interpolate_hours(self):
         """
         Method: interpolate_hours(data)
         Purpose: Interpolates the values of temp in case the hours are not round
@@ -221,7 +235,7 @@ class DataManager:
                     dat['df'] = sinter
                     break
 
-    def to_utc(self):
+    def __to_utc(self):
         """
         Method: to_utc(data)
         Purpose: Shift temporal axis
@@ -261,7 +275,7 @@ class DataManager:
                     'GMT': self.mdata[0]["GMT"], 'Sensors': [],
                     'NData': []}
         # ATTENTION THIS HAS BEEN MODIFIED CHECK
-        textbox, PDF_DATA = self.metadata_string_creator(textbox, PDF_DATA)
+        textbox, PDF_DATA = self.__metadata_string_creator(textbox, PDF_DATA)
         textbox.insert("end", "=========\n")
         for text in self.reportlogger:
             textbox.insert("end", text + "\n")
@@ -297,7 +311,7 @@ class DataManager:
                 pdf.text(text)
         pdf.output('test2.pdf', 'F')
 
-    def metadata_string_creator(self, textbox, PDF_DATA):
+    def __metadata_string_creator(self, textbox, PDF_DATA):
         for item in self.mdata:
             daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
             cadena = "=========\n"
