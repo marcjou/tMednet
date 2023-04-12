@@ -37,6 +37,8 @@ class GUIPlot:
         List containing information about the type of plot that is being created
     index : list
         List containing the pointer to the selected file on the list box
+    dm : DataManager Object
+        Object containing the instance of the data loaded into the GUI
     savefilename : str
         Name under which the plot will be saved
 

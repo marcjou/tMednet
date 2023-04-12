@@ -191,10 +191,8 @@ class tmednet(tk.Frame):
         Version: 11/2021, MJB: Documentation
         """
         # DEFINIR VARIABLES
-        self.path = ""
         self.files = []
         self.index = []
-        self.newfiles = 0
         self.recoverindex = None
         self.recoverindexpos = None
         self.reportlogger = []
@@ -272,7 +270,7 @@ class tmednet(tk.Frame):
         Version: 01/2021, EGL: Documentation
         """
 
-        self.path = "./"
+
         files = askopenfilenames(initialdir='../src', title="Open files",
                                  filetypes=[("All files", "*.*")])
         try:

@@ -14,15 +14,52 @@ import progressbar as pb
 
 
 class DataManager:
+    """
+        Creates an object containing all the data that is being loaded into the GUI.
+        It also allows to load and manipulate said data.
 
+        ...
+
+        Attributes
+        ----------
+        counter : list
+            List containing information about the type of plot that is being created
+        index : list
+            List containing the pointer to the selected file on the list box
+        savefilename : str
+            Name under which the plot will be saved
+
+        Methods
+        -------
+        plot_ts(self, mdata, files, index)
+            Plots the selected time series from the list of loaded files
+        plot_zoom(self, mdata, files, list, cut_data_manually, controller=False)
+            Plots a zoomed version of the selected time series from the list of loaded files
+        plot_all_zoom(self, mdata, list)
+            Plots a zoom version of multiple selected time series from the list of loaded files
+        plot_dif(self, mdata)
+            Plots the difference between consecutive depths of all the loaded files
+        plot_dif_filter1d(self, mdata)
+            Plots the filtered difference between consecutive depths of all the loaded files
+        plot_hovmoller(self, mdata)
+            Creates a hovmoller plot with only the time series loaded
+        plot_stratification(self, historical, year)
+            Creates the stratification plot of a given dataset and year
+        plot_annual_T_cycle(self, historical, year)
+            Creates the annual T cycle plot of a given dataset and year
+        plot_thresholds(self, historical, toolbar, consolescreen)
+            Creates the thresholds plot of a given dataset
+        clear_plots(self, clear_thresholds=True)
+            Deletes all current plots and plot related attributes
+
+        Version: 04/2023 MJB: Documentation
+        """
     def __init__(self, console, reportlogger):
         self.path = ""
         self.files = []
         self.mdata = []
         self.index = []
         self.newfiles = 0
-        self.recoverindex = None
-        self.recoverindexpos = None
         self.reportlogger = []
         self.tempdataold = []
         self.controlevent = False
