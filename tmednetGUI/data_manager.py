@@ -62,7 +62,6 @@ class DataManager:
         self.newfiles = 0
         self.reportlogger = []
         self.tempdataold = []
-        self.controlevent = False
         self.console_writer = console
         self.reportlogger = reportlogger
         print('hello')
@@ -157,7 +156,7 @@ class DataManager:
                 except:
                     datos['S/N'] = 'XXXXXXXX'
                 self.mdata.append(datos)
-                self.tempdataold.append(datos.copy())
+                self.tempdataold.append({'df':datos['df'].copy(), 'depth':datos['depth']})
             self.mdata = sorted(self.mdata, key=lambda k: k['depth'])
             self.tempdataold = sorted(self.tempdataold, key=lambda k: k['depth'])
             self.to_utc()
@@ -379,7 +378,6 @@ class DataManager:
         
     def zoom_data_loop(self):
         for data in self.mdata:
-            # self.tempdataold.append(data['df']['Temp'].copy())
             time_series, temperatures, indexes, start_index, valid_start, valid_end = self.zoom_data(data)
             for i in indexes:
                 data['df']['Temp'][int(i) - len(np.array(temperatures[1]))] = 999

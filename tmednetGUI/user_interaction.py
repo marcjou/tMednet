@@ -191,13 +191,9 @@ class tmednet(tk.Frame):
         Version: 11/2021, MJB: Documentation
         """
         # DEFINIR VARIABLES
-        self.files = []
         self.index = []
         self.recoverindex = None
-        self.recoverindexpos = None
         self.reportlogger = []
-        self.tempdataold = []
-        self.controlevent = False
         self.dm = fm2.DataManager(self.console_writer, self.reportlogger)
 
     def console_writer(self, msg, mod, var=False, liner=False):
@@ -332,7 +328,6 @@ class tmednet(tk.Frame):
                 self.recoverindex.append(ind)
             else:
                 self.recoverindex = [ind]
-            # self.tempdataold.append(self.dm.mdata[ind]['temp'].copy())
 
             # Checks if the cut is done on the first third of the dataset, which would be considered
             # a cut on the beginning of the data.
@@ -395,16 +390,16 @@ class tmednet(tk.Frame):
         try:
             if self.recoverindex:
                 for i in self.recoverindex:
-                    self.dm.mdata[i]['temp'] = self.tempdataold[i]['temp'].copy()
+                    self.dm.mdata[i]['df'] = self.dm.tempdataold[i]['df'].copy()
                 self.recoverindex = None
-                # self.tempdataold = None
+
             else:
                 i = 0
                 for data in self.dm.mdata:
-                    data['temp'] = self.tempdataold[i]['temp'].copy()
+                    data['df'] = self.dm.tempdataold[i]['df'].copy()
                     i += 1
             self.console_writer('Recovering old data', 'action')
-            self.clear_plots()
+            self.gui_plot.clear_plots()
         except (AttributeError, TypeError):
             self.console_writer('Cut the ending of a file before trying to recover it', 'warning')
 
@@ -416,7 +411,6 @@ class tmednet(tk.Frame):
         Version: 05/2021, MJB: Documentation
         """
         if self.dm.mdata:
-            # self.tempdataold = []
             self.dm.zoom_data_loop()
             self.console_writer('Endings of all the files cut', 'action', liner=True)
             self.reportlogger.append('Endings and start automatically cut')
@@ -457,7 +451,7 @@ class tmednet(tk.Frame):
 
                 filename = ""
                 for n in self.gui_plot.counter:
-                    filename = filename + "_" + self.files[n][-6:-4]
+                    filename = filename + "_" + self.dm.files[n][-6:-4]
                 filename = self.dm.mdata[0]["datainici"].strftime("%Y-%m-%d") + "_" \
                            + self.dm.mdata[0]["datafin"].strftime("%Y-%m-%d") + "_Combo of depths" + filename + ' ' + zoom
 
