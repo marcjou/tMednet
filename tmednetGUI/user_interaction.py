@@ -2,23 +2,17 @@ import sys
 import time
 import matplotlib
 import GUI_plots as gp
-import numpy as np
 import pandas as pd
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import file_writer as fw
 import excel_writer as ew
-from datetime import datetime
-import marineHeatWaves as mhw
 import tkinter.font as tkFont
 import surface_temperature as st
 from PIL import Image, ImageTk
 from datetime import timedelta
-import matplotlib.pyplot as plt
 import matplotlib.dates as dates
-import matplotlib.dates as mdates
-from matplotlib.figure import Figure
 from tkinter import messagebox, Button
 from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -27,7 +21,7 @@ version = "0.8"
 build = "Mars 2022"
 matplotlib.use("TkAgg")
 
-import file_manipulation2 as fm2
+import data_manager as fm2
 class tmednet(tk.Frame):
 
     def __init__(self, master=None):

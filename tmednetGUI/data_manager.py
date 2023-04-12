@@ -7,8 +7,6 @@ import numpy as np
 import pdf_creator
 import pandas as pd
 from numpy import diff
-from netCDF4 import Dataset
-import user_interaction as ui
 from geojson import Point, Feature, dump
 from datetime import datetime, timedelta
 from scipy.ndimage.filters import uniform_filter1d

@@ -588,7 +588,6 @@ class GUIPlot:
         # TODO discuss with Nat how many days for the running average of the climatology
         orderedhist_df = self.dm.running_average_special(orderedhist_df, running=30)
         orderedhist_df.index = pd.DatetimeIndex(orderedhist_df.index)
-        # dfdelta = fm.running_average(self.mdata, running=360)
 
         # All this block serves only to transform the data from hourly to daily. It should be inside its own method
         daylist = []
