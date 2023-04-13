@@ -82,13 +82,18 @@ class DataManager:
 
     def openfile(self, files, textBox, lister):
         """
-        Method: openfile(self, files, consolescreen)
-        Purpose: Opens the files to be used with the GUI
-        Require:
-            self: The mdata
-            files: The filenames to be opened
-            consolescreen: In order to write to the console
-        Version: 01/2021, EGL: Documentation
+        Opens the files to be used with the GUI
+
+        ...
+
+        Parameters
+        ----------
+        files : list
+            The filenames to be opened
+        textBox : tK Text
+            Writes on console
+        lister : list
+            List of all the previously loaded files
         """
 
         filesname = []
@@ -124,12 +129,7 @@ class DataManager:
 
     def load_data(self):
         """
-        Method: load_data(self, consolescreen)
-        Purpose: read tmednet *.txt data files
-        Require:
-            self: For the mdata dictionary
-            consolescreen: In order to write to the consolescreen
-        Version: 05/2021, MJB: Documentation
+        Reads the txt files and stores them on mdata dictionaries
         """
         try:
             # Iterates based on the last entry on self.files to not overwrite
@@ -181,13 +181,7 @@ class DataManager:
             self.console_writer("Error, file extension not supported, load a txt",'warning')
 
     def __load_coordinates(self, region):
-        """
-        Method: load_coordinates(region)
-        Purpose: Loads the coordinates of the file from the 'metadata.json' auxiliary file
-        Require:
-            region: The number of the site where the data is taken from
-        Version: 05/2021, MJB: Documentation
-        """
+        # Loads the coordinates of the file from the 'metadata.json' auxiliary file
         with open('../src/metadata.json') as f:
             data = json.load(f)
         lat = float(data['stations'][str(region)]['lat'])
@@ -196,13 +190,7 @@ class DataManager:
         return lat, lon, name
 
     def __check_start(self):
-        """
-            Method: check_start(data)
-            Purpose: Checks that the start time is correct
-            Require:
-                data: The mdata
-            Version: 11/2021, MJB: Documentation
-        """
+        # Checks that the start time is correct
         for dat in self.mdata:
             titlestart = dat['datainici'].timestamp()
             filestart = dat['df'].index[0].timestamp()
@@ -211,13 +199,7 @@ class DataManager:
                                      "file in depth " + str(dat['depth']), 'warning')
 
     def __interpolate_hours(self):
-        """
-        Method: interpolate_hours(data)
-        Purpose: Interpolates the values of temp in case the hours are not round
-        Require:
-            data: The mdata
-        Version: 05/2021, MJB: Documentation
-        """
+        # Interpolates the values of temp in case the hours are not round
         for dat in self.mdata:
             for i in range(len(dat['df'].index)):
                 if dat['df'].index[i].timestamp() % 3600 == 0:  # Check if the difference between timestamps is an hour
@@ -236,12 +218,7 @@ class DataManager:
                     break
 
     def __to_utc(self):
-        """
-        Method: to_utc(data)
-        Purpose: Shift temporal axis
-        Require:
-        Version: 01/2021, EGL: Documentation
-        """
+        # Change from local time to utc
         for i in range(len(self.mdata)):
             gmthshift = int(self.mdata[i]["GMT"][1:])
             # Mirar timedelta
@@ -252,11 +229,14 @@ class DataManager:
 
     def report(self, textbox):
         """
-        Method: report(self)
-        Purpose: List main file characteristics
-        Require:
-            textBox: text object
-        Version: 01/2021, EGL: Documentation
+        List main file characteristics and prints it on the report screen and on a PDF
+
+        ...
+
+        Parameters
+        ----------
+        textbox : tK Text
+            The textbox object for the report screen on the GUI
         """
         textbox.delete(1.0, "end")
         # TODO format the PDF file to make it more "elegant"
@@ -312,6 +292,7 @@ class DataManager:
         pdf.output('test2.pdf', 'F')
 
     def __metadata_string_creator(self, textbox, PDF_DATA):
+        # Generates the metadata of the files on a string to implement on the report
         for item in self.mdata:
             daysinsitu = (item['datainici'] - item['datafin']).total_seconds() / 86400
             cadena = "=========\n"
@@ -331,11 +312,15 @@ class DataManager:
 
     def zoom_data(self, data):
         """
-        Method: zoom_data(data)
-        Purpose: Gets the first and last day of operation data
-        Require:
-            data: The mdata dictionary
-        Version: 05/2021, MJB: Documentation
+        Gets the first and last day of operation for a given depth
+
+        ...
+
+        Parameters
+        ----------
+        data : dict
+            An mdata dict of a given depth
+
         """
 
         enddate = data["datafin"]  # - timedelta(hours=int(data["GMT"][1:])) converted to utc in new to_utc method
@@ -391,6 +376,9 @@ class DataManager:
             return time_series, temperatures, indexes, start_index, valid_start, valid_end
         
     def zoom_data_loop(self):
+        """
+        Gets the first and last days of operation for all the depths
+        """
         for data in self.mdata:
             time_series, temperatures, indexes, start_index, valid_start, valid_end = self.zoom_data(data)
             for i in indexes:
@@ -400,11 +388,7 @@ class DataManager:
 
     def merge(self):
         """
-        Method: merge(data)
-        Purpose: Merges all of the loaded files into a single one
-        Require:
-        Version:
-        01/2021, EGL: Documentation
+        Merges all of the loaded files into a single one
         """
 
         print('merging files')
@@ -418,11 +402,7 @@ class DataManager:
 
     def list_to_df(self):
         """
-        Method: list_to_df(data)
-        Purpose: Converts the list mdata to a dataframe
-        Require:
-            data: List mdata
-        Version: 05/2021, MJB: Documentation
+        Converts the mdata attribute into a single dataframe
         """
         df1 = pd.DataFrame(self.mdata[0]['df'].values, index=self.mdata[0]['df'].index, columns=[str(self.mdata[0]['depth'])])
         depths = [self.mdata[0]['depth']]
@@ -439,15 +419,18 @@ class DataManager:
 
     def df_to_geojson(self, df, properties, SN):
         """
-        Method: df_to_geojson(df, properties, SN, lat, lon)
-        Purpose: Iterates through the DF in order to create the properties for the Geojson file
-        Require:
-            df: The Dataframe to be read
-            properties: The properties of the geojson
-            SN: List of serial numbers
-            lat: The latitude coordinate
-            lon: The longitude coordinate
-        Version: 05/2021, MJB: Documentation
+        Iterates through the DF in order to create the properties for the Geojson file
+
+        ...
+
+        Parameters
+        ----------
+        df : DataFrame
+            The Dataframe to be read
+        properties : list
+            The depths of the geojson
+        SN : list
+            List of serial numbers
         """
         start_time = time.time()
         df = df.fillna(999)
@@ -472,13 +455,16 @@ class DataManager:
 
     def df_to_txt(self, df, SN):
         """
-        Method: df_to_txt(df, data, SN)
-        Purpose: Writes a txt with the Dataframe values
-        Requires:
-            df: The Dataframe to be read
-            data: List mdata
-            SN: The serial number list
-        Version: 05/2021, MJB: Documentation
+        Converts the dataframe containing the data of all the files loaded into a txt file
+
+        ...
+
+        Parameters
+        ----------
+        df : DataFrame
+            The Dataframe to be read
+        SN : list
+            List of serial numbers
         """
         print('writing txt')
         output = '../src/output_files/' + str(self.mdata[0]['region']) + '_' + self.mdata[0]['datainici'].strftime('%Y-%m-%d') + '_' + \
@@ -496,6 +482,18 @@ class DataManager:
         return output
 
     def convert_to_netCDF(self, filename, df):
+        """
+        Converts the dataframe containing the data of all the files loaded into a netCDF file
+
+        ...
+
+        Parameters
+        ----------
+        filename : str
+            Name of the resulting file
+        df : DataFrame
+            Dataframe to be stored as a NetCDF
+        """
         # TODO print on console when the netCDF has been create
         try:
             xarray.Dataset(df.to_xarray()).to_netcdf('../src/output_files/' + filename + '.nc4')
@@ -505,11 +503,7 @@ class DataManager:
 
     def temp_difference(self):
         """
-        Method: temp_difference(data)
-        Purpose: Gets the difference in temperature between levels
-        Require:
-            data: The mdata dictionary
-        Version: 05/2021, MJB: Documentation
+        Gets the difference in temperature between levels
         """
         # to_utc(data)      Applying it only at the beggining interpolate_hours
         df, depths, _ = self.list_to_df()
@@ -528,11 +522,7 @@ class DataManager:
 
     def apply_uniform_filter(self):
         """
-        Method: apply_uniform_filter(data)
-        Purpose: Applies the 10 running day filter to the data
-        Require:
-            data: The mdata dictionary
-        Version: 05/2021, MJB: Documentation
+        Applies the 10 running day filter to the data
         """
         df, depths = self.temp_difference()
         i = 1
@@ -558,6 +548,24 @@ class DataManager:
 
     @staticmethod
     def historic_to_df(historic, year, start_month='05', end_month='12'):
+        """
+        Converts the loaded historic txt file into a dataframe
+
+        ...
+
+        Parameters
+        ----------
+        historic : str
+            Filepath of the data that will be loaded and converted into a DataFrame
+        year : str
+            Year of operation that we want to extract
+        start_month : str, optional
+            First month that we want to extract
+            (default is May, month '05')
+        end_month : str, optional
+            Last month that we want to extract
+            (default is December, month '12')
+        """
         start_time = year + '-' + start_month + '-01 00:00:00'
         if end_month == '01':
             end_time = str(int(year) + 1) + '-' + end_month + '-01 00:00:00'
@@ -642,11 +650,17 @@ class DataManager:
     @staticmethod
     def running_average_special(year_df, running=240):
         """
-        Method: running_average_special(data)
-        Purpose: Applies the 10 running day filter to the data
-        Require:
-            data: The mdata dictionary
-        Version: 05/2021, MJB: Documentation
+        Applies the 10 running day filter to the data
+
+        ...
+
+        Parameters
+        ----------
+        year_df : DataFrame
+            Dataframe which will be applied the filter
+        running : int, optional
+            Number of instances for which the filter will be applied in hours
+            (default is 240, which corresponds to 10 days)
         """
         i = 1
         longest = 0
