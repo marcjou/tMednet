@@ -23,16 +23,39 @@ matplotlib.use("TkAgg")
 
 import data_manager as fm2
 class tmednet(tk.Frame):
+    """
+    Creates the GUI. This class will be the only direct interaction the user will have
+    with all of the code. All the complex calculations and different manipulations
+    that occur due to the user input happen in another classes.
+
+    Attributes
+    ----------
+    master : tk Frame
+        The main frame of the GUI
+    gui_plot : GUIPlot object
+        Object containing all the information necessary to create the different plots that will
+        be shown on the GUI
+    dm : DataManager object
+        Object containing all the data that is being loaded into the GUI.
+        It also allows to load and manipulate said data.
+    toolbar : NavigationToolbar2Tk
+        Object that contains the plot manipulation buttons
+    list : Listbox
+        Object that contains the loaded files filenames
+    right_menu : Menu
+        Object that contains the menu buttons that pop up when right clicking on the list box
+    textBox : tk Text
+        Object that contains a black box in which the report is written
+    consolescreen : tk text
+        Object that contains a black box in which all the console messages are written
+    recoverindex : list
+        List containing the index of the files that have been cut manually
+    reportlogger : list
+        List containing the strings of the important changes to be stored on the report
+
+    """
 
     def __init__(self, master=None):
-        """
-        Method: __init__()
-        Purpose: Main class constructor
-        Require:
-        Version:
-        01/2021, EGL: Documentation
-        """
-
         tk.Frame.__init__(self, master)  # This defines self.master
         self.master = master
         self.master.geometry("2000x1000")
@@ -47,20 +70,13 @@ class tmednet(tk.Frame):
         self.master.option_add("*Font", def_font)
 
         # DEFINIR VARIABLES
-        self.init_variables()
+        self.__init_variables()
 
         # We build the GUI
-        self.init_window()
+        self.__init_window()
 
-    def init_window(self):
-        """
-        Method: init_window(self)
-        Purpose: Build the GUI
-        Require:
-            master: master widget
-        Version: 01/2021, EGL: Documentation
-        """
-
+    def __init_window(self):
+        # Builds the GUI
         menubar = tk.Menu(self.master)
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="Open", command=self.on_open)
@@ -181,17 +197,8 @@ class tmednet(tk.Frame):
         self.consolescreen.tag_config('warning', foreground="firebrick3")
         self.consolescreen.tag_config('action', foreground="steelblue4", font='Courier 12 bold')
 
-    # p.add(f1,width=300)
-    # p.add(f2,width=1200)
-    def init_variables(self):
-        """
-        Method: init_variables(self)
-        Purpose: Initializes the variables
-        Require:
-        Version: 11/2021, MJB: Documentation
-        """
-        # DEFINIR VARIABLES
-        self.index = []
+    def __init_variables(self):
+        # Initializes the variables
         self.recoverindex = None
         self.reportlogger = []
         self.dm = fm2.DataManager(self.console_writer, self.reportlogger)
@@ -301,7 +308,7 @@ class tmednet(tk.Frame):
         self.list.delete(0, END)
         self.textBox.delete('1.0', END)
         self.consolescreen.delete('1.0', END)
-        self.init_variables()
+        self.__init_variables()
 
 
 
