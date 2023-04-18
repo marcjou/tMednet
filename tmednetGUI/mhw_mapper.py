@@ -112,7 +112,7 @@ class MHWMapper:
         gl : Gridlines
             the gridlines of the plot featured to divide the latitude and longitude
         """
-        plt.figure(figsize=(15/2.54, 10/2.54))
+        plt.figure(figsize=(20/2.54, 15/2.54))
 
         ax = plt.axes(projection=ccrs.Mercator())
         ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
@@ -121,7 +121,7 @@ class MHWMapper:
         ax.coastlines(resolution='10m')
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
 
-        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=2, color='black', alpha=0.5, linestyle='--',
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=1, color='grey', alpha=0.3, linestyle='--',
                           draw_labels=True)
         gl.xlabels_top = False
         gl.ylabels_left = True
@@ -134,12 +134,12 @@ class MHWMapper:
         # gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
         p = ax.get_window_extent()
         plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
-                    xy=(0.2, -0.3), xycoords=p, xytext=(0.1, 0),
+                    xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0),
                     textcoords="offset points",
                     va="center", ha="left")
-        plt.annotate('t-mednet.org', xy=(0.2, 0.3), xycoords=p, xytext=(0.1, 0),
+        plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
-                     va="center", ha="left")
+                     va="center", ha="left", alpha=0.5)
 
         return ax, gl
 
@@ -250,11 +250,11 @@ class MHWMapper:
                 tit = 'days'
             elif mode == 'intensity':
                 tit = mode
-            plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=1.05, fontsize=18)
+            plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
             plt.title('reference period 1982-2011', fontsize=10)
             # plt.show()
             print('hey')
-            plt.savefig('../src/output_images/image_' + str(i) + '.png')
+            plt.savefig('../src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
             print('hoy')
             filenames.append('../src/output_images/image_' + str(i) + '.png')
             ax.remove()
@@ -282,7 +282,7 @@ class MHWMapper:
         if mode == 'intensity':
             extra = 'MHW'
             type = 'imax'
-        elif mode == 'temperature':
+        elif mode == 'duration':
             extra = 'MHW'
             type = 'days'
         elif mode == 'temperature':
