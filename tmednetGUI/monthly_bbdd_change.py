@@ -10,10 +10,10 @@ TODAY = datetime.today().strftime('%d/%m/%Y')
 MONTH_ABBR = calendar.month_abbr[datetime.today().month]
 YEAR = datetime.today().year
 
-MHW_MAPS = '<h2>MHW MAPS in NRT</h2>\n<p>Started in May - last update {}</p>\n<div class="row-fluid">\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + YEAR + '/anim_MHW_days_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + YEAR + '/anim_MHW_imax_{}.gif" width="550" height="349" /></div><div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/2022/anim_SST_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + YEAR + '/anim_SST_{}.gif" width="550" height="349" /></div>\n'.format(TODAY, MONTH_ABBR, MONTH_ABBR, MONTH_ABBR, MONTH_ABBR)
+MHW_MAPS = '<h2>MHW MAPS in NRT</h2>\n<p>Started in May - last update {}</p>\n<div class="row-fluid">\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + str(YEAR) + '/anim_MHW_days_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + str(YEAR) + '/anim_MHW_imax_{}.gif" width="550" height="349" /></div><div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/2022/anim_SST_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + str(YEAR) + '/anim_SST_{}.gif" width="550" height="349" /></div>\n'.format(TODAY, MONTH_ABBR, MONTH_ABBR, MONTH_ABBR, MONTH_ABBR)
 MONTHLY = '<h2>MONTHLY MAPS</h2>\n<div class="row-fluid">\n{}</div>\n<p> </p>'
 
-OLD_DISPLAYS = '<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + YEAR + '/anim_days_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + YEAR + '/anim_imax_{}.gif" width="550" height="349" /></div>\n'
+OLD_DISPLAYS = '<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + str(YEAR) + '/anim_days_{}.gif" width="550" height="349" /></div>\n<div class="span6"><img style="display: block; margin-left: auto; margin-right: auto;" src="images/heatwaves/' + str(YEAR) + '/anim_imax_{}.gif" width="550" height="349" /></div>\n'
 
 str=''
 for i in range(1, datetime.today().month):
@@ -23,6 +23,7 @@ MONTHLY = MONTHLY.format(str)
 
 
 cnx = mysql.connector.connect(user='tmednetj382', password='$eE%q0l32',
-                              host='172.16.0.44:3306',
+                              host='172.16.0.44', port='3306',
                               database='tmednetj382')
+
 cnx.close()

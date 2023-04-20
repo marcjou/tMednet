@@ -530,7 +530,8 @@ class tmednet(tk.Frame):
         #output = self.secondInput.get()
         self.newwindow.destroy()
         # fw.Excel(input, '../src/output_files/' + output + '.xlsx')
-        ew.excel_writer(input)
+        er = ew.ExcelReport(input)
+        er.excel_writer()
         self.console_writer('Excel file successfully created!', 'action')
 
     def __browse_file(self, merge=False):
