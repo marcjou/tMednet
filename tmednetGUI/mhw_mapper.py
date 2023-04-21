@@ -227,7 +227,7 @@ class MHWMapper:
             cmap = 'Purples'
             ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
-            ds = self.ds_MHW_sliced.cumsum()
+            ds = self.ds_MHW_sliced.rolling(time=self.ds_MHW_sliced.shape[0], min_periods=1).max()
             levels = np.arange(0, 10, 1)
             cmap = 'gist_heat_r'
             ylabel = 'Max Intensity (ºC)'
