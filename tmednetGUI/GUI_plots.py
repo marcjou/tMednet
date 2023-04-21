@@ -682,6 +682,7 @@ class GUIPlot:
         """
         self.clear_plots()
         self.counter.append("Thresholds")
+        # TODO cargarme el objecto excel, implementarlo más simple en ExcelCreator o algo
         excel_object = fw.Excel(historical, write_excel=False, console=consolescreen)  # returns an excel object
         df = excel_object.mydf3
 

@@ -96,7 +96,8 @@ class MHWMapper:
         except:
             end_time = self.ds_dtime[-1]
         self.ds_time = self.ds_dtime.loc[start_time:end_time].dt.strftime('%Y-%m-%d')
-        self.ds_MHW_sliced = self.MHW.sel(time=slice(start_time, end_time))
+        # Gets the sliced version of the data with the maximum values until that moment for intensity
+        self.ds_MHW_sliced = self.MHW.sel(time=slice(start_time, end_time)).max('time')
         self.ds_MHW_days_sliced = self.MHW_days.sel(time=slice(start_time, end_time))
 
     @staticmethod
