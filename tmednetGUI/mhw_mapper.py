@@ -97,7 +97,7 @@ class MHWMapper:
             end_time = self.ds_dtime[-1]
         self.ds_time = self.ds_dtime.loc[start_time:end_time].dt.strftime('%Y-%m-%d')
         # Gets the sliced version of the data with the maximum values until that moment for intensity
-        self.ds_MHW_sliced = self.MHW.sel(time=slice(start_time, end_time)).max('time')
+        self.ds_MHW_sliced = self.MHW.sel(time=slice(start_time, end_time))
         self.ds_MHW_days_sliced = self.MHW_days.sel(time=slice(start_time, end_time))
 
     @staticmethod
@@ -227,7 +227,7 @@ class MHWMapper:
             cmap = 'Purples'
             ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
-            ds = self.ds_MHW_sliced
+            ds = self.ds_MHW_sliced.cumsum()
             levels = np.arange(0, 10, 1)
             cmap = 'gist_heat_r'
             ylabel = 'Max Intensity (ºC)'
