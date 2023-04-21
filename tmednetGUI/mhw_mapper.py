@@ -255,9 +255,9 @@ class MHWMapper:
             plt.title('reference period 1982-2011', fontsize=10)
             # plt.show()
             print('hey')
-            plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
+            plt.savefig('../src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
             print('hoy')
-            filenames.append('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png')
+            filenames.append('../src/output_images/image_' + str(i) + '.png')
             ax.remove()
         return filenames
 
@@ -290,7 +290,7 @@ class MHWMapper:
             extra = ''
             type = 'SST'
         # build gif
-        with imageio.get_writer('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
+        with imageio.get_writer('../src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
                                 duration=0.7) as writer:
             for filename in filenames:
                 image = imageio.v3.imread(filename)
