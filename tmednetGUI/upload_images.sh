@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+export LC_ALL=C
 sv="t-mednet.org 21"
 user="t-mednet"
 pass="lk@hRTpo1"

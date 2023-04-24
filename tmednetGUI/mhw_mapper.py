@@ -217,6 +217,8 @@ class MHWMapper:
         start = time.time()
         if mode == 'temperature':
             ds = self.ds_asst_interpolated
+            ticks = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
+                               math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
             levels = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
                                math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
             cmap = 'RdYlBu_r'
@@ -224,12 +226,14 @@ class MHWMapper:
         elif mode == 'duration':
             midi = xr.where(self.ds_MHW_days_sliced >= 1, 1, self.ds_MHW_days_sliced)
             ds = midi.rolling(time=midi.shape[0], min_periods=1).sum()
-            levels = np.arange(0, 31, 5)
-            cmap = 'Purples'
+            ticks = np.arange(0, 31, 5)
+            levels = np.arange(0, 31, 1)
+            cmap = 'plasma'
             ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
             ds = self.ds_MHW_sliced.rolling(time=self.ds_MHW_sliced.shape[0], min_periods=1).max()
-            levels = np.arange(0, 10, 1)
+            ticks = np.arange(0, 10, 1)
+            levels = np.arange(0, 10, 0.1)
             cmap = 'gist_heat_r'
             ylabel = 'Max Intensity (ºC)'
         end = time.time()
@@ -247,7 +251,7 @@ class MHWMapper:
             timu = end - start
             print('Time to create temp: ' + str(timu))
             # if i == 0:
-            cb = plt.colorbar(temp, location="right", ticks=levels, label=ylabel)
+            cb = plt.colorbar(temp, location="right", ticks=ticks, label=ylabel)
             if mode == 'duration':
                 tit = 'days'
             elif mode == 'intensity':

@@ -208,5 +208,5 @@ map_temperature(ds_lat, ds_lon, ds_time, ds_asst_sliced)
 
 import mhw_mapper as mp
 df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period='2023-04-01', end_period='2023-04-20')
-df_map.map_temperature('duration')
+df_map.map_temperature('intensity')
 print('hola')
