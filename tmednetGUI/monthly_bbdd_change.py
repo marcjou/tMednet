@@ -1,5 +1,6 @@
 import calendar
 import mysql.connector
+from mysql.connector import Error
 from datetime import datetime
 
 HEADER = '<div class="row">\n<div class="col-lg-4 col-sm-4" style="border: 1px solid grey;"><a style="display: block;" href="index.php?option=com_content&amp;view=article&amp;layout=aterkia:article&amp;id=279">2023</a></div>\n<div class="col-lg-4 col-sm-4" style="border: 1px solid grey;"><a style="display: block;" href="index.php?option=com_content&amp;view=article&amp;layout=aterkia:article&amp;id=278">2022</a></div>\n<div class="col-lg-4 col-sm-4" style="border: 1px solid grey;"><a style="display: block;" href="index.php?option=com_content&amp;view=article&amp;layout=aterkia:article&amp;id=206">2020</a></div>\n<div class="col-lg-4 col-sm-4" style="border: 1px solid grey;"><a style="display: block;" href="index.php?option=com_content&amp;view=article&amp;layout=aterkia:article&amp;id=175">2019</a></div>\n</div>\n<p> </p>\n<p>Marc - Welcome to T-MEDNet Marine Heatwave Tracker at 4 km in Near Real Time.</p>\n<p>Powered by @nat_bensoussan &amp; ICM-CSIC.</p>'
@@ -22,8 +23,25 @@ for i in range(1, datetime.today().month):
 MONTHLY = MONTHLY.format(str)
 
 
-cnx = mysql.connector.connect(user='tmednetj382', password='$eE%q0l32',
-                              host='172.16.0.44', port='3306',
-                              database='tmednetj382')
+try:
+    connection = mysql.connector.connect(host='172.16.0.44:3306',
+                                         database='tmednetj382',
+                                         user='tmednetj382',
+                                         password='$eE%q0l32')
+    if connection.is_connected():
+        db_Info = connection.get_server_info()
+        print("Connected to MySQL Server version ", db_Info)
+        cursor = connection.cursor()
+        cursor.execute("select database();")
+        record = cursor.fetchone()
+        print("You're connected to database: ", record)
+
+except Error as e:
+    print("Error while connecting to MySQL", e)
+finally:
+    if connection.is_connected():
+        cursor.close()
+        connection.close()
+        print("MySQL connection is closed")
 
 cnx.close()

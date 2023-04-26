@@ -697,4 +697,35 @@ class DataManager:
 
         return dfdelta
 
+    def thresholds_df(self, historical):
+        ugh = pd.read_csv(historical, sep='\t')
+        depths = list(ugh)[2:]
+        ugh['month'] = pd.DatetimeIndex(ugh['Date'], dayfirst=True).month
+        ugh2 = ugh.loc[(ugh['month'] >= 7) & (ugh['month'] <= 9)]
+        ugh2['year'] = pd.DatetimeIndex(ugh2['Date'], dayfirst=True).year
+        df_recreated = pd.DataFrame(ugh2['year'].unique(), columns=['year'])
+        df_recreated = pd.DataFrame(np.repeat(df_recreated.values, len(depths), axis=0), columns=['year'])
+        df_recreated['season'] = np.repeat(3, len(df_recreated))
+        df_recreated['depth'] = depths * int(len(df_recreated) / len(depths))
+        df_recreated['depth'] = df_recreated['depth'].astype(int)
+        argh = ugh2.melt(id_vars=['year'], value_vars=depths,
+                         var_name="depth",
+                         value_name="Value", ignore_index=False)
+        argh['depth'] = argh['depth'].astype(int)
+        argh_count = argh.groupby(['year', 'depth']).count()
+        df_recreated['N'] = argh_count['Value'].values
+        df_recreated['Ndays>=23'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 23).sum()) / 24).values
+        df_recreated['Ndays>=24'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 24).sum()) / 24).values
+        df_recreated['Ndays>=25'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 25).sum()) / 24).values
+        df_recreated['Ndays>=26'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 26).sum()) / 24).values
+        df_recreated['Ndays>=27'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 27).sum()) / 24).values
+        df_recreated['Ndays>=28'] = round(
+            argh.groupby(['year', 'depth'])['Value'].apply(lambda x: (x >= 28).sum()) / 24).values
+        return df_recreated
+
 

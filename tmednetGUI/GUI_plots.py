@@ -683,8 +683,11 @@ class GUIPlot:
         self.clear_plots()
         self.counter.append("Thresholds")
         # TODO cargarme el objecto excel, implementarlo más simple en ExcelCreator o algo
-        excel_object = fw.Excel(historical, write_excel=False, console=consolescreen)  # returns an excel object
-        df = excel_object.mydf3
+        df = self.dm.thresholds_df(historical)
+
+        #TODO trying to get mydf3 way faster
+
+
 
         # Converts Number of operation days [N] = 0 to np.nan
         df['N'].replace(0, np.nan, inplace=True)
