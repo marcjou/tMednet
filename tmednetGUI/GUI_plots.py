@@ -684,7 +684,8 @@ class GUIPlot:
         self.counter.append("Thresholds")
         # TODO cargarme el objecto excel, implementarlo más simple en ExcelCreator o algo
         df = self.dm.thresholds_df(historical)
-
+        df['year'] = df['year'].astype(str)
+        df['depth(m)'] = df['depth(m)'].astype(str)
         #TODO trying to get mydf3 way faster
 
 
@@ -693,9 +694,9 @@ class GUIPlot:
         df['N'].replace(0, np.nan, inplace=True)
 
         dfhist_control = pd.read_csv(historical, sep='\t', dayfirst=True)
-        dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'])
-        dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date']).year
-        dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date']).month
+        dfhist_control['Date'] = pd.to_datetime(dfhist_control['Date'], dayfirst=True)
+        dfhist_control['year'] = pd.DatetimeIndex(dfhist_control['Date'], dayfirst=True).year
+        dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date'], dayfirst=True).month
         dfhist_summer = dfhist_control.loc[
             (dfhist_control['month'] == 7) | (dfhist_control['month'] == 8) | (
                         dfhist_control['month'] == 9)]
@@ -704,6 +705,7 @@ class GUIPlot:
         depths = df['depth(m)'].unique()
 
         for depth in depths:
+            depth = str(depth)
             for year in df['year'].unique():
                 if (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].isnull().all()) | (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].count() / 24 < 30):
                     for i in range(23, 29):
