@@ -682,13 +682,9 @@ class GUIPlot:
         """
         self.clear_plots()
         self.counter.append("Thresholds")
-        # TODO cargarme el objecto excel, implementarlo más simple en ExcelCreator o algo
         df = self.dm.thresholds_df(historical)
         df['year'] = df['year'].astype(str)
         df['depth(m)'] = df['depth(m)'].astype(str)
-        #TODO trying to get mydf3 way faster
-
-
 
         # Converts Number of operation days [N] = 0 to np.nan
         df['N'].replace(0, np.nan, inplace=True)
