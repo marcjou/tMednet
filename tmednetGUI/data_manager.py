@@ -65,6 +65,8 @@ class DataManager:
             Converts the loaded historic txt file into a dataframe
         running_average_special(year_df, running=240)
             Applies the 10 running day filter to the data
+        thresholds_df(historical)
+            Creates a DataFrame containing the information needed to plot the thresholds
 
         Version: 04/2023 MJB: Documentation
         """
@@ -697,7 +699,24 @@ class DataManager:
 
         return dfdelta
 
-    def thresholds_df(self, historical):
+    @staticmethod
+    def thresholds_df(historical):
+        """
+        Creates a DataFrame containing the information needed to plot the thresholds
+
+        ...
+
+        Parameters
+        ----------
+        historical : str
+            Path to the data file to be read
+
+        Returns
+        -------
+        df_recreated : DataFrame
+            Dataframe containing the information related to how many days over a certain temperature have
+            been on a summer season each year
+        """
         df_read = pd.read_csv(historical, sep='\t')
         depths = list(df_read)[2:]
         df_read['month'] = pd.DatetimeIndex(df_read['Date'], dayfirst=True).month
