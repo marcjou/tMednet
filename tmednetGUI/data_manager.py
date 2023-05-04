@@ -159,9 +159,10 @@ class DataManager:
                 meta = f.readline()
                 meta = re.sub('\t+', ' ', meta.strip()).split(' ')
                 f.close()
-                df.index = [datetime.strptime(df['Date'][i] + ' ' + df['Time'][i], "%d/%m/%y %H:%M:%S") for i
+                df.index = [datetime.strptime(df['Date'].iloc[i] + ' ' + df['Time'].iloc[i], "%d/%m/%y %H:%M:%S") for i
                             in
-                            range(1, len(df) + 1)]
+                            range(0, len(df))]
+                df = df.drop_duplicates()
                 df.drop(['Date', 'Time'], axis=1, inplace=True)
                 datos['df'] = df
                 igm = '_'.join(meta).find("GMT")

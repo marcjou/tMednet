@@ -266,7 +266,7 @@ class GUIPlot:
             self.__plot2 = self.fig.add_subplot(212)
 
         for i in index:
-            time_series, temperatures, _, bad, bad2, bad3 = self.dm.zoom_data(mdata[i], self.console_writer)
+            time_series, temperatures, _, bad, bad2, bad3 = self.dm.zoom_data(mdata[i])
             depths = depths + " " + str(mdata[i]['depth'])
 
             masked_temperatures = np.ma.masked_where(np.array(mdata[i]['df']['Temp']) == 999,

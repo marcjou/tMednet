@@ -24,7 +24,7 @@ MONTHLY = MONTHLY.format(str)
 
 
 try:
-    connection = mysql.connector.connect(host='172.16.0.44:3306',
+    connection = mysql.connector.connect(host='86.109.170.198',
                                          database='tmednetj382',
                                          user='tmednetj382',
                                          password='$eE%q0l32')
@@ -38,10 +38,9 @@ try:
 
 except Error as e:
     print("Error while connecting to MySQL", e)
-finally:
+"""finally:
     if connection.is_connected():
         cursor.close()
         connection.close()
-        print("MySQL connection is closed")
+        print("MySQL connection is closed")"""
 
-cnx.close()

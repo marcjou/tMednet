@@ -5,10 +5,10 @@ import pandas as pd
 cwd = os.getcwd()
 #print(cwd)
 
-for file in os.listdir('../src/93'):  # use the directory name here
+for file in os.listdir('../src/Agde'):  # use the directory name here
 
     file_name, file_ext = os.path.splitext(file)
-    file_path = '../src/93/' + file
+    file_path = '../src/Agde/' + file
     if file_ext == '.csv':
         df = pd.read_csv(file_path, names=['date', 'val'], skiprows=2, sep=',', usecols=[0, 1], dayfirst=True)
         #del df['num']
@@ -25,4 +25,4 @@ for file in os.listdir('../src/93'):  # use the directory name here
                                 index_names=False)
         smeta = pd.DataFrame({'date': meta, 'val': ''}, index=[0])
         df_final = pd.concat([smeta,df.loc[:]]).reset_index(drop=True)
-        df_final.to_csv('../src/93/' + file_name + '.txt', header=None, index=None, sep='\t', mode='a')
+        df_final.to_csv('../src/Agde/' + file_name + '.txt', header=None, index=None, sep='\t', mode='a')
