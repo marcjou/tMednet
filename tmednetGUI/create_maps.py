@@ -24,7 +24,7 @@ def main(argv):
             mode = arg
         print(opts)
     print('Selected map is ', mode)
-    start_date = datetime.strftime(datetime.today(), '%Y-%m-%d')[:-2] + '01'
+    start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
     end_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')
     df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
     if mode == 'all':

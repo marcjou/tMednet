@@ -215,9 +215,10 @@ class DataManager:
                     dfmerge = dfraw.merge(dfcontrol, how='outer', left_index=True,
                                           right_index=True).interpolate(method='index', limit_direction='both')
                     dfmerge = dfmerge[dfmerge.index.astype('int64') // 10 ** 9 % 3600 == 0]
-                    dfinter = dfmerge.drop(columns='0')
-                    sinter = dfinter['Temp'].round(3)
-                    dat['df'] = sinter
+                    dfinter = dfmerge.drop(columns=0)
+
+                    dfinter['Temp'] = dfinter['Temp'].round(3)
+                    dat['df'] = dfinter
                     break
 
     def __to_utc(self):
