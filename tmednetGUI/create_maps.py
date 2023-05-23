@@ -32,6 +32,8 @@ def main(argv):
     df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
     if mode == 'all':
         for i in MODES:
+            if i == 'temperature':
+                df_map = mp.MHWMapper('/mnt/MHW/lastTemp.nc', start_period=start_date, end_period=end_date)
             df_map.map_temperature(i)
     else:
         df_map.map_temperature(mode)
