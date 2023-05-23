@@ -11,8 +11,9 @@ import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cf
 import matplotlib.pyplot as plt
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Literal, get_args, get_origin
+from shapely.validation import make_valid
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 os.environ['PROJ_LIB'] = '/home/marcjou/anaconda3/envs/tMednet/share/proj/'
@@ -75,14 +76,16 @@ class MHWMapper:
         """
         # Set up the Netcdf satellite data using the xarray library
         with xr.open_dataset(dataset_path) as self.ds:
-            self.MHW = self.ds.MHW
-            self.MHW_days = self.ds.MHW_days
             self.ds_dtime = self.ds.time
             self.lat = self.ds.lat
             self.lon = self.ds.lon
-
-        # Get the period you want to plot
-        self.__set_sliced_ds(start_period, end_period)
+            try:
+                self.MHW = self.ds.MHW
+                self.MHW_days = self.ds.MHW_days
+                # Get the period you want to plot
+                self.__set_sliced_ds(start_period, end_period)
+            except AttributeError:
+                self.corrected_sst = self.ds.corrected_sst
 
     def __str__(self):
         return "<MHWMapper object>"
@@ -97,6 +100,7 @@ class MHWMapper:
             end_time = self.ds_dtime[-1]
         self.ds_time = self.ds_dtime.loc[start_time:end_time].dt.strftime('%Y-%m-%d')
         # Gets the sliced version of the data with the maximum values until that moment for intensity
+
         self.ds_MHW_sliced = self.MHW.sel(time=slice(start_time, end_time))
         self.ds_MHW_days_sliced = self.MHW_days.sel(time=slice(start_time, end_time))
 
@@ -124,9 +128,9 @@ class MHWMapper:
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=1, color='grey', alpha=0.3, linestyle='--',
                           draw_labels=True)
-        gl.xlabels_top = False
-        gl.ylabels_left = True
-        gl.ylabels_right = False
+        gl.top_labels = False
+        gl.left_labels = True
+        gl.right_labels = False
         gl.xlines = True
         #gl.xlocator = mticker.FixedLocator([120, 140, 160, 180, -160, -140, -120])
         #gl.ylocator = mticker.FixedLocator([0, 20, 40, 60])
@@ -216,7 +220,7 @@ class MHWMapper:
         # created to be used for the gif
         start = time.time()
         if mode == 'temperature':
-            ds = self.ds_asst_interpolated
+            ds = self.corrected_sst - 273.15
             ticks = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
                                math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
             levels = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
@@ -226,8 +230,8 @@ class MHWMapper:
         elif mode == 'duration':
             midi = xr.where(self.ds_MHW_days_sliced >= 1, 1, self.ds_MHW_days_sliced)
             ds = midi.rolling(time=midi.shape[0], min_periods=1).sum()
-            ticks = np.arange(0, 31, 5)
-            levels = np.arange(0, 31, 1)
+            ticks = np.arange(0, 32, 5)
+            levels = np.arange(0, 32, 1)
             cmap = 'plasma'
             ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
@@ -246,7 +250,7 @@ class MHWMapper:
             print('Loop i: ' + str(i))
             start = time.time()
             temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
-                               cmap=cmap)
+                                   cmap=cmap)
             end = time.time()
             timu = end - start
             print('Time to create temp: ' + str(timu))
@@ -254,15 +258,31 @@ class MHWMapper:
             cb = plt.colorbar(temp, location="right", ticks=ticks, label=ylabel)
             if mode == 'duration':
                 tit = 'days'
+                plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
             elif mode == 'intensity':
                 tit = mode
-            plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
+                plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
+            elif mode == 'temperature':
+                tit = 'Sea Surface Temperature'
+                date = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%Y-%m-%d')
+                day = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%d')
+                plt.suptitle(tit + ' ' + date, y=0.85, x=0.45, fontsize=18)
+
+
             plt.title('reference period 1982-2011', fontsize=10)
             # plt.show()
             print('hey')
-            plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
-            print('hoy')
-            filenames.append('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png')
+            if mode == 'temperature':
+                plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_' + date + '.png',
+                            bbox_inches='tight')
+            else:
+
+                plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
+                if i == ds.shape[0] - 1:
+                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_.png',
+                                bbox_inches='tight')
+                print('hoy')
+                filenames.append('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png')
             ax.remove()
         return filenames
 
@@ -280,7 +300,10 @@ class MHWMapper:
         lons, lats = self.lon, self.lat
         filenames = []
         filenames = self.__create_image_by_type(lons, lats, mode, filenames)
-        dt = datetime.strptime(self.ds_time.values[0], '%Y-%m-%d')
+        if mode == 'temperature':
+            dt = pd.to_datetime(str(self.ds_dtime[0].values))
+        else:
+            dt = datetime.strptime(self.ds_time.values[0], '%Y-%m-%d')
         year = dt.year
         month = calendar.month_abbr[dt.month]
 
@@ -295,12 +318,45 @@ class MHWMapper:
             extra = ''
             type = 'SST'
         # build gif
-        with imageio.get_writer('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
+        if mode == 'temperature':
+            sst_files = self.__get_SST_files()
+            with imageio.get_writer(
+                    '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif',
+                    mode='I',
+                    duration=0.7) as writer:
+                for filename in sst_files:
+                    image = imageio.v3.imread(filename)
+                    writer.append_data(image)
+        else:
+            with imageio.get_writer('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
                                 duration=0.7) as writer:
-            for filename in filenames:
-                image = imageio.v3.imread(filename)
-                writer.append_data(image)
-        import os
-        # Remove files
-        for filename in set(filenames):
-            os.remove(filename)
+                for filename in filenames:
+                    image = imageio.v3.imread(filename)
+                    writer.append_data(image)
+
+            # Rename last day image if exists
+            if os.path.exists('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_.png'):
+                os.rename('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_.png', '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_' + extra + '_' + type + '_' + month + '.png')
+            # Remove files
+            for filename in set(filenames):
+                os.remove(filename)
+
+    def __get_SST_files(self):
+        # Read all files from a directory, and read your input argument
+        files = os.listdir("/home/marcjou/Escritorio/Projects/tMednet/src/output_images/")
+        input_argument = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m')
+
+        # Sort file names by name
+        files = sorted(files)
+
+        relevant_files = []
+        for file_name in files:
+            # Your Conditions goes here ........
+
+            if file_name.startswith(input_argument):
+                relevant_files.append(file_name)
+
+        if relevant_files:
+            return "Error | Not Found"
+        else:
+            return relevant_files

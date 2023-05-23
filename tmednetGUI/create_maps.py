@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 def main(argv):
     # Gets the parameters from the command line to execute the publication script
     mode = ''
-    MODES = ['intensity', 'duration']
+    MODES = ['intensity', 'duration', 'temperature']
+    last_day = False
     try:
         opts, args = getopt.getopt(argv, 'hm:', ['mode='])
     except getopt.GetoptError:
@@ -26,6 +27,8 @@ def main(argv):
     print('Selected map is ', mode)
     start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
     end_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')
+    if datetime.today().day == 1:
+        last_day = True
     df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
     if mode == 'all':
         for i in MODES:
