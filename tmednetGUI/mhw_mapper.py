@@ -321,11 +321,11 @@ class MHWMapper:
         if mode == 'temperature':
             sst_files = self.__get_SST_files()
             with imageio.get_writer(
-                    '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif',
+                    '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + type + '_' + month + '.gif',
                     mode='I',
                     duration=0.7) as writer:
                 for filename in sst_files:
-                    image = imageio.v3.imread(filename)
+                    image = imageio.v3.imread('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/' + filename)
                     writer.append_data(image)
         else:
             with imageio.get_writer('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
@@ -344,7 +344,7 @@ class MHWMapper:
     def __get_SST_files(self):
         # Read all files from a directory, and read your input argument
         files = os.listdir("/home/marcjou/Escritorio/Projects/tMednet/src/output_images/")
-        input_argument = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m')
+        input_argument = 'SST_' + datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m')
 
         # Sort file names by name
         files = sorted(files)
@@ -356,7 +356,7 @@ class MHWMapper:
             if file_name.startswith(input_argument):
                 relevant_files.append(file_name)
 
-        if relevant_files:
+        if len(relevant_files) > 1:
             return "Error | Not Found"
         else:
             return relevant_files

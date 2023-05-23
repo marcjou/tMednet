@@ -16,6 +16,7 @@ quote PASS $pass
 cd httpdocs/images/heatwaves/${year}
 put anim_MHW_days_${month}.gif
 put anim_MHW_imax_${month}.gif
+put anim_SST_${month}.gif
 quit 
 
 END_SCRIPT
