@@ -2,6 +2,7 @@ import os
 import time
 import math
 import imageio
+import logging
 import calendar
 import numpy as np
 import xarray as xr
@@ -244,46 +245,53 @@ class MHWMapper:
         timu = end - start
         print('Time for creating levels: ' + str(timu))
         print('after levels')
-
+        # Keeps track and creates an error log file to store which files were causing trouble
+        logging.basicConfig(filename='/tmp/myapp.log', level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s %(name)s %(message)s')
+        logger = logging.getLogger(__name__)
         for i in range(0, ds.shape[0]):
             ax, gl = self.ax_setter()
             print('Loop i: ' + str(i))
             start = time.time()
-            temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
-                                   cmap=cmap)
-            end = time.time()
-            timu = end - start
-            print('Time to create temp: ' + str(timu))
-            # if i == 0:
-            cb = plt.colorbar(temp, location="right", ticks=ticks, label=ylabel)
-            if mode == 'duration':
-                tit = 'days'
-                plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
-            elif mode == 'intensity':
-                tit = mode
-                plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
-            elif mode == 'temperature':
-                tit = 'Sea Surface Temperature'
-                date = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%Y-%m-%d')
-                day = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%d')
-                plt.suptitle(tit + ' ' + date, y=0.85, x=0.45, fontsize=18)
+            try:
+                temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
+                                       cmap=cmap)
+                end = time.time()
+                timu = end - start
+                print('Time to create temp: ' + str(timu))
+                # if i == 0:
+                cb = plt.colorbar(temp, location="right", ticks=ticks, label=ylabel)
+                if mode == 'duration':
+                    tit = 'days'
+                    plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
+                elif mode == 'intensity':
+                    tit = mode
+                    plt.suptitle('Marine Heatwaves ' + tit + ' ' + str(self.ds_time[i].values), y=0.85, x=0.45, fontsize=18)
+                elif mode == 'temperature':
+                    tit = 'Sea Surface Temperature'
+                    date = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%Y-%m-%d')
+                    day = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%d')
+                    plt.suptitle(tit + ' ' + date, y=0.85, x=0.45, fontsize=18)
 
 
-            plt.title('reference period 1982-2011', fontsize=10)
-            # plt.show()
-            print('hey')
-            if mode == 'temperature':
-                plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_' + date + '.png',
-                            bbox_inches='tight')
-            else:
-
-                plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
-                if i == ds.shape[0] - 1:
-                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_.png',
+                plt.title('reference period 1982-2011', fontsize=10)
+                # plt.show()
+                print('hey')
+                if mode == 'temperature':
+                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_' + date + '.png',
                                 bbox_inches='tight')
-                print('hoy')
-                filenames.append('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png')
-            ax.remove()
+                else:
+
+                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png', bbox_inches='tight')
+                    if i == ds.shape[0] - 1:
+                        plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/img_.png',
+                                    bbox_inches='tight')
+                    print('hoy')
+                    filenames.append('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/image_' + str(i) + '.png')
+                ax.remove()
+            except:
+                print('Found error on day ' + str(date))
+                logger.error('Found error on day ' + str(date))
         return filenames
 
     def map_temperature(self, mode):
