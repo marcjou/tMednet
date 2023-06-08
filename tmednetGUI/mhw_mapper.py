@@ -222,10 +222,8 @@ class MHWMapper:
         start = time.time()
         if mode == 'temperature':
             ds = self.corrected_sst - 273.15
-            ticks = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
-                               math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 1)
-            levels = np.arange(math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.01))),
-                               math.trunc(float(np.nanquantile(np.ma.filled(ds, np.nan), 0.99))) + 1, 0.1)
+            ticks = np.arange(15, 32, 1)
+            levels = np.arange(15, 32, 0.1)
             cmap = 'RdYlBu_r'
             ylabel = 'Temperature (ºC)'
         elif mode == 'duration':
@@ -278,7 +276,7 @@ class MHWMapper:
                 # plt.show()
                 print('hey')
                 if mode == 'temperature':
-                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_' + date + '.png',
+                    plt.savefig('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_img/SST_' + date + '.png',
                                 bbox_inches='tight')
                 else:
 
@@ -328,13 +326,16 @@ class MHWMapper:
         # build gif
         if mode == 'temperature':
             sst_files = self.__get_SST_files()
-            with imageio.get_writer(
-                    '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + type + '_' + month + '.gif',
-                    mode='I',
-                    duration=0.7) as writer:
-                for filename in sst_files:
-                    image = imageio.v3.imread('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/' + filename)
-                    writer.append_data(image)
+            if sst_files == 'Error | Not found':
+                pass
+            else:
+                with imageio.get_writer(
+                        '/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + type + '_' + month + '.gif',
+                        mode='I',
+                        duration=0.7) as writer:
+                    for filename in sst_files:
+                        image = imageio.v3.imread('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_img/' + filename)
+                        writer.append_data(image)
         else:
             with imageio.get_writer('/home/marcjou/Escritorio/Projects/tMednet/src/output_images/anim_' + extra + '_' + type + '_' + month + '.gif', mode='I',
                                 duration=0.7) as writer:
@@ -351,7 +352,7 @@ class MHWMapper:
 
     def __get_SST_files(self):
         # Read all files from a directory, and read your input argument
-        files = os.listdir("/home/marcjou/Escritorio/Projects/tMednet/src/output_images/")
+        files = os.listdir("/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_img")
         input_argument = 'SST_' + datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m')
 
         # Sort file names by name
@@ -364,7 +365,7 @@ class MHWMapper:
             if file_name.startswith(input_argument):
                 relevant_files.append(file_name)
 
-        if len(relevant_files) > 1:
+        if len(relevant_files) < 1:
             return "Error | Not Found"
         else:
             return relevant_files

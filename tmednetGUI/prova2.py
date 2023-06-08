@@ -208,9 +208,11 @@ map_temperature(ds_lat, ds_lon, ds_time, ds_asst_sliced)
 
 import mhw_mapper as mp
 MODES = ['intensity', 'duration', 'temperature']
+MODES = ['temperature']
 start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
-start_date = '21-05-2023'
+#start_date = '2023-05-01'
 end_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')
+#end_date = '2023-05-31'
 df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
 for i in MODES:
     if i == 'temperature':
