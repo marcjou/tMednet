@@ -1,5 +1,6 @@
 *.pyc
 tmednetGUI/__pycache__/
+tmednetGUI/upload_images.sh
 exit
 venv/
 __pycache__
