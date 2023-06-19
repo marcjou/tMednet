@@ -159,7 +159,7 @@ class HistoricData:
                 columns={depth: 'max'}).drop(['year', 'Date'], axis=1)['max']
         df.sort_values(['month', 'day'], inplace=True)
         df['date'] = pd.to_datetime(
-            '2020/' + df["month"].astype(str) + "/" + df["day"].astype(str))
+            '2020/' + df["month"].astype(int).astype(str) + "/" + df["day"].astype(int).astype(str))
         df.set_index('date', inplace=True)
         df.drop(['month', 'day'], axis=1, inplace=True)
 
@@ -387,9 +387,11 @@ class HistoricData:
         data_dict.plot(ax=ax)
         # labelLines(plt.gca().get_lines(), zorder=2.5)
         lines = ax.get_lines()
-        labelLine(lines[0], 200, label='10')
-        labelLine(lines[2], 200, label='25')
-        labelLine(lines[4], 200, label='40')
+        i = 0
+        for depth in depths:
+
+            labelLine(lines[i], 200, label=depth)
+            i = i + 2
         for depth in depths:
             plt.fill_between(data_dict.index, data_dict[last_years_legend[depth]], data_dict[this_year_legend[depth]],
                              where=(data_dict[this_year_legend[depth]] > data_dict[last_years_legend[depth]]),
@@ -427,24 +429,30 @@ class HistoricData:
         data = self.df.drop(['Time'], axis=1)
         last_legend_dict = {}
         this_legend_dict = {}
+        removable = []
         for depth in depths:
-            data_depth, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.__marine_heat_spikes_setter(
-                pd.DataFrame(data, columns=['Date', depth]), target_year, clim=True)
-            this_year_legend = this_year_legend + ' (' + depth + 'm)'
-            last_years_legend = last_years_legend + ' (' + depth + 'm)'
-            last_legend_dict[depth] = last_years_legend
-            this_legend_dict[depth] = this_year_legend
-            last_years_filtered = self.__marine_heat_spikes_filter(data_depth, depth)
-            last_years_means = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
-            this_year_mean = self.__marine_heat_spikes_df_setter(data_depth, depth, this_year_legend, target_year, years='new')
+            if depth in data.columns:
+                data_depth, last_years_legend, percentile_legend, this_year_legend, low_percentile_legend = self.__marine_heat_spikes_setter(
+                    pd.DataFrame(data, columns=['Date', depth]), target_year, clim=True)
+                this_year_legend = this_year_legend + ' (' + depth + 'm)'
+                last_years_legend = last_years_legend + ' (' + depth + 'm)'
+                last_legend_dict[depth] = last_years_legend
+                this_legend_dict[depth] = this_year_legend
+                last_years_filtered = self.__marine_heat_spikes_filter(data_depth, depth)
+                last_years_means = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
+                this_year_mean = self.__marine_heat_spikes_df_setter(data_depth, depth, this_year_legend, target_year, years='new')
 
-            # Sets a unique Dataframe consisting of the other three
+                # Sets a unique Dataframe consisting of the other three
 
-            if depths.index(depth) == 0:
-                concated = pd.concat([last_years_means, this_year_mean], axis=1)
-                prop = concated.index.strftime('%b')
+                if depths.index(depth) == 0:
+                    concated = pd.concat([last_years_means, this_year_mean], axis=1)
+                    prop = concated.index.strftime('%b')
+                else:
+                    concated = pd.concat([concated, last_years_means, this_year_mean], axis=1)
             else:
-                concated = pd.concat([concated, last_years_means, this_year_mean], axis=1)
+                removable.append(depth)
+        for depth in removable:
+            depths.remove(depth)
 
         concated.index = concated.index.strftime('%m-%d')
 
