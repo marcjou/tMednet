@@ -3,6 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
+import mortality_frequency as mf
+
+achi = mf.MME_Plot('../src/MME.xlsx')
+achi.affected_percentage_regional_composer()
+
 ex = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
 
 ex.columns = ex.columns.astype(str)

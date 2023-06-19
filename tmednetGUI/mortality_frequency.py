@@ -11,11 +11,53 @@ class MME_Plot:
         self.columns = self.df_events.columns
 
     def plot_affected_percentage(self):
+        df_inc = pd.DataFrame([self.df_events['#Years with MME'].loc[self.df_events['#Years with MME'] == i].count() for i in y_axis],
+                              columns=['count'])
+        df_inc['% affected'] = (df_inc['count'] / total_hex) * 100
+        df_inc['N affected'] = df_inc['count']
+        df_inc['y_axis'] = y_axis
+        ax = df_inc.plot.bar(x='y_axis', y='% affected')
+        ax.set_xlabel('Years with MME')
+        ax.set_ylabel('Percentage of affected hexagons')
+        ax.set_ylim([0, 100])
+        plt.xticks(rotation=0)
+        ax.get_legend().remove()
+        plt.title('Mediterranean MME')
+        self.save_image('MME_Global')
+
+    def save_image(self, title):
+        plt.savefig('../src/output_images/' + title + '.png',
+                    bbox_inches='tight')
+
+    def affected_percentage_regional_composer(self):
+        self.loop_ecoregion(self.plot_affected_percentage_regional)
+
+    def loop_ecoregion(self, func):
+        for n in self.df_events['sub-ecoregion'].unique():
+            func(n)
+
+    def plot_affected_percentage_regional(self, reg):
+        y_axis = self.df_events['#Years with MME'].loc[self.df_events['sub-ecoregion'] == reg].unique()
+        y_axis.sort()
+        total_hex = self.df_events['#Years with MME'].loc[self.df_events['sub-ecoregion'] == reg].count()
+        df_inc = pd.DataFrame(
+            [self.df_events['#Years with MME'].loc[(self.df_events['#Years with MME'] == i) & (self.df_events['sub-ecoregion'] == reg)].count() for i in
+             y_axis],
+            columns=['count'])
+        df_inc['% affected'] = (df_inc['count'] / total_hex) * 100
+        df_inc['N affected'] = df_inc['count']
+        df_inc['y_axis'] = y_axis
+        ax = df_inc.plot.bar(x='y_axis', y='% affected')
+        ax.set_xlabel('Years with MME')
+        ax.set_ylabel('Percentage of affected hexagons')
+        ax.set_ylim([0, 100])
+        plt.xticks(rotation=0)
+        ax.get_legend().remove()
+        plt.title(reg + ' MME')
+        self.save_image('MME_' + reg)
 
 
-
-
-
+'''
 
 ex = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
 ex.columns = ex.columns.astype(str)
@@ -31,19 +73,6 @@ total_hex = ex['#Years with MME'].count()
 
 #Dataframe for counting N of MME per
 
-df_inc = pd.DataFrame([ex['#Years with MME'].loc[ex['#Years with MME'] == i].count() for i in y_axis], columns=['count'])
-df_inc['% affected'] = (df_inc['count']/total_hex)*100
-df_inc['N affected'] = df_inc['count']
-df_inc['y_axis'] = y_axis
-ax = df_inc.plot.bar(x='y_axis', y='% affected')
-ax.set_xlabel('Years with MME')
-ax.set_ylabel('Percentage of affected hexagons')
-ax.set_ylim([0, 100])
-plt.xticks(rotation=0)
-ax.get_legend().remove()
-plt.title('Mediterranean MME')
-plt.savefig('../src/output_images/MME_Global.png',
-                                bbox_inches='tight')
 df_third['Year'] = df_third['Year'].astype(int)
 ax = df_third.plot.bar(x='Year', y='Count', figsize = (10, 5))
 ax.set_xlabel('Year')
@@ -204,3 +233,4 @@ for n in ex['sub-ecoregion'].unique():
 
 print('stop')
 
+'''
