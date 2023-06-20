@@ -7,6 +7,7 @@ import mortality_frequency as mf
 
 achi = mf.MME_Plot('../src/MME.xlsx')
 achi.affected_percentage_regional_composer()
+achi.affected_numbers_regional_composer()
 
 ex = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
 

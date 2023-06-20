@@ -8,9 +8,12 @@ class MME_Plot:
         self.df_events = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
         self.df_numbers = pd.read_excel('../src/MME.xlsx', sheet_name='Massimo original dataset')
         self.df_events.columns = self.df_events.columns.astype(str)
-        self.columns = self.df_events.columns
+        self.columns = self.df_events.columns[4:]
 
     def plot_affected_percentage(self):
+        y_axis = self.df_events['#Years with MME'].unique()
+        y_axis.sort()
+        total_hex = self.df_events['#Years with MME'].count()
         df_inc = pd.DataFrame([self.df_events['#Years with MME'].loc[self.df_events['#Years with MME'] == i].count() for i in y_axis],
                               columns=['count'])
         df_inc['% affected'] = (df_inc['count'] / total_hex) * 100
@@ -25,12 +28,34 @@ class MME_Plot:
         plt.title('Mediterranean MME')
         self.save_image('MME_Global')
 
+    def plot_affected_number(self):
+        df_third = self.get_numbered_df()
+        df_third['Year'] = df_third['Year'].astype(int)
+        ax = df_third.plot.bar(x='Year', y='Count', figsize=(10, 5))
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Number of affected hexagons')
+        ax.set_ylim([0, df_third['Count'].max() + 25])
+        plt.xticks(rotation=90)
+        ax.get_legend().remove()
+        plt.title('Mediterranean MME')
+        self.save_image('MME_N_Global')
+
+    def get_numbered_df(self):
+        df_third = pd.DataFrame(self.columns, columns=['Year'])
+        df_third['Count'] = 0
+        for year in self.columns:
+            df_third['Count'].loc[df_third['Year'] == year] = self.df_events[year].sum()
+        return df_third
+
     def save_image(self, title):
         plt.savefig('../src/output_images/' + title + '.png',
                     bbox_inches='tight')
 
     def affected_percentage_regional_composer(self):
         self.loop_ecoregion(self.plot_affected_percentage_regional)
+
+    def affected_numbers_regional_composer(self):
+        self.loop_ecoregion(self.plot_affected_numbers_regional)
 
     def loop_ecoregion(self, func):
         for n in self.df_events['sub-ecoregion'].unique():
@@ -56,9 +81,22 @@ class MME_Plot:
         plt.title(reg + ' MME')
         self.save_image('MME_' + reg)
 
+    def plot_affected_numbers_regional(self, reg):
+        df_third = self.get_numbered_df()
+        for year in self.columns:
+            df_third['Count'].loc[df_third['Year'] == year] = self.df_events[year].loc[self.df_events['sub-ecoregion'] == reg].sum()
+        ax = df_third.plot.bar(x='Year', y='Count', figsize=(10, 5))
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Number of affected hexagons')
+        ax.set_ylim([0, df_third['Count'].max() + 25])
+        plt.xticks(rotation=90)
+        ax.get_legend().remove()
+        plt.title(reg + ' MME')
+        self.save_image('MME_N_' + reg)
+
+
 
 '''
-
 ex = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
 ex.columns = ex.columns.astype(str)
 columns = ex.columns[4:]
@@ -84,23 +122,7 @@ plt.title('Mediterranean MME')
 plt.savefig('../src/output_images/MME_N_Global.png',
                                 bbox_inches='tight')
 for n in ex['sub-ecoregion'].unique():
-    y_axis = ex['#Years with MME'].loc[ex['sub-ecoregion'] == n].unique()
-    y_axis.sort()
-    total_hex = ex['#Years with MME'].loc[ex['sub-ecoregion'] == n].count()
-    df_inc = pd.DataFrame([ex['#Years with MME'].loc[(ex['#Years with MME'] == i) & (ex['sub-ecoregion'] == n)].count() for i in y_axis],
-                          columns=['count'])
-    df_inc['% affected'] = (df_inc['count'] / total_hex) * 100
-    df_inc['N affected'] = df_inc['count']
-    df_inc['y_axis'] = y_axis
-    ax = df_inc.plot.bar(x='y_axis', y='% affected')
-    ax.set_xlabel('Years with MME')
-    ax.set_ylabel('Percentage of affected hexagons')
-    ax.set_ylim([0, 100])
-    plt.xticks(rotation=0)
-    ax.get_legend().remove()
-    plt.title(n + ' MME')
-    plt.savefig('../src/output_images/MME_' + n + '.png',
-                bbox_inches='tight')
+
 
     for year in columns:
         df_third['Count'].loc[df_third['Year'] == year] = ex[year].loc[ex['sub-ecoregion'] == n].sum()
