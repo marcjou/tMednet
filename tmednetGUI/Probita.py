@@ -6,6 +6,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
 
 achi = mf.MME_Plot('../src/MME.xlsx')
+achi.regional_map_composer()
 achi.affected_percentage_regional_composer()
 achi.affected_numbers_regional_composer()
 

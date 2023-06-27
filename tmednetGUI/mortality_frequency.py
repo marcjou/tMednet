@@ -1,15 +1,81 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import matplotlib
+from matplotlib.colors import ListedColormap, BoundaryNorm
+import time
+import math
+import imageio
+import logging
+import calendar
+import numpy as np
+import xarray as xr
+import pandas as pd
+from sys import _getframe
+import cartopy
+import cartopy.crs as ccrs
+import cartopy.feature as cf
+import matplotlib.pyplot as plt
+from datetime import datetime, date, timedelta
+from typing import Literal, get_args, get_origin
+from shapely.validation import make_valid
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 class MME_Plot:
 
     def __init__(self, PATH):
         self.df_events = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
         self.df_numbers = pd.read_excel('../src/MME.xlsx', sheet_name='Massimo original dataset')
+        df_coords = pd.read_excel('../src/Coords.xlsx')
+        self.df_map = pd.merge(self.df_events, df_coords[['id.hexagon', 'Lat', 'Lon']], on='id.hexagon', how='left')
         self.df_events.columns = self.df_events.columns.astype(str)
         self.columns = self.df_events.columns[4:]
+        self.coords = pd.read_csv('../src/Ecoregion coords.csv')
 
+    def plot_map_regional(self, reg):
+        # Use only the pixels with more than a year of mortality
+        self.df_map = self.df_map.loc[self.df_map['#Years with MME'] > 1]
+        df = self.df_map.loc[self.df_map['sub-ecoregion'] == reg]
+        if (reg == 'Southwestern Mediterranean') or (reg == 'Northwestern Mediterranean'):
+            reg_df = self.coords.loc[self.coords['ECOREGION'] == 'Western Mediterranean']
+        else:
+            reg_df = self.coords.loc[self.coords['ECOREGION'] == reg]
+        print('Before setting axes for ' + reg)
+        ax, gl = self.ax_setter(float(reg_df['Lat1']), float(reg_df['Lat2']), float(reg_df['Lon1']), float(reg_df['Lon2']))
+        print('Axes set')
+        cmap = 'autumn_r'
+        nyears = ax.scatter(x=df['Lon'], y=df['Lat'], c=df['#Years with MME'],
+                            transform=ccrs.PlateCarree(), cmap=cmap, alpha=0.7, s=15, edgecolor='blue', linewidths=0.5)
+        cb = plt.colorbar(nyears, ticks=range(0, 41), label='No of Years with MME')
+        print('Plotted, time to save')
+        plt.title(reg)
+        self.save_image('Years per pixel_' + reg)
+
+    def regional_map_composer(self):
+        self.loop_ecoregion(self.plot_map_regional)
+    def plot_data_map(self, type):
+        # Use only the pixels with more than a year of mortality
+        self.df_map = self.df_map.loc[self.df_map['#Years with MME'] > 1]
+        ax, gl = self.ax_setter()
+        cmap = 'autumn_r'
+        nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=self.df_map['#Years with MME'],
+                            transform=ccrs.PlateCarree(), cmap=cmap, alpha=0.7, s=15, edgecolor='blue', linewidths=0.5)
+        cb = plt.colorbar(nyears, ticks=range(0, 41), label='No of Years with MME')
+
+        #self.df_map['Record range'] = (self.df_map['#Records MMEs_All_years_']/10).apply(np.floor)*10
+        #Set the categories
+        self.df_map['Record range'] = self.df_map['#Records MMEs_All_years_'].apply(
+            lambda y: 0.2 if y < 10 else (0.4 if y < 50 else (0.6 if y < 100 else (0.8 if y < 200 else 1))))
+        self.df_map['Log10 Records'] = np.log10(self.df_map['#Records MMEs_All_years_'])
+        colors = ['#f6ff00', '#d5c000', '#ff6300', '#d05000', '#580000']
+        color_dict = {'1-10' : 'gold', '10-50' : 'goldenrod', '50-100' : 'orange', '100-200' : 'darkorange', '>200' : 'red'}
+        ax, gl = self.ax_setter()
+        nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=[ color_dict[i] for i in self.df_map['Record range'] ],
+                            transform=ccrs.PlateCarree(), alpha=1, s=15, edgecolor='blue', linewidths=0.5)
+        cb = plt.colorbar(nyears, label='No of Records across all years')
+        cb.set_ticks([np.log10(1), np.log10(10), np.log10(50), np.log10(100), np.log10(200)])
+        cb.set_ticklabels(['1-10', '10-50', '50-100', '100-200', '>200'])
     def plot_affected_percentage(self):
         y_axis = self.df_events['#Years with MME'].unique()
         y_axis.sort()
@@ -93,6 +159,50 @@ class MME_Plot:
         ax.get_legend().remove()
         plt.title(reg + ' MME')
         self.save_image('MME_N_' + reg)
+
+    @staticmethod
+    def ax_setter(lon1=-9.5, lon2=37., lat1=28., lat2=50.):
+        """
+        Creates the axes where the map will be plotted selecting the coordinates to properly represent
+        the Mediterranean sea and plots and colors the land and sea.
+
+        Returns
+        -------
+        ax : Axes matplotlib
+            the axes in which the data will be plotted
+        gl : Gridlines
+            the gridlines of the plot featured to divide the latitude and longitude
+        """
+        plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+
+        ax = plt.axes(projection=ccrs.Mercator())
+        ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
+        ax.add_feature(cf.OCEAN)
+        ax.add_feature(cf.LAND)
+        ax.coastlines(resolution='10m')
+        ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
+
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=1, color='grey', alpha=0.3, linestyle='--',
+                          draw_labels=True)
+        gl.top_labels = False
+        gl.left_labels = True
+        gl.right_labels = False
+        gl.xlines = True
+        # gl.xlocator = mticker.FixedLocator([120, 140, 160, 180, -160, -140, -120])
+        # gl.ylocator = mticker.FixedLocator([0, 20, 40, 60])
+        gl.xformatter = LONGITUDE_FORMATTER
+        gl.yformatter = LATITUDE_FORMATTER
+        # gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
+        p = ax.get_window_extent()
+        plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
+                     xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0),
+                     textcoords="offset points",
+                     va="center", ha="left")
+        plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
+                     textcoords="offset points",
+                     va="center", ha="left", alpha=0.5)
+
+        return ax, gl
 
 
 
