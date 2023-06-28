@@ -5,6 +5,7 @@ import os
 import matplotlib
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import time
+import seaborn as sns
 import math
 import imageio
 import logging
@@ -33,6 +34,111 @@ class MME_Plot:
         self.columns = self.df_events.columns[4:]
         self.coords = pd.read_csv('../src/Ecoregion coords.csv')
 
+    def plot_return_time_regional(self, reg):
+        plt.clf()
+        df_scatter = self.create_scatter_dataframe()
+        df_reg = df_scatter.loc[df_scatter['sub-ecoregion'] == reg]
+        df = self.create_dict_df(df_reg)
+        df_sorted_yearly = self.create_dataframe_sorted(df)
+
+        ax_scatter_years2 = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(40, 400),
+                                            alpha=.5, legend='brief')
+        ax_scatter_years2 = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return')
+        ax_scatter_years2 = sns.regplot(df_sorted_yearly, x='Year', y='Mean', ci=None)
+        leg = plt.legend(loc='upper right', labels=['Max return years', 'Regression', 'Nº of Events'])
+        ax_scatter_years2.add_artist(leg)
+        plt.legend(loc=[0.8, 0.3])
+        plt.title(reg)
+        ax_scatter_years2.set(ylabel='Return Years')
+        plt.savefig('../src/output_images/Returning Time_' + reg + '.png',
+                    bbox_inches='tight')
+        print('ha')
+
+    def create_scatter_dataframe(self):
+        df_return = self.df_events.copy()
+        ret_counter = 0
+        old_year = ''
+        for idx, row in self.df_events.iterrows():
+            for year in self.columns:
+                if row[year] == 1 or year == self.columns[-1]:
+                    if year == '2020':
+                        print('ye')
+                    ret_counter = ret_counter + 1
+                    if old_year == '':
+                        old_year = year
+                        if year == self.columns[-1]:
+                            old_year = ''
+                            ret_counter = 0
+                            df_return[year][idx] = np.nan
+                    else:
+                        if year == self.columns[-1]:
+                            df_return[old_year][idx] = np.nan
+                            df_return[year][idx] = np.nan
+                            old_year = ''
+                            ret_counter = 0
+                        else:
+                            if ret_counter - 1 <= 0:
+                                df_return[old_year][idx] = np.nan
+                            else:
+                                df_return[old_year][idx] = ret_counter - 1
+                            ret_counter = 1
+                            old_year = year
+                else:
+                    df_return[year][idx] = np.nan
+                    if ret_counter != 0:
+                        ret_counter = ret_counter + 1
+
+        df_scatter = df_return.melt(id_vars=['sub-ecoregion', 'id.hexagon', '#Years with MME',
+                                             '#Records MMEs_All_years_'], var_name='Year', value_name='Return time')
+
+        df_scatter['Year'] = df_scatter['Year'].astype(int)
+
+        return df_scatter
+
+    def create_dict_df(self, df_scatter):
+        dict_for_yearly = {'Year': '', 'Return years': 0, 'Count': 0}
+
+        dict_list_yearly = []
+        for i in range(1, 41):
+            for year in df_scatter['Year'].unique():
+                dict_for_yearly['Year'] = year
+                dict_for_yearly['Return years'] = i
+                dict_for_yearly['Count'] = df_scatter['Return time'].loc[
+                    (df_scatter['Year'] == year) & (df_scatter['Return time'] == i)].count()
+                dict_list_yearly.append(dict_for_yearly.copy())
+
+        df = pd.DataFrame.from_records(dict_list_yearly)
+
+        return df
+
+    def create_dataframe_sorted(self, df):
+        df_sorted_yearly = df.sort_values(['Year', 'Return years']).reset_index()
+        df_sorted_yearly.loc[df_sorted_yearly['Count'] > 0, 'Return tax'] = df_sorted_yearly.loc[
+            df_sorted_yearly['Count'] > 0, 'Return years']
+        df_sorted_yearly.loc[df_sorted_yearly['Count'] == 0, 'Count'] = np.nan
+        df_sorted_yearly['Max Return'] = df_sorted_yearly['Year'].max() - df_sorted_yearly['Year']
+        df_sorted_yearly['Cum years'] = df_sorted_yearly['Return years'] * df_sorted_yearly['Count']
+        df_sorted_yearly['Mean'] = np.nan
+        df_sorted_yearly['Mean'] = round(
+            df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
+                'Cum years'].transform('sum') /
+            df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
+                'Count'].transform('sum'), 2)
+        return df_sorted_yearly
+
+    def plot_return_time(self):
+        df_scatter = self.create_scatter_dataframe()
+        df = self.create_dict_df(df_scatter)
+        df_sorted_yearly = self.create_dataframe_sorted(df)
+        ax_scatter_years = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(40, 400),
+                                           alpha=.5, legend='brief')
+        ax_scatter_years = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return')
+        ax_scatter_years = sns.regplot(df_sorted_yearly, x='Year', y='Mean')
+        leg = plt.legend(loc='upper right', labels=['Max return years', 'Regression', 'Nº of Events'])
+        ax_scatter_years.add_artist(leg)
+        plt.legend(loc=[0.8, 0.5])
+        ax_scatter_years.set(ylabel='Return Years')
+        self.save_image('Returning Time_Mediterranean')
     def plot_map_regional(self, reg):
         # Use only the pixels with more than a year of mortality
         self.df_map = self.df_map.loc[self.df_map['#Years with MME'] > 1]
@@ -52,6 +158,8 @@ class MME_Plot:
         plt.title(reg)
         self.save_image('Years per pixel_' + reg)
 
+    def regional_returntime_composer(self):
+        self.loop_ecoregion(self.plot_return_time_regional)
     def regional_map_composer(self):
         self.loop_ecoregion(self.plot_map_regional)
     def plot_data_map(self, type):
@@ -149,12 +257,13 @@ class MME_Plot:
 
     def plot_affected_numbers_regional(self, reg):
         df_third = self.get_numbered_df()
+        total_max = df_third['Count'].max()
         for year in self.columns:
             df_third['Count'].loc[df_third['Year'] == year] = self.df_events[year].loc[self.df_events['sub-ecoregion'] == reg].sum()
         ax = df_third.plot.bar(x='Year', y='Count', figsize=(10, 5))
         ax.set_xlabel('Year')
         ax.set_ylabel('Number of affected hexagons')
-        ax.set_ylim([0, df_third['Count'].max() + 25])
+        ax.set_ylim([0, total_max + 25])
         plt.xticks(rotation=90)
         ax.get_legend().remove()
         plt.title(reg + ' MME')
