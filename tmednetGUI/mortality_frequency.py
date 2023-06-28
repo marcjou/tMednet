@@ -40,11 +40,12 @@ class MME_Plot:
         df_reg = df_scatter.loc[df_scatter['sub-ecoregion'] == reg]
         df = self.create_dict_df(df_reg)
         df_sorted_yearly = self.create_dataframe_sorted(df)
-
-        ax_scatter_years2 = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(40, 400),
+        min_size = np.min(df_sorted_yearly['Count']) * 10
+        max_size = np.max(df_sorted_yearly['Count']) * 10
+        ax_scatter_years2 = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(min_size, max_size),
                                             alpha=.5, legend='brief')
-        ax_scatter_years2 = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return')
-        ax_scatter_years2 = sns.regplot(df_sorted_yearly, x='Year', y='Mean', ci=None)
+        ax_scatter_years2 = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return', color='k')
+        ax_scatter_years2 = sns.regplot(df_sorted_yearly, x='Year', y='Mean', ci=None, color='tab:orange')
         leg = plt.legend(loc='upper right', labels=['Max return years', 'Regression', 'Nº of Events'])
         ax_scatter_years2.add_artist(leg)
         plt.legend(loc=[0.8, 0.3])
@@ -127,18 +128,22 @@ class MME_Plot:
         return df_sorted_yearly
 
     def plot_return_time(self):
+        plt.clf()
         df_scatter = self.create_scatter_dataframe()
         df = self.create_dict_df(df_scatter)
         df_sorted_yearly = self.create_dataframe_sorted(df)
-        ax_scatter_years = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(40, 400),
+        min_size = np.min(df_sorted_yearly['Count']) * 10
+        max_size = np.max(df_sorted_yearly['Count']) * 10
+        ax_scatter_years = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(min_size, max_size),
                                            alpha=.5, legend='brief')
-        ax_scatter_years = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return')
-        ax_scatter_years = sns.regplot(df_sorted_yearly, x='Year', y='Mean')
+        ax_scatter_years = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return', color='k')
+        ax_scatter_years = sns.regplot(df_sorted_yearly, x='Year', y='Mean', color='tab:orange')
         leg = plt.legend(loc='upper right', labels=['Max return years', 'Regression', 'Nº of Events'])
         ax_scatter_years.add_artist(leg)
         plt.legend(loc=[0.8, 0.5])
         ax_scatter_years.set(ylabel='Return Years')
         self.save_image('Returning Time_Mediterranean')
+        
     def plot_map_regional(self, reg):
         # Use only the pixels with more than a year of mortality
         self.df_map = self.df_map.loc[self.df_map['#Years with MME'] > 1]
