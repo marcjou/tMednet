@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import matplotlib
+from matplotlib.colors import LinearSegmentedColormap
+
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import time
 import seaborn as sns
@@ -273,6 +275,44 @@ class MME_Plot:
         ax.get_legend().remove()
         plt.title(reg + ' MME')
         self.save_image('MME_N_' + reg)
+
+    def setup_heatmap_base(self):
+        events_copy = self.df_events.copy()
+        events_copy.replace(0, np.nan, inplace=True)
+        events_copy.index = events_copy['sub-ecoregion']
+        for i in self.df_events.columns[:4]:
+            del events_copy[i]
+        myColors = ((1.0, 1.0, 1.0, 1.0), (0.8, 0.0, 0.0, 1.0))
+        cmap = LinearSegmentedColormap.from_list('Custom', myColors, len(myColors))
+        return events_copy, cmap
+
+    def plot_heatmap_base(self):
+        plt.clf()
+        events_copy, cmap = self.setup_heatmap_base()
+        reg = events_copy.index.unique()
+        yticks = []
+        for i in reg:
+            yticks.append(events_copy.index.get_indexer_for((events_copy[events_copy.index == i].index))[0])
+        num_ticks = len(reg)
+        reg_list = events_copy.index
+        # the content of labels of these yticks
+        yticklabels = [reg_list[idx] for idx in yticks]
+
+        ax = sns.heatmap(events_copy, cmap=cmap, yticklabels=yticklabels, vmax=1, vmin=0, cbar_kws={'ticks': [0, 1]})
+        ax.set_yticks(yticks)
+        ax.set_yticklabels(yticklabels)
+        self.save_image('Heatmap Global')
+
+    def plot_heatmap_base_regional(self, reg):
+        events_copy, cmap = self.setup_heatmap_base()
+        plt.clf()
+        ax = sns.heatmap(events_copy.loc[events_copy.index == reg], cmap=cmap, yticklabels=False, vmax=1, vmin=0,
+                         cbar_kws={'ticks': [0, 1]})
+        ax.set_ylabel(reg)
+        self.save_image('Heatmap ' + reg)
+
+    def heatmap_base_composer(self):
+        self.loop_ecoregion(self.plot_heatmap_base_regional)
 
     @staticmethod
     def ax_setter(lon1=-9.5, lon2=37., lat1=28., lat2=50.):
