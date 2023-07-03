@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import matplotlib
 from matplotlib.colors import LinearSegmentedColormap
-
+from matplotlib.patches import RegularPolygon
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import time
 import seaborn as sns
@@ -169,28 +169,29 @@ class MME_Plot:
         self.loop_ecoregion(self.plot_return_time_regional)
     def regional_map_composer(self):
         self.loop_ecoregion(self.plot_map_regional)
-    def plot_data_map(self, type):
+    def plot_data_map(self):
+        '''plt.clf()
         # Use only the pixels with more than a year of mortality
         self.df_map = self.df_map.loc[self.df_map['#Years with MME'] > 1]
         ax, gl = self.ax_setter()
         cmap = 'autumn_r'
         nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=self.df_map['#Years with MME'],
                             transform=ccrs.PlateCarree(), cmap=cmap, alpha=0.7, s=15, edgecolor='blue', linewidths=0.5)
-        cb = plt.colorbar(nyears, ticks=range(0, 41), label='No of Years with MME')
-
+        cb = plt.colorbar(nyears, ticks=range(0, 41), label='No of Years with MME')'''
+        plt.clf()
+        cmap = 'autumn_r'
         #self.df_map['Record range'] = (self.df_map['#Records MMEs_All_years_']/10).apply(np.floor)*10
         #Set the categories
         self.df_map['Record range'] = self.df_map['#Records MMEs_All_years_'].apply(
             lambda y: 0.2 if y < 10 else (0.4 if y < 50 else (0.6 if y < 100 else (0.8 if y < 200 else 1))))
         self.df_map['Log10 Records'] = np.log10(self.df_map['#Records MMEs_All_years_'])
-        colors = ['#f6ff00', '#d5c000', '#ff6300', '#d05000', '#580000']
-        color_dict = {'1-10' : 'gold', '10-50' : 'goldenrod', '50-100' : 'orange', '100-200' : 'darkorange', '>200' : 'red'}
-        ax, gl = self.ax_setter()
-        nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=[ color_dict[i] for i in self.df_map['Record range'] ],
-                            transform=ccrs.PlateCarree(), alpha=1, s=15, edgecolor='blue', linewidths=0.5)
+        ax, gl = self.ax_setter(-9.5, 37., 28., 50.)
+        nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=self.df_map['Log10 Records'],
+                            transform=ccrs.PlateCarree(), alpha=1, s=15, edgecolor='blue', linewidths=0.5, cmap=cmap)
         cb = plt.colorbar(nyears, label='No of Records across all years')
         cb.set_ticks([np.log10(1), np.log10(10), np.log10(50), np.log10(100), np.log10(200)])
         cb.set_ticklabels(['1-10', '10-50', '50-100', '100-200', '>200'])
+        self.save_image('Records across years Map')
     def plot_affected_percentage(self):
         y_axis = self.df_events['#Years with MME'].unique()
         y_axis.sort()
@@ -331,6 +332,8 @@ class MME_Plot:
 
         ax = plt.axes(projection=ccrs.Mercator())
         ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
+        lat_range = np.arange(lat1,lat2,0.5)
+        lon_range = np.arange(lon1, lon2, 0.5)
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)
         ax.coastlines(resolution='10m')
@@ -355,6 +358,10 @@ class MME_Plot:
         plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
                      va="center", ha="left", alpha=0.5)
+        for x, y in zip(lat_range, lon_range):
+            hex = RegularPolygon((x, y), numVertices=6, radius=1./2.,
+                                 orientation=np.radians(30), alpha=0.2, edgecolor='k')
+            ax.add_patch(hex)
 
         return ax, gl
 
