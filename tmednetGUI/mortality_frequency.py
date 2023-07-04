@@ -185,7 +185,7 @@ class MME_Plot:
         self.df_map['Record range'] = self.df_map['#Records MMEs_All_years_'].apply(
             lambda y: 0.2 if y < 10 else (0.4 if y < 50 else (0.6 if y < 100 else (0.8 if y < 200 else 1))))
         self.df_map['Log10 Records'] = np.log10(self.df_map['#Records MMEs_All_years_'])
-        ax, gl = self.ax_setter(-9.5, 37., 28., 50.)
+        ax, gl = self.ax_setter()
         nyears = ax.scatter(x=self.df_map['Lon'], y=self.df_map['Lat'], c=self.df_map['Log10 Records'],
                             transform=ccrs.PlateCarree(), alpha=1, s=15, edgecolor='blue', linewidths=0.5, cmap=cmap)
         cb = plt.colorbar(nyears, label='No of Records across all years')
@@ -316,7 +316,7 @@ class MME_Plot:
         self.loop_ecoregion(self.plot_heatmap_base_regional)
 
     @staticmethod
-    def ax_setter(lon1=-9.5, lon2=37., lat1=28., lat2=50.):
+    def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50.):
         """
         Creates the axes where the map will be plotted selecting the coordinates to properly represent
         the Mediterranean sea and plots and colors the land and sea.
