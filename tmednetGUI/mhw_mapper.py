@@ -251,6 +251,7 @@ class MHWMapper:
             ax, gl = self.ax_setter()
             print('Loop i: ' + str(i))
             start = time.time()
+            date = pd.to_datetime(str(self.ds_dtime[i].values)).strftime('%Y-%m-%d')
             try:
                 temp = ax.contourf(lons, lats, ds[i, :, :], levels=levels, transform=ccrs.PlateCarree(),
                                        cmap=cmap)
