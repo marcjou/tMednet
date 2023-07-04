@@ -6,7 +6,8 @@ from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
 
 achi = mf.MME_Plot('../src/MME.xlsx')
-achi.heatmap_base_composer()
+achi.affected_numbers_regional_composer()
+achi.plot_affected_number()
 
 ex = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
 
