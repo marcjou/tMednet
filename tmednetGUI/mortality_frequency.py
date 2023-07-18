@@ -332,8 +332,6 @@ class MME_Plot:
 
         ax = plt.axes(projection=ccrs.Mercator())
         ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
-        lat_range = np.arange(lat1,lat2,0.5)
-        lon_range = np.arange(lon1, lon2, 0.5)
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)
         ax.coastlines(resolution='10m')
@@ -351,17 +349,14 @@ class MME_Plot:
         gl.yformatter = LATITUDE_FORMATTER
         # gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
         p = ax.get_window_extent()
-        plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
+        '''plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
                      xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
-                     va="center", ha="left")
+                     va="center", ha="left")'''
         plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
                      va="center", ha="left", alpha=0.5)
-        for x, y in zip(lat_range, lon_range):
-            hex = RegularPolygon((x, y), numVertices=6, radius=1./2.,
-                                 orientation=np.radians(30), alpha=0.2, edgecolor='k')
-            ax.add_patch(hex)
+
 
         return ax, gl
 
