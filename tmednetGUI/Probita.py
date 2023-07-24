@@ -21,10 +21,11 @@ urgh['Assesment'] = urgh['% Affected all'].apply(
 colors = ['green', 'yellow', 'orange', 'red']
 cmap = LinearSegmentedColormap.from_list('Custom', colors, len(colors))
 asses = ax.scatter(x=urgh['LONG'], y=urgh['LAT'], c=urgh['Assesment'],
-                            transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3)
+                            transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3, zorder=10)
 cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
 cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
 
+'''
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
@@ -51,7 +52,7 @@ for i in range(0, len(xv[0])):
         hex = mpatches.RegularPolygon(xy=[xv[j, i], yv[j, i]], numVertices=6, radius=r_lon, alpha=0.3, edgecolor='k',
                                       transform=ccrs.PlateCarree())
         ax.add_patch(hex)
-
+'''
 
 plt.clf()
 urgh = pd.read_excel('../src/Example_Visual_census_ALL.xlsx', 'DATA-All')
@@ -61,7 +62,7 @@ urgh['Assesment'] = urgh['Tropical. Index'].apply(
 colors = ['green', 'yellow', 'orange', 'red']
 cmap = LinearSegmentedColormap.from_list('Custom', colors, len(colors))
 asses = ax.scatter(x=urgh['LONG'], y=urgh['LAT'], c=urgh['Assesment'],
-                            transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3)
+                            transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3, zorder=10)
 cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
 cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
 # Coral assessment No impact, Low Impact, Moderate Impact, High Impact
@@ -73,7 +74,7 @@ for year in urgh['YEAR'].unique():
     ax, gl = achi.ax_setter()
     df = urgh.loc[urgh['YEAR'] == year]
     asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
-                       transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3)
+                       transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0, vmax=3, zorder=10)
     cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
     cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
     plt.title('Fish census ' + str(year))
