@@ -10,7 +10,7 @@ from hexalattice.hexalattice import *
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
-achi.plot_affected_number()
+#achi.plot_affected_number()
 #achi.regional_map_composer()
 #achi.plot_data_map()
 
@@ -25,13 +25,68 @@ df_third['Year'] = df_third['Year'].astype(int)
 df_records = pd.DataFrame(achi.columns, columns=['Year'])
 df_records['Count'] = 0
 for year in achi.columns:
-    df_records['Count'].loc[df_records['Year'] == year] = total_records[year].sum()
+    df_records['Count'].loc[df_records['Year'] == year] = total_records[int(year)].sum()
 
-# TODO create df that contains number of ecoregions affected by year
+# df that contains number of ecoregions affected by year
 df_affected_regions = pd.DataFrame(achi.columns, columns=['Year'])
 df_affected_regions['Count'] = 0
 for year in achi.columns:
     df_affected_regions['Count'].loc[df_third['Year'] == year] = len(total_numbers['sub-ecoregion'].loc[total_numbers[year] >= 1].unique())
+df_records['Cumulative'] = df_records['Count'].cumsum()
+
+
+def make_patch_spines_invisible(ax):
+    ax.set_frame_on(True)
+    ax.patch.set_visible(False)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+
+
+fig, host = plt.subplots()
+fig.subplots_adjust(right=0.75)
+
+par1 = host.twinx()
+par2 = host.twinx()
+
+# Offset the right spine of par2.  The ticks and label have already been
+# placed on the right by twinx above.
+par2.spines["right"].set_position(("axes", 1.2))
+# Having been created by twinx, par2 has its frame off, so the line of its
+# detached spine is invisible.  First, activate the frame but make the patch
+# and spines invisible.
+make_patch_spines_invisible(par2)
+# Second, show the right spine.
+par2.spines["right"].set_visible(True)
+
+w = 0.3
+
+p1 = host.bar(df_third['Year'].astype(int)-w, df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
+p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
+p3, = par2.plot(df_records['Year'].astype(int), df_records['Cumulative'], color='tab:red', label='Cumulative')
+'''
+host.set_xlim(0, 2)
+host.set_ylim(0, 2)
+par1.set_ylim(0, 4)
+par2.set_ylim(1, 65)
+'''
+host.set_xlabel("Year")
+host.set_ylabel("# of affected hexagons")
+par1.set_ylabel("# of records")
+par2.set_ylabel("Cumulative # of MME records")
+
+host.yaxis.label.set_color('tab:blue')
+par1.yaxis.label.set_color('tab:orange')
+par2.yaxis.label.set_color('tab:red')
+
+tkw = dict(size=4, width=1.5)
+host.tick_params(axis='y', colors='tab:blue', **tkw)
+par1.tick_params(axis='y', colors='tab:orange', **tkw)
+par2.tick_params(axis='y', colors='tab:red', **tkw)
+host.tick_params(axis='x', **tkw)
+
+myl = [p1] + [p2] + [p3]
+host.legend(myl, [l.get_label() for l in myl], loc='upper left')
+
 ax = plt.subplot(111)
 w = 0.3
 
@@ -43,6 +98,15 @@ for rect in bar_props:
     height = rect.get_height()
     plt.text(rect.get_x(), height, f'{text:.0f}', ha='center', va='bottom')
     i += 1
+
+ax2 = ax.twinx()
+
+
+
+ax2.plot(df_records['Year'].astype(int), df_records['Cumulative'])
+
+ax2.set_ylabel('Cumulative # of MME records')
+ax.set_ylabel('# of affected hexagons and records')
 
 
 #TODO set the ranges of assesment
