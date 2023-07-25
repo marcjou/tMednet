@@ -10,8 +10,40 @@ from hexalattice.hexalattice import *
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
+achi.plot_affected_number()
 #achi.regional_map_composer()
 #achi.plot_data_map()
+
+# Proba de nou grafic de Quim el MegaGraph
+total_numbers = achi.df_events # Number of total hexagons affected per year dataset
+total_records = achi.df_numbers # Number of total records per year dataset
+
+df_third = achi.get_numbered_df()
+df_third['Year'] = df_third['Year'].astype(int)
+
+#TODO Incluir en get numbered df
+df_records = pd.DataFrame(achi.columns, columns=['Year'])
+df_records['Count'] = 0
+for year in achi.columns:
+    df_records['Count'].loc[df_records['Year'] == year] = total_records[year].sum()
+
+# TODO create df that contains number of ecoregions affected by year
+df_affected_regions = pd.DataFrame(achi.columns, columns=['Year'])
+df_affected_regions['Count'] = 0
+for year in achi.columns:
+    df_affected_regions['Count'].loc[df_third['Year'] == year] = len(total_numbers['sub-ecoregion'].loc[total_numbers[year] >= 1].unique())
+ax = plt.subplot(111)
+w = 0.3
+
+ax.bar(df_third['Year'].astype(int)-w, df_third['Count'], width=w, color='b', align='center')
+bar_props = ax.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='r', align='center')
+i = 0
+for rect in bar_props:
+    text = df_affected_regions['Count'][i]
+    height = rect.get_height()
+    plt.text(rect.get_x(), height, f'{text:.0f}', ha='center', va='bottom')
+    i += 1
+
 
 #TODO set the ranges of assesment
 urgh = pd.read_excel('../src/Mortality Atención Corales.xlsx', 'Mortality Data')

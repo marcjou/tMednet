@@ -7,3 +7,12 @@ Marine Heatwave
 - Recordar al Quim al Septembre de parlar amb justino per fer la grafica que fa ell amb la temperatura ferla amb MHW sense tenir en compte el detrending, fent-ho amb un periode de referencia fix.
 - Pensar com dividir-ho per ecoregions
 - Fer un resum al final del any. Com un miniinforme descarregable amb unes quantes gràfiques.
+
+Figures article
+- Mapa amb número d'anys afectat cada hexagon per MME
+- Número total o percentatje d'hexagons afectats per any (considerant que els hexagons totals son els que han estat afectats)
+	- Posar a sobre de cada barra el número d'ecoregions afectades
+- Una amb el numero absolut i l'altre amb el percentatje
+- Grafica amb dues barres per cada any: Numero o percentatje afectat per any i numero de records afectats per any
+- A sobre de les barres el numero d'ecorregions afectades
+- Afegir sobre les barres una linea acumulada de numero de registres al llarg del temps
