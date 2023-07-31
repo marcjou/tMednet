@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import patches
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
@@ -10,6 +11,7 @@ from hexalattice.hexalattice import *
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
+achi.plot_yearly_fish_assesment()
 #achi.plot_affected_number()
 #achi.regional_map_composer()
 #achi.plot_data_map()
@@ -31,8 +33,11 @@ for year in achi.columns:
 df_affected_regions = pd.DataFrame(achi.columns, columns=['Year'])
 df_affected_regions['Count'] = 0
 for year in achi.columns:
-    df_affected_regions['Count'].loc[df_third['Year'] == year] = len(total_numbers['sub-ecoregion'].loc[total_numbers[year] >= 1].unique())
+    df_affected_regions['Count'].loc[df_affected_regions['Year'] == year] = len(total_numbers['sub-ecoregion'].loc[total_numbers[year] >= 1].unique())
 df_records['Cumulative'] = df_records['Count'].cumsum()
+
+trecords = df_records['Cumulative'].iloc[-1]
+df_records['PercentageCum'] = (df_records['Cumulative'] / trecords) * 100
 
 
 def make_patch_spines_invisible(ax):
@@ -62,7 +67,7 @@ w = 0.3
 
 p1 = host.bar(df_third['Year'].astype(int)-w, df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
 p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
-p3, = par2.plot(df_records['Year'].astype(int), df_records['Cumulative'], color='tab:red', label='Cumulative')
+p3, = par2.plot(df_records['Year'].astype(int), df_records['PercentageCum'], color='black', label='Cumulative', marker='.')
 '''
 host.set_xlim(0, 2)
 host.set_ylim(0, 2)
@@ -72,20 +77,30 @@ par2.set_ylim(1, 65)
 host.set_xlabel("Year")
 host.set_ylabel("# of affected hexagons")
 par1.set_ylabel("# of records")
-par2.set_ylabel("Cumulative # of MME records")
+par2.set_ylabel("Cumulative % of MME records")
 
 host.yaxis.label.set_color('tab:blue')
 par1.yaxis.label.set_color('tab:orange')
-par2.yaxis.label.set_color('tab:red')
+par2.yaxis.label.set_color('black')
 
 tkw = dict(size=4, width=1.5)
 host.tick_params(axis='y', colors='tab:blue', **tkw)
 par1.tick_params(axis='y', colors='tab:orange', **tkw)
-par2.tick_params(axis='y', colors='tab:red', **tkw)
+par2.tick_params(axis='y', colors='black', **tkw)
 host.tick_params(axis='x', **tkw)
 
 myl = [p1] + [p2] + [p3]
 host.legend(myl, [l.get_label() for l in myl], loc='upper left')
+
+i = 0
+for rect in p2:
+    text = df_affected_regions['Count'][i]
+    height = rect.get_height()
+    #circle = patches.Ellipse((rect.get_x(), height + 4.5), 1, 10, facecolor='None', edgecolor='black')
+    #par1.add_patch(circle)
+    par1.text(rect.get_x(), height, f'{text:.0f}', ha='center')
+    i += 1
+
 
 ax = plt.subplot(111)
 w = 0.3

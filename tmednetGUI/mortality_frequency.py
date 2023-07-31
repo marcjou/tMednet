@@ -30,6 +30,7 @@ class MME_Plot:
     def __init__(self, PATH):
         self.df_events = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
         self.df_numbers = pd.read_excel('../src/MME.xlsx', sheet_name='Massimo original dataset')
+        self.df_fishes = pd.read_excel('../src/Example_Visual_census_ALL.xlsx', 'DATA-All')
         df_coords = pd.read_excel('../src/Coords.xlsx')
         self.df_map = pd.merge(self.df_events, df_coords[['id.hexagon', 'Lat', 'Lon']], on='id.hexagon', how='left')
         self.df_events.columns = self.df_events.columns.astype(str)
@@ -315,6 +316,35 @@ class MME_Plot:
     def heatmap_base_composer(self):
         self.loop_ecoregion(self.plot_heatmap_base_regional)
 
+    def plot_fish_assesment(self):
+        plt.clf()
+        ax, gl = self.ax_setter()
+        cmap = self.fish_assesment()
+        asses = ax.scatter(x=self.df_fishes['LONG'], y=self.df_fishes['LAT'], c=self.df_fishes['Assesment'],
+                           transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                           vmax=3, zorder=10)
+        cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+        cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
+        self.save_image('Fish Assesment')
+
+    def fish_assesment(self):
+        self.df_fishes['Assesment'] = self.df_fishes['Tropical. Index'].apply(
+            lambda y: 0 if y <= 1 else (1 if y <= 3 else (2 if y <= 5 else 3)))
+        colors = ['green', 'yellow', 'orange', 'red']
+        cmap = LinearSegmentedColormap.from_list('Custom', colors, len(colors))
+        return cmap
+    def plot_yearly_fish_assesment(self):
+        for year in self.df_fishes['YEAR'].unique():
+            plt.clf()
+            ax, gl = self.ax_setter()
+            cmap = self.fish_assesment()
+            df = self.df_fishes.loc[self.df_fishes['YEAR'] == year]
+            asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
+                               transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                               vmax=3, zorder=10)
+            cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+            cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
+            plt.title('Fish census ' + str(year))
     @staticmethod
     def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50.):
         """
