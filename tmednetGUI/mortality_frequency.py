@@ -31,6 +31,7 @@ class MME_Plot:
         self.df_events = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
         self.df_numbers = pd.read_excel('../src/MME.xlsx', sheet_name='Massimo original dataset')
         self.df_fishes = pd.read_excel('../src/Example_Visual_census_ALL.xlsx', 'DATA-All')
+        self.df_corals = pd.read_excel('../src/Mortality Atención Corales.xlsx', 'Mortality Data')
         df_coords = pd.read_excel('../src/Coords.xlsx')
         self.df_map = pd.merge(self.df_events, df_coords[['id.hexagon', 'Lat', 'Lon']], on='id.hexagon', how='left')
         self.df_events.columns = self.df_events.columns.astype(str)
@@ -205,7 +206,7 @@ class MME_Plot:
         ax = df_inc.plot.bar(x='y_axis', y='% affected')
         ax.set_xlabel('Years with MME')
         ax.set_ylabel('Percentage of affected hexagons')
-        ax.set_ylim([0, 100])
+        ax.set_ylim([0, 70])
         plt.xticks(rotation=0)
         ax.get_legend().remove()
         plt.title('Mediterranean MME')
@@ -327,12 +328,24 @@ class MME_Plot:
         cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
         self.save_image('Fish Assesment')
 
+    def plot_fish_assesment_zoom(self):
+        plt.clf()
+        ax, gl = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86)
+        cmap = self.fish_assesment()
+        asses = ax.scatter(x=self.df_fishes['LONG'], y=self.df_fishes['LAT'], c=self.df_fishes['Assesment'],
+                           transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                           vmax=3, zorder=10)
+        cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+        cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
+        self.save_image('Fish Assesment_Zoom')
+
     def fish_assesment(self):
         self.df_fishes['Assesment'] = self.df_fishes['Tropical. Index'].apply(
             lambda y: 0 if y <= 1 else (1 if y <= 3 else (2 if y <= 5 else 3)))
         colors = ['green', 'yellow', 'orange', 'red']
         cmap = LinearSegmentedColormap.from_list('Custom', colors, len(colors))
         return cmap
+
     def plot_yearly_fish_assesment(self):
         for year in self.df_fishes['YEAR'].unique():
             plt.clf()
@@ -345,8 +358,87 @@ class MME_Plot:
             cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
             cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
             plt.title('Fish census ' + str(year))
+            self.save_image('Fish Assesment ' + str(year))
+
+    def plot_yearly_fish_assesment_zoom(self):
+        for year in self.df_fishes['YEAR'].unique():
+            plt.clf()
+            ax, gl = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86)
+            cmap = self.fish_assesment()
+            df = self.df_fishes.loc[self.df_fishes['YEAR'] == year]
+            asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
+                               transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                               vmax=3, zorder=10)
+            cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+            cb.set_ticklabels(['Tempered', 'Warm', 'Tropicalized', 'Highly Tropicalized'])
+            plt.title('Fish census ' + str(year))
+            self.save_image('Fish Assesment Zoom ' + str(year))
+
+    def plot_mortality_assesment(self):
+        ax, gl = self.ax_setter()
+        cmap = self.mortality_assesment()
+        asses = ax.scatter(x=self.df_corals['LONG'], y=self.df_corals['LAT'], c=self.df_corals['Assesment'],
+                           transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                           vmax=3, zorder=10)
+        cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+        cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
+        self.save_image('Mortality Assesment')
+
+    def plot_mortality_assesment_zoom(self):
+        ax, gl = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86)
+        cmap = self.mortality_assesment()
+        asses = ax.scatter(x=self.df_corals['LONG'], y=self.df_corals['LAT'], c=self.df_corals['Assesment'],
+                           transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                           vmax=3, zorder=10)
+        cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+        cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
+        self.save_image('Mortality Assesment Zoom')
+
+    def mortality_assesment(self):
+        indx = self.df_corals.loc[self.df_corals['Total colonies'] == 0].index
+        self.df_corals.drop(index=indx, inplace=True)
+        self.df_corals['Assesment'] = self.df_corals['% Affected all'].apply(
+            lambda y: 0 if y <= 10 else (1 if y <= 30 else (2 if y < 60 else 3)))
+        colors = ['green', 'yellow', 'orange', 'red']
+        cmap = LinearSegmentedColormap.from_list('Custom', colors, len(colors))
+        return cmap
+
+    def plot_yearly_mortality_assesment(self):
+        for year in self.df_corals['YEAR'].unique():
+            plt.clf()
+            ax, gl = self.ax_setter()
+            cmap = self.mortality_assesment()
+            df = self.df_corals.loc[self.df_corals['Year'] == year]
+            asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
+                               transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                               vmax=3, zorder=10)
+            cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+            cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
+            plt.title('Mortality Assesment ' + str(year))
+            self.save_image('Mortality Assesment ' + str(year))
+
+    def plot_yearly_mortality_assesment_zoom(self):
+        for year in self.df_corals['Year'].unique():
+            plt.clf()
+            ax, gl, fig = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86, subplot=True)
+            cmap = self.mortality_assesment()
+            df = self.df_corals.loc[self.df_corals['Year'] == year]
+            df_histo = df['% Affected all'].sort_values(ascending=False).reset_index()
+            asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
+                               transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                               vmax=3, zorder=10)
+            cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
+            cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
+            plt.title('Mortality Assesment ' + str(year))
+            ax2 = fig.add_subplot(2,1,2)
+            ax2.bar(df_histo.index, df_histo['% Affected all'])
+            ax2.set_xticks([])
+            ax2.set_ylim([0, 100])
+            ax2.set_ylabel('% Affected all')
+            self.save_image('Mortality Assesment Zoom + Histogram ' + str(year))
+
     @staticmethod
-    def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50.):
+    def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50., subplot=False):
         """
         Creates the axes where the map will be plotted selecting the coordinates to properly represent
         the Mediterranean sea and plots and colors the land and sea.
@@ -358,9 +450,14 @@ class MME_Plot:
         gl : Gridlines
             the gridlines of the plot featured to divide the latitude and longitude
         """
-        plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+        if not subplot:
+            rows = 1
+        else:
+            rows = 2
 
-        ax = plt.axes(projection=ccrs.Mercator())
+        fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+
+        ax = fig.add_subplot(rows, 1, 1, projection=ccrs.Mercator())
         ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)
@@ -387,8 +484,10 @@ class MME_Plot:
                      textcoords="offset points",
                      va="center", ha="left", alpha=0.5)
 
-
-        return ax, gl
+        if not subplot:
+            return ax, gl
+        else:
+            return ax, gl, fig
 
 
 

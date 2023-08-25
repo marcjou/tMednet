@@ -1,0 +1,3 @@
+- Mapa d'un any mortalitat es posa el mapa i un histograma simple on cada barra seria una població, i el eix de les y seria el percentatge de colonies afectades en aquella població. Ordenat de més alt a menys. Es poden afegir lineas als nivells que es fan els assesments i posarli colors segons els assesments. 
+- Mapa amb tots els punts.
+- Mapa amb els valors del ultim any mesurat i afegir-li un histograma en eix de x tenim els anys i cada columna tenir el % de les diferents categories (no impact, low, moderate...) [Fins i tot treure el no impact i nomes deixar els de impact]

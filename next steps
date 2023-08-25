@@ -1,14 +1,14 @@
 Mapas mortalitat i fish
-- Fer zoom per que es vegi
-- Fer per any i zona
-- COm representar millor les imatges perque els punts es solapen molt
+- FET Fer zoom per que es vegi
+- FET Fer per any i zona
+- FET COm representar millor les imatges perque els punts es solapen molt
 
 Marine Heatwave
 - Recordar al Quim al Septembre de parlar amb justino per fer la grafica que fa ell amb la temperatura ferla amb MHW sense tenir en compte el detrending, fent-ho amb un periode de referencia fix.
 - Pensar com dividir-ho per ecoregions
 - Fer un resum al final del any. Com un miniinforme descarregable amb unes quantes gràfiques.
 
-Figures article
+FET Figures article
 - Mapa amb número d'anys afectat cada hexagon per MME
 - Número total o percentatje d'hexagons afectats per any (considerant que els hexagons totals son els que han estat afectats)
 	- Posar a sobre de cada barra el número d'ecoregions afectades
