@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import matplotlib
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.patches import RegularPolygon
+from matplotlib import patches as ptch
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import time
 import seaborn as sns
@@ -435,6 +435,16 @@ class MME_Plot:
             ax2.set_xticks([])
             ax2.set_ylim([0, 100])
             ax2.set_ylabel('% Affected all')
+            ax2.axhline(y = 10, color = 'g', linestyle = '-', alpha=0.3)
+            ax2.axhline(y=30, color='yellow', linestyle='-', alpha=0.3)
+            ax2.axhline(y=60, color='orange', linestyle='-', alpha=0.3)
+
+
+            ax2.add_patch(plt.Rectangle((-1,0), len(df_histo.index) + 1, 10, facecolor='green', alpha=0.3))
+            ax2.add_patch(plt.Rectangle((-1, 10), len(df_histo.index) + 1, 20, facecolor='yellow', alpha=0.3))
+            ax2.add_patch(plt.Rectangle((-1, 30), len(df_histo.index) + 1, 30, facecolor='orange', alpha=0.3))
+            ax2.add_patch(plt.Rectangle((-1, 60), len(df_histo.index) + 1, 40, facecolor='red', alpha=0.3))
+            print('Year ' + str(year) + ' Plotter')
             self.save_image('Mortality Assesment Zoom + Histogram ' + str(year))
 
     @staticmethod
