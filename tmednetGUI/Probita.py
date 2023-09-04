@@ -7,6 +7,11 @@ from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
 import cartopy.crs as ccrs
 from hexalattice.hexalattice import *
+import surface_temperature as st
+
+historic = st.HistoricData('../src/input_files/Database_T_06_Medes_200207-202210.txt')
+for i in range(int(2014), historic.last_year):
+    historic.browse_anomalies(i, percentile=True)
 
 
 
@@ -15,6 +20,7 @@ achi = mf.MME_Plot('../src/MME.xlsx')
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.plot_mortality_assesment_zoom()
 #achi.plot_yearly_mortality_assesment_zoom()
+#achi.horizontal_mortality_percentage()
 #achi.plot_affected_number()
 #achi.regional_map_composer()
 #achi.plot_data_map()
@@ -54,7 +60,7 @@ def make_patch_spines_invisible(ax):
 fig, host = plt.subplots()
 fig.subplots_adjust(right=0.75)
 
-par1 = host.twinx()
+#par1 = host.twinx()
 #par2 = host.twinx()
 
 # Offset the right spine of par2.  The ticks and label have already been
@@ -70,26 +76,27 @@ par1 = host.twinx()
 w = 0.3
 
 p1 = host.bar(df_third['Year'].astype(int)-w, df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
-p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
+#p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
 #p3, = par2.plot(df_records['Year'].astype(int), df_records['PercentageCum'], color='black', label='Cumulative', marker='.')
 
 host.set_xlabel("Year")
 host.set_ylabel("# of affected hexagons")
-par1.set_ylabel("# of records")
+#par1.set_ylabel("# of records")
 #par2.set_ylabel("Cumulative % of MME records")
 
 host.yaxis.label.set_color('tab:blue')
-par1.yaxis.label.set_color('tab:orange')
+#par1.yaxis.label.set_color('tab:orange')
 #par2.yaxis.label.set_color('black')
 
 tkw = dict(size=4, width=1.5)
 host.tick_params(axis='y', colors='tab:blue', **tkw)
-par1.tick_params(axis='y', colors='tab:orange', **tkw)
+#par1.tick_params(axis='y', colors='tab:orange', **tkw)
 #par2.tick_params(axis='y', colors='black', **tkw)
 host.tick_params(axis='x', **tkw)
 
 #myl = [p1] + [p2] + [p3]
-myl = [p1] + [p2]
+#myl = [p1] + [p2]
+myl = [p1]
 host.legend(myl, [l.get_label() for l in myl], loc='upper left')
 
 i = 0

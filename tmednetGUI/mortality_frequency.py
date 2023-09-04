@@ -430,6 +430,7 @@ class MME_Plot:
             cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
             cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
             plt.title('Mortality Assesment ' + str(year))
+            # Bar plot
             ax2 = fig.add_subplot(2,1,2)
             ax2.bar(df_histo.index, df_histo['% Affected all'])
             ax2.set_xticks([])
@@ -438,14 +439,37 @@ class MME_Plot:
             ax2.axhline(y = 10, color = 'g', linestyle = '-', alpha=0.3)
             ax2.axhline(y=30, color='yellow', linestyle='-', alpha=0.3)
             ax2.axhline(y=60, color='orange', linestyle='-', alpha=0.3)
-
-
+            # Percentage mortality
             ax2.add_patch(plt.Rectangle((-1,0), len(df_histo.index) + 1, 10, facecolor='green', alpha=0.3))
             ax2.add_patch(plt.Rectangle((-1, 10), len(df_histo.index) + 1, 20, facecolor='yellow', alpha=0.3))
             ax2.add_patch(plt.Rectangle((-1, 30), len(df_histo.index) + 1, 30, facecolor='orange', alpha=0.3))
             ax2.add_patch(plt.Rectangle((-1, 60), len(df_histo.index) + 1, 40, facecolor='red', alpha=0.3))
             print('Year ' + str(year) + ' Plotter')
             self.save_image('Mortality Assesment Zoom + Histogram ' + str(year))
+
+
+    def horizontal_mortality_percentage(self):
+
+        cmap = self.mortality_assesment()
+        df = self.df_corals.copy()
+        #Assesment tip: 0 means No, 1 Low, 2 Moderate, 3 Severe
+        df_assesment_yearly = df.groupby('Year')['Assesment'].value_counts(normalize=True).unstack(
+            'Assesment').fillna(0).sort_values('Year')
+
+
+        fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+        ax = fig.add_subplot(1,1,1)
+        category_colors = plt.get_cmap('RdYlGn_r')(
+            np.linspace(0.15, 0.85, 4))
+
+        df_assesment_yearly.plot.barh(ax=ax, stacked=True, color=category_colors)
+        category_names = ['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact']
+
+        ax.legend(ncol=len(category_names), labels=category_names, bbox_to_anchor=(0, 1),
+                  loc='lower left', fontsize='small')
+        self.save_image('Horizontal Assesment total')
+
+
 
     @staticmethod
     def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50., subplot=False):
@@ -462,12 +486,14 @@ class MME_Plot:
         """
         if not subplot:
             rows = 1
+            columns = 1
         else:
             rows = 2
+            columns = 1
 
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
 
-        ax = fig.add_subplot(rows, 1, 1, projection=ccrs.Mercator())
+        ax = fig.add_subplot(rows, columns, 1, projection=ccrs.Mercator())
         ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)

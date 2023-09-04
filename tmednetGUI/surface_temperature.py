@@ -157,6 +157,11 @@ class HistoricData:
                 columns={depth: 'min'}).drop(['year', 'Date'], axis=1)
             df['max'] = data.loc[locator].groupby(['day', 'month'], as_index=False).max().rename(
                 columns={depth: 'max'}).drop(['year', 'Date'], axis=1)['max']
+        if type == 'percentile_minmax':
+            df = data.loc[locator].groupby(['day', 'month'], as_index=False).quantile(percentile[0], numeric_only=True).rename(
+                columns={depth: 'p10'}).drop(['year'], axis=1)
+            df['p90'] = data.loc[locator].groupby(['day', 'month'], as_index=False).quantile(percentile[1], numeric_only=True).rename(
+                columns={depth: 'p90'}).drop(['year'], axis=1)['p90']
         df.sort_values(['month', 'day'], inplace=True)
         df['date'] = pd.to_datetime(
             '2020/' + df["month"].astype(int).astype(str) + "/" + df["day"].astype(int).astype(str))
@@ -245,7 +250,7 @@ class HistoricData:
             '../src/output_images/' + str(target_year) + '_spike_Summer Months_' + self.site_name + '_' + depth + '.png')
         ax.remove()
 
-    def __anomaly_plot_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend):
+    def __anomaly_plot_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend, percentile=False):
         # Starts the axes and plots the data for the anomaly plot
         ax = plt.axes()
         cycler = plt.cycler(linestyle=['-', '-', '--', '--'], color=['black', 'grey', '#01086b', '#820316'],
@@ -267,12 +272,16 @@ class HistoricData:
 
         plt.title(str(target_year) + ' Anomalies in ' + self.site_name + ' at ' + depth + ' meters deep')
         handles, labels = plt.gca().get_legend_handles_labels()
-        plt.legend(handles=[handles[0], handles[2], handles[3]],
-                   labels=[labels[0]] + ['Historic min.', 'Historic max.'])
+        if percentile:
+            plt.legend(handles=[handles[0], handles[2], handles[3]],
+                       labels=[labels[0]] + ['p10', 'p90'])
+        else:
+            plt.legend(handles=[handles[0], handles[2], handles[3]],
+                       labels=[labels[0]] + ['Historic min.', 'Historic max.'])
         plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + self.site_name + '_' + depth + '.png')
         ax.remove()
 
-    def __anomaly_zoom_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend):
+    def __anomaly_zoom_setter(self, data, prop, target_year, depth, last_years_legend, this_year_legend, percentile=False):
         # Makes the plot zoomed for the summer
         prop_zoom = prop.to_list()
         prop_zoom = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
@@ -300,8 +309,12 @@ class HistoricData:
 
         plt.title(str(target_year) + ' Anomalies in Summer in ' + self.site_name + ' at ' + depth + ' meters deep')
         handles, labels = plt.gca().get_legend_handles_labels()
-        plt.legend(handles=[handles[0], handles[2], handles[3]],
-                   labels=[labels[0]] + ['Historic min.', 'Historic max.'])
+        if percentile:
+            plt.legend(handles=[handles[0], handles[2], handles[3]],
+                       labels=[labels[0]] + ['p10', 'p90'])
+        else:
+            plt.legend(handles=[handles[0], handles[2], handles[3]],
+                       labels=[labels[0]] + ['Historic min.', 'Historic max.'])
         plt.savefig(
             '../src/output_images/' + str(target_year) + '_anomalies_Summer Months_' + self.site_name + '_' + depth + '.png')
         ax.remove()
@@ -345,7 +358,7 @@ class HistoricData:
         self.__spike_plot_setter(concated, prop, target_year, depth, percentile_legend, this_year_legend)
         self.__spike_zoom_setter(concated, prop, target_year, depth, percentile_legend, this_year_legend)
 
-    def anomalies_plotter(self, data, depth, target_year):
+    def anomalies_plotter(self, data, depth, target_year, percentile=False):
         """
         Calculates and plots the anomaly of a given depth for a given year
 
@@ -365,8 +378,13 @@ class HistoricData:
         last_years_filtered = self.__marine_heat_spikes_filter(data, depth)
         last_years_means = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year)
         this_year_mean = self.__marine_heat_spikes_df_setter(data, depth, this_year_legend, target_year, years='new')
-        min_max_temp = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year,
-                                                    type='minmax')
+        if percentile:
+            min_max_temp = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend,
+                                                               target_year,
+                                                               type='percentile_minmax', percentile=[0.1,0.9])
+        else:
+            min_max_temp = self.__marine_heat_spikes_df_setter(last_years_filtered, depth, last_years_legend, target_year,
+                                                        type='minmax')
         # Sets a unique Dataframe consisting of the other three
         concated = pd.concat([last_years_means, this_year_mean, min_max_temp], axis=1)
         prop = concated.index.strftime('%b')
@@ -374,8 +392,8 @@ class HistoricData:
         anomaly = pd.DataFrame(concated[this_year_legend] - concated[last_years_legend], index=concated.index,
                                columns=['anomaly'])
         anomaly['zero'] = 0
-        self.__anomaly_plot_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend)
-        self.__anomaly_zoom_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend)
+        self.__anomaly_plot_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend, percentile)
+        self.__anomaly_zoom_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend, percentile)
 
     def __multidepth_anomaly_plot_setter(self, data_dict, prop_dict, target_year, depths, last_years_legend,
                                        this_year_legend):
@@ -473,7 +491,7 @@ class HistoricData:
         for depth in data.columns[1:]:
             self.marine_heat_spikes_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, year)
 
-    def browse_anomalies(self, year):
+    def browse_anomalies(self, year, percentile=False):
         """
         Erases the Time column on the df attribute to use it later to calculate and
         plot the anomalies of a given year in all its depths
@@ -485,5 +503,5 @@ class HistoricData:
         """
         data = self.df.drop(['Time'], axis=1)
         for depth in data.columns[1:]:
-            self.anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, year)
+            self.anomalies_plotter(pd.DataFrame(data, columns=['Date', depth]), depth, year, percentile)
 
