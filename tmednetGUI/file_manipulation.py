@@ -108,11 +108,11 @@ def load_data(args, consolescreen=False):
         check_start(args.mdata, consolescreen)
         interpolate_hours(args.mdata)  # Interpolates the temperature between different not round hours
 
-    except ValueError:
+    except ValueError as e:
         if consolescreen == False:
-            print('Error, file extension not suported, load a txt')
+            print('Error, file extension not suported, load a txt ' + e)
         else:
-            consolescreen.insert("end", "Error, file extension not supported, load a txt\n", 'warning')
+            consolescreen.insert("end", "Error, file extension not supported, load a txt " + e +"\n", 'warning')
             consolescreen.insert("end", "=============\n")
 
 

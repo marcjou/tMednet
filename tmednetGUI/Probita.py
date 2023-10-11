@@ -9,17 +9,18 @@ import cartopy.crs as ccrs
 from hexalattice.hexalattice import *
 import surface_temperature as st
 
-historic = st.HistoricData('../src/input_files/Database_T_06_Medes_200207-202210.txt')
-for i in range(int(2014), historic.last_year):
-    historic.browse_anomalies(i, percentile=True)
+
 
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
+#achi.affected_by_ecoregion()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.plot_mortality_assesment_zoom()
-#achi.plot_yearly_mortality_assesment_zoom()
+#achi.mortality_by_species()
+achi.plot_yearly_mortality_assesment_zoom()
+#achi.yearly_horizontal_mortality_percentage()
 #achi.horizontal_mortality_percentage()
 #achi.plot_affected_number()
 #achi.regional_map_composer()

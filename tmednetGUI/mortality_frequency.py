@@ -417,35 +417,58 @@ class MME_Plot:
             plt.title('Mortality Assesment ' + str(year))
             self.save_image('Mortality Assesment ' + str(year))
 
-    def plot_yearly_mortality_assesment_zoom(self):
+    def plot_yearly_mortality_assesment_zoom(self, species='All'):
         for year in self.df_corals['Year'].unique():
             plt.clf()
+            category_colors = ['#3faa59','#fbfcd0', '#ffcf3d', '#ff6a6c']
             ax, gl, fig = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86, subplot=True)
             cmap = self.mortality_assesment()
-            df = self.df_corals.loc[self.df_corals['Year'] == year]
+            if species == 'All':
+                df = self.df_corals.loc[self.df_corals['Year'] == year]
+            else:
+                df = self.df_corals.loc[
+                    (self.df_corals['Year'] == year) & (self.df_corals['Species'] == species)]
             df_histo = df['% Affected all'].sort_values(ascending=False).reset_index()
+            my_cmap = matplotlib.colors.ListedColormap(category_colors, name='my_colormap_name')
+
             asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment'],
-                               transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
+                               transform=ccrs.PlateCarree(), s=20, cmap=my_cmap, edgecolor='blue', linewidth=0.2, vmin=0,
                                vmax=3, zorder=10)
             cb = plt.colorbar(asses, ticks=range(0, 5), label='Assesment')
             cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
             plt.title('Mortality Assesment ' + str(year))
+
             # Bar plot
+            mask_no = df_histo['% Affected all'] < 10
+            mask_lo = (df_histo['% Affected all'] >= 10) & (df_histo['% Affected all'] < 30)
+            mask_mod = (df_histo['% Affected all'] >= 30) & (df_histo['% Affected all'] < 60)
+            mask_hi = (df_histo['% Affected all'] >= 60)
+
             ax2 = fig.add_subplot(2,1,2)
-            ax2.bar(df_histo.index, df_histo['% Affected all'])
+            ax2.set_facecolor('#97b6e1') # Light Grey #e6e6e6, Ligth Blue #8a87de
+            ax2.bar(df_histo.index[mask_no], df_histo['% Affected all'][mask_no], color=category_colors[0])
+            ax2.bar(df_histo.index[mask_lo], df_histo['% Affected all'][mask_lo], color=category_colors[1])
+            ax2.bar(df_histo.index[mask_mod], df_histo['% Affected all'][mask_mod], color=category_colors[2])
+            ax2.bar(df_histo.index[mask_hi], df_histo['% Affected all'][mask_hi], color=category_colors[3])
+            #ax2.bar(df_histo.index, df_histo['% Affected all'])
             ax2.set_xticks([])
             ax2.set_ylim([0, 100])
             ax2.set_ylabel('% Affected all')
-            ax2.axhline(y = 10, color = 'g', linestyle = '-', alpha=0.3)
-            ax2.axhline(y=30, color='yellow', linestyle='-', alpha=0.3)
-            ax2.axhline(y=60, color='orange', linestyle='-', alpha=0.3)
+            ax2.axhline(y = 10, color = category_colors[0], linestyle = '-')
+            ax2.axhline(y=30, color=category_colors[1], linestyle='-')
+            ax2.axhline(y=60, color=category_colors[2], linestyle='-')
             # Percentage mortality
-            ax2.add_patch(plt.Rectangle((-1,0), len(df_histo.index) + 1, 10, facecolor='green', alpha=0.3))
-            ax2.add_patch(plt.Rectangle((-1, 10), len(df_histo.index) + 1, 20, facecolor='yellow', alpha=0.3))
-            ax2.add_patch(plt.Rectangle((-1, 30), len(df_histo.index) + 1, 30, facecolor='orange', alpha=0.3))
-            ax2.add_patch(plt.Rectangle((-1, 60), len(df_histo.index) + 1, 40, facecolor='red', alpha=0.3))
+            '''
+            ax2.add_patch(plt.Rectangle((-1,0), len(df_histo.index) + 1, 10, facecolor=category_colors[0], zorder=0))
+            ax2.add_patch(plt.Rectangle((-1, 10), len(df_histo.index) + 1, 20, facecolor=category_colors[1], zorder=0))
+            ax2.add_patch(plt.Rectangle((-1, 30), len(df_histo.index) + 1, 30, facecolor=category_colors[2], zorder=0))
+            ax2.add_patch(plt.Rectangle((-1, 60), len(df_histo.index) + 1, 40, facecolor=category_colors[3], zorder=0))
+            '''
             print('Year ' + str(year) + ' Plotter')
-            self.save_image('Mortality Assesment Zoom + Histogram ' + str(year))
+            if species == 'All':
+                self.save_image('Mortality Assesment Zoom + Histogram ' + str(year))
+            else:
+                self.save_image('Mortality Assesment Zoom + Histogram ' + str(year) + '__' + str(species))
 
 
     def horizontal_mortality_percentage(self):
@@ -459,8 +482,7 @@ class MME_Plot:
 
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
         ax = fig.add_subplot(1,1,1)
-        category_colors = plt.get_cmap('RdYlGn_r')(
-            np.linspace(0.15, 0.85, 4))
+        category_colors = ['#3faa59','#fbfcd0', '#ffcf3d', '#ff6a6c']
 
         df_assesment_yearly.plot.barh(ax=ax, stacked=True, color=category_colors)
         category_names = ['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact']
@@ -469,7 +491,58 @@ class MME_Plot:
                   loc='lower left', fontsize='small')
         self.save_image('Horizontal Assesment total')
 
+    def yearly_horizontal_mortality_percentage(self):
+        for year in self.df_corals['Year'].unique():
+            try:
+                plt.clf()
+                category_colors = ['#3faa59','#fbfcd0', '#ffcf3d', '#ff6a6c']
+                fig = plt.figure(figsize=(20 / 2.54, 7 / 2.54))
+                ax = fig.add_subplot(1, 1, 1)
+                cmap = self.mortality_assesment()
+                df = self.df_corals.loc[self.df_corals['Year'] == year]
+                # Horizontal bar
+                df_assesment_yearly = df.groupby('Year')['Assesment'].value_counts(normalize=True).unstack(
+                    'Assesment').fillna(0).sort_values('Year')
+                # Check if the columns correspond to all the assesment categories, if not, add them
+                ass_columns = [0,1,2,3]
+                if list(df_assesment_yearly.columns) != ass_columns:
+                    for i in ass_columns:
+                        if i not in list(df_assesment_yearly.columns):
+                            df_assesment_yearly[i] = 0.0
+                    df_assesment_yearly = df_assesment_yearly[ass_columns]
 
+                df_assesment_yearly.plot.barh(ax=ax, stacked=True, color=category_colors)
+                category_names = ['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact']
+
+                ax.legend(ncol=len(category_names), labels=category_names, bbox_to_anchor=(0, 1),
+                          loc='lower left', fontsize='small')
+                self.save_image('Horizontal Assesment ' + str(year))
+            except:
+                print('No numeric data to plot for ' + str(year))
+
+    def mortality_by_species(self):
+        species = self.df_corals['Species'].dropna().unique()
+        for specie in species:
+            self.plot_yearly_mortality_assesment_zoom(species=specie)
+
+    def affected_by_ecoregion(self):
+        max_years_with_MME = self.df_events['#Years with MME'].max()
+        regions = self.df_events['sub-ecoregion'].unique().tolist()*max_years_with_MME
+        df_aff = pd.DataFrame(regions, columns=['region']).sort_values('region').reset_index(drop=True)
+        df_aff['#Years'] = list(range(1, 13)) * len(df_aff['region'].unique())
+        df_aff['#Hexagons'] = 0
+        for reg in self.df_events['sub-ecoregion'].unique():
+            df_aff['#Hexagons'].loc[df_aff['region'] == reg] = [self.df_events['#Years with MME'].loc[(self.df_events['sub-ecoregion'] == reg) & (self.df_events['#Years with MME'] == i)].count()
+                                                                           for i in range(1, max_years_with_MME + 1)]
+        df_plot_ready = df_aff.groupby(['region','#Years'])['#Hexagons'].aggregate('first').unstack()
+        df_plot_ready_percentage = df_plot_ready.div(df_plot_ready.sum(axis=1), axis=0)*100
+        fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+        ax = fig.add_subplot(1, 1, 1)
+        df_plot_ready.plot.bar(ax=ax, stacked=True)
+        ax.legend(title='# Affected Years', ncol=len(range(1, max_years_with_MME + 1)), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')
+        ax.set_ylabel('# Affected Hexagons')
+        #TODO created the dataframe, time to plot it
+        print('proba')
 
     @staticmethod
     def ax_setter(lat1=-9.5, lat2=37., lon1=28., lon2=50., subplot=False):

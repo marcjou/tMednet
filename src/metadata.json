@@ -702,6 +702,33 @@
             "start_year": "2020",
             "end_year": "2022",
             "institution": ""
+        },
+       
+        
+        "114": {
+            "lat": "44.3301",
+            "long": "9.1460",
+            "site_number": "",
+            "site_name": "Portofino_Tonnarella",
+            "site_code": "114",
+            "eco_region": "W-Med",
+            "sub_basin": "Ligurian",
+            "start_year": "2022",
+            "end_year": "2023",
+            "institution": ""
+        },
+        
+        "134": {
+            "lat": "36.5569",
+            "long": "29.0309",
+            "site_number": "",
+            "site_name": "Fethiye Bay Balaban Island",
+            "site_code": "114",
+            "eco_region": "Levantine Sea",
+            "sub_basin": "N-Levantine",
+            "start_year": "2021",
+            "end_year": "2023",
+            "institution": ""
         }
     },
     "regions": {

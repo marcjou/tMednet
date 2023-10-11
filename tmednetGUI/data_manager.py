@@ -180,8 +180,8 @@ class DataManager:
             self.__check_start()
             self.__interpolate_hours()  # Interpolates the temperature between different not round hours
 
-        except ValueError:
-            self.console_writer("Error, file extension not supported, load a txt",'warning')
+        except ValueError as e:
+            self.console_writer("Error, file extension not supported, load a txt " + str(e),'warning')
 
     def __load_coordinates(self, region):
         # Loads the coordinates of the file from the 'metadata.json' auxiliary file

@@ -546,8 +546,8 @@ class GUIPlot:
 
         except IndexError:
             self.console_writer('Load several files before creating a diagram', 'warning')
-        except TypeError:
-            self.console_writer('Load more than a file for the Hovmoller Diagram', 'warning')
+        except TypeError as e:
+            self.console_writer('Load more than a file for the Hovmoller Diagram: ' + str(e), 'warning')
 
     def plot_annual_T_cycle(self, historical, year):
         """

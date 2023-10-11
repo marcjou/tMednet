@@ -3,6 +3,7 @@ import pandas as pd
 import time
 from pandas import ExcelWriter
 import marineHeatWaves as mhw
+import datetime
 
 
 class ExcelReport:
@@ -26,7 +27,13 @@ class ExcelReport:
         self.dfmonthly = self.dfmonthly.sort_values(by=['year', 'month', 'depth(m)'])
         self.dfseasonal['depth(m)'] = self.dfseasonal['depth(m)'].astype(int)
         self.dfseasonal = self.dfseasonal.sort_values(by=['year', 'depth(m)'])
+        self.dfexcel['year'] = pd.DatetimeIndex(self.dfexcel['date']).year
         self.dfexcel['date'] = self.dfexcel['date'].dt.date
+        dfmaxes = self.dfexcel.loc[self.dfexcel.groupby(['year'])['max'].idxmax()][['year', 'date', 'max']]
+        dfmaxes.sort_values('max', ascending=False, inplace=True)
+        dfmaxesdepth = self.dfexcel.loc[self.dfexcel.groupby(['year', 'depth(m)'])['max'].idxmax().dropna()][
+            ['year', 'depth(m)', 'date', 'max']]
+        dfmaxesdepth.sort_values(['depth(m)', 'max'], ascending=False, inplace=True)
         # Write the Excel file with the given DataFrames as sheets
         filein_split = self.filein.split('_')
         fileout_name = filein_split[3] + '_Stat_Report_' + filein_split[4] + '_' + filein_split[5][:-4]
@@ -34,10 +41,17 @@ class ExcelReport:
         self.dfexcel.to_excel(writer, 'Daily', index=False)
         self.dfmonthly.to_excel(writer, 'Monthly', index=False)
         self.dfseasonal.to_excel(writer, 'Seasonal', index=False)
+        dfmaxes.to_excel(writer, 'Maxes', index=False)
+        dfmaxesdepth.to_excel(writer, 'Maxes depth', index=False)
         write_mhw = self.__check_year_difference()
         if write_mhw:
             mhw_sheet = self.create_mhw()
             mhw_sheet.to_excel(writer, 'MHW', index=False)
+            mhw_sheet['year'] = pd.DatetimeIndex(mhw_sheet['Date']).year
+            dfmaxesmhw = mhw_sheet.loc[mhw_sheet.groupby(['year', 'Depth (m)'])['Max Intensity (ºC)'].idxmax().dropna()]
+            dfmaxesmhw.sort_values(['Date'], ascending=True, inplace=True)
+            dfmaxesmhw.to_excel(writer, 'MHW_MAX I', index=False)
+
         writer.save()
         end = time.time()
         print(end - start)
