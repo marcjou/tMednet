@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import matplotlib.colors as mcol
 import matplotlib
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import patches as ptch
@@ -538,10 +539,29 @@ class MME_Plot:
         df_plot_ready_percentage = df_plot_ready.div(df_plot_ready.sum(axis=1), axis=0)*100
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
         ax = fig.add_subplot(1, 1, 1)
-        df_plot_ready.plot.bar(ax=ax, stacked=True)
+        # Colormap
+        lvTmp = np.linspace(0.3, 1.0, len(df_plot_ready.columns) - 1)
+        cmTmp = matplotlib.cm.hot_r(lvTmp)
+        newCmap = mcol.ListedColormap(cmTmp)
+        df_plot_ready.plot.bar(ax=ax, stacked=True, cmap=newCmap)
         ax.legend(title='# Affected Years', ncol=len(range(1, max_years_with_MME + 1)), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')
         ax.set_ylabel('# Affected Hexagons')
-        #TODO created the dataframe, time to plot it
+        plt.xticks(rotation=45, ha='right')
+        labels = df_plot_ready.index
+        labels = ['\n'.join(label.split()) for label in labels]
+        plt.setp(ax.set_xticklabels(labels))
+        self.save_image('# of affected years per total of hexagons per eco region')
+        plt.clf()
+        fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+        ax = fig.add_subplot(1, 1, 1)
+        df_plot_ready_percentage.plot.bar(ax=ax, stacked=True, cmap=newCmap)
+        ax.legend(title='# Affected Years', ncol=len(range(1, max_years_with_MME + 1)), bbox_to_anchor=(0, 1),
+                  loc='lower left', fontsize='small')
+        ax.set_ylabel('% Affected Hexagons')
+        plt.xticks(rotation=30, ha='right')
+        plt.setp(ax.set_xticklabels(labels))
+        self.save_image('# of affected years per percentage of hexagons per eco region')
+        plt.clf()
         print('proba')
 
     @staticmethod

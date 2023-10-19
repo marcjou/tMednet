@@ -54,6 +54,7 @@ class HistoricData:
         """
         self.df = pd.read_csv(filename, sep='\t')
         self.site_name = filename[filename.find('Database'):].split('_')[3]
+        self.site_id = filename[filename.find('Database'):].split('_')[2]
         self.max_temperature = round(np.max(self.df.quantile(0.99, numeric_only=True))) + 1
         self.last_year = datetime.strptime(self.df['Date'][len(self.df) - 1], '%d/%m/%Y').year + 1
 
@@ -427,9 +428,12 @@ class HistoricData:
 
         plt.title('Anomalies in ' + self.site_name + ' in ' + str(target_year))
         handles, labels = plt.gca().get_legend_handles_labels()
-        plt.legend(handles=[handles[0]], labels=['Multi-Year Mean'])
-        plt.savefig('../src/output_images/' + str(target_year) + '_anomalies_' + self.site_name + '_Multidepth.png')
+        red_patch = mpatches.Patch(color='#fa5a5a', label='[+] anomaly')
+        blue_patch = mpatches.Patch(color='#5aaaff', label='[-] anomaly')
+        plt.legend(handles=[handles[0], red_patch, blue_patch], labels=['Multi-Year Mean', '[+] anomaly', '[-] anomaly'])
+        plt.savefig('../src/output_images/' + str(int(self.site_id)) + '_4_' + str(target_year) + '_A.png')
         ax.remove()
+
 
     def multidepth_anomaly_plotter(self, target_year, depths=['10', '25', '40']):
         """
