@@ -32,7 +32,7 @@ class MME_Plot:
         self.df_events = pd.read_excel('../src/MME.xlsx', sheet_name='Quim Years with MME')
         self.df_numbers = pd.read_excel('../src/MME.xlsx', sheet_name='Massimo original dataset')
         self.df_fishes = pd.read_excel('../src/Example_Visual_census_ALL.xlsx', 'DATA-All')
-        self.df_corals = pd.read_excel('../src/Mortality Atención Corales.xlsx', 'Mortality Data')
+        self.df_corals = pd.read_excel('../src/AtencioCoralls_ProjecteCORFUN.xlsx', 'Censos Drive')
         df_coords = pd.read_excel('../src/Coords.xlsx')
         self.df_map = pd.merge(self.df_events, df_coords[['id.hexagon', 'Lat', 'Lon']], on='id.hexagon', how='left')
         self.df_events.columns = self.df_events.columns.astype(str)
@@ -386,7 +386,7 @@ class MME_Plot:
         self.save_image('Mortality Assesment')
 
     def plot_mortality_assesment_zoom(self):
-        ax, gl = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86)
+        ax, gl = self.ax_setter(lat1=3.00, lat2=3.43, lon1=41.74, lon2=42.42)
         cmap = self.mortality_assesment()
         asses = ax.scatter(x=self.df_corals['LONG'], y=self.df_corals['LAT'], c=self.df_corals['Assesment'],
                            transform=ccrs.PlateCarree(), s=20, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
@@ -422,7 +422,8 @@ class MME_Plot:
         for year in self.df_corals['Year'].unique():
             plt.clf()
             category_colors = ['#3faa59','#fbfcd0', '#ffcf3d', '#ff6a6c']
-            ax, gl, fig = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86, subplot=True)
+            ax, gl, fig = self.ax_setter(lat1=3.00, lat2=3.43, lon1=41.74, lon2=42.42, subplot=True)
+            # ax, gl, fig = self.ax_setter(lat1=-5.49, lat2=21.60, lon1=35.82, lon2=45.86, subplot=True)
             cmap = self.mortality_assesment()
             if species == 'All':
                 df = self.df_corals.loc[self.df_corals['Year'] == year]
@@ -577,6 +578,7 @@ class MME_Plot:
         gl : Gridlines
             the gridlines of the plot featured to divide the latitude and longitude
         """
+        import owslib
         if not subplot:
             rows = 1
             columns = 1
@@ -588,9 +590,13 @@ class MME_Plot:
 
         ax = fig.add_subplot(rows, columns, 1, projection=ccrs.Mercator())
         ax.set_extent([lat1, lat2, lon1, lon2], crs=ccrs.PlateCarree())
-        ax.add_feature(cf.OCEAN)
-        ax.add_feature(cf.LAND)
-        ax.coastlines(resolution='10m')
+        #ax.add_feature(cf.OCEAN)
+        #ax.add_feature(cf.LAND)
+        ax.add_wms(wms='http://ows.emodnet-bathymetry.eu/wms',
+                   layers=['coastlines', 'emodnet:mean_atlas_land']) # Poner emodnet bathymetry getcapabilities for layers
+        #coast = cf.GSHHSFeature(scale='full')
+        #ax.add_feature(coast)
+        #ax.coastlines(resolution='10m')
         ax.add_feature(cf.BORDERS, linestyle=':', alpha=1)
 
         gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=1, color='grey', alpha=0.3, linestyle='--',
@@ -609,10 +615,11 @@ class MME_Plot:
                      xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
                      va="center", ha="left")'''
-        plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
+        # TODO quitar cuando no toca
+        '''plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
                      textcoords="offset points",
                      va="center", ha="left", alpha=0.5)
-
+        '''
         if not subplot:
             return ax, gl
         else:
