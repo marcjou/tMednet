@@ -14,20 +14,31 @@ import surface_temperature as st
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
-#achi.affected_by_ecoregion()
+ochi = mf.MME_Plot('../src/MME.xlsx')
+
+achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
-achi.plot_mortality_assesment_zoom()
-achi.mortality_by_species()
-achi.plot_yearly_mortality_assesment_zoom()
-achi.yearly_horizontal_mortality_percentage()
-achi.horizontal_mortality_percentage()
+#achi.mortality_assesment_census()
+
+# Species Esingularis Pclavata
+#achi.plot_mortality_assesment_zoom(specie='Pclavata')
+#achi.recent_old_mortality()
+#achi.palamos_capdecreus()
+#achi.mortality_by_species()
+#achi.plot_yearly_mortality_assesment_zoom()
+
+#achi.plot_yearly_mortality_assesment_zoom()
+
+#achi.horizontal_mortality_percentage(type='depth')
+
+
 #achi.plot_affected_number()
 #achi.regional_map_composer()
 #achi.plot_data_map()
 
 # Proba de nou grafic de Quim el MegaGraph
-
+'''
 total_numbers = achi.df_events # Number of total hexagons affected per year dataset
 total_records = achi.df_numbers # Number of total records per year dataset
 
@@ -117,3 +128,4 @@ plt.savefig('Megaplot.png',bbox_inches='tight')
 
 
 
+'''
