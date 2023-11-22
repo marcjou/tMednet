@@ -934,10 +934,20 @@ class MME_Plot:
         ax = fig.add_subplot(1, 1, 1)
         # Colormap
         lvTmp = np.linspace(0.3, 1.0, len(df_plot_ready.columns) - 1)
-        cmTmp = matplotlib.cm.hot_r(lvTmp)
+        cmTmp = matplotlib.cm.cool(lvTmp)
         newCmap = mcol.ListedColormap(cmTmp)
+        df_plot_ready['sum'] = df_plot_ready[list(df_plot_ready.columns)].sum(axis=1)
+        df_plot_ready.sort_values(by='sum', ascending=False, inplace=True)
+        df_plot_ready.drop('sum', axis=1, inplace=True)
+        # Plot order west to east
+        #newCmap = sns.color_palette("ch:start=.2,rot=-.3", as_cmap=True)
+        newCmap = sns.color_palette("crest", as_cmap=True)
+        '''seas = ['Alboran Sea', 'Northwestern Mediterranean', 'Southwestern Mediterranean', 'Tunisian Plateau-Gulf of Sidra', 'Adriatic Sea', 'Ionian Sea', 'Aegean Sea', 'Levantine Sea']
+        mapping = {sea: i for i, sea in enumerate(seas)}
+        key = df_plot_ready.index.map(mapping)
+        df_plot_ready = df_plot_ready.iloc[key.argsort()]'''
         df_plot_ready.plot.bar(ax=ax, stacked=True, cmap=newCmap)
-        ax.legend(title='# Affected Years', ncol=len(range(1, max_years_with_MME + 1)), bbox_to_anchor=(0, 1), loc='lower left', fontsize='small')
+        ax.legend(title='# Affected Years', bbox_to_anchor=(1, 0.5), loc='center left', fontsize='small') #, ncol=len(range(1, max_years_with_MME + 1)),
         ax.set_ylabel('# Affected Hexagons')
         plt.xticks(rotation=45, ha='right')
         labels = df_plot_ready.index

@@ -16,7 +16,9 @@ import surface_temperature as st
 achi = mf.MME_Plot('../src/MME.xlsx')
 ochi = mf.MME_Plot('../src/MME.xlsx')
 
-achi.create_full_census_plots()
+achi.affected_by_ecoregion()
+
+#achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.mortality_assesment_census()
@@ -38,12 +40,17 @@ achi.create_full_census_plots()
 #achi.plot_data_map()
 
 # Proba de nou grafic de Quim el MegaGraph
-'''
+
 total_numbers = achi.df_events # Number of total hexagons affected per year dataset
 total_records = achi.df_numbers # Number of total records per year dataset
 
 df_third = achi.get_numbered_df()
 df_third['Year'] = df_third['Year'].astype(int)
+df_third['Cumulative'] = df_third['Count'].cumsum()
+thex = df_third['Cumulative'].iloc[-1]
+
+df_third['PercentageCum'] = (df_third['Cumulative'] / thex) * 100
+
 
 #TODO Incluir en get numbered df
 df_records = pd.DataFrame(achi.columns, columns=['Year'])
@@ -73,7 +80,7 @@ fig, host = plt.subplots()
 fig.subplots_adjust(right=0.75)
 
 #par1 = host.twinx()
-#par2 = host.twinx()
+par2 = host.twinx()
 
 # Offset the right spine of par2.  The ticks and label have already been
 # placed on the right by twinx above.
@@ -83,34 +90,40 @@ fig.subplots_adjust(right=0.75)
 # and spines invisible.
 #make_patch_spines_invisible(par2)
 # Second, show the right spine.
-#par2.spines["right"].set_visible(True)
+par2.spines["right"].set_visible(True)
 
-w = 0.3
+w = 0.5
 
-p1 = host.bar(df_third['Year'].astype(int)-w, df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
+p1 = host.bar(df_third['Year'].astype(int), df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
 #p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
-#p3, = par2.plot(df_records['Year'].astype(int), df_records['PercentageCum'], color='black', label='Cumulative', marker='.')
+p3, = par2.plot(df_records['Year'].astype(int), df_third['PercentageCum'], color='black', label='Cumulative', marker='.')
 
 host.set_xlabel("Year")
 host.set_ylabel("# of affected hexagons")
 #par1.set_ylabel("# of records")
-#par2.set_ylabel("Cumulative % of MME records")
+par2.set_ylabel("Cumulative % of affected hexagons")
 
 host.yaxis.label.set_color('tab:blue')
 #par1.yaxis.label.set_color('tab:orange')
-#par2.yaxis.label.set_color('black')
+par2.yaxis.label.set_color('black')
 
 tkw = dict(size=4, width=1.5)
 host.tick_params(axis='y', colors='tab:blue', **tkw)
 #par1.tick_params(axis='y', colors='tab:orange', **tkw)
-#par2.tick_params(axis='y', colors='black', **tkw)
+par2.tick_params(axis='y', colors='black', **tkw)
 host.tick_params(axis='x', **tkw)
+from matplotlib.ticker import AutoMinorLocator, MultipleLocator
+host.set_xlim([1978.5, 2020.5])
+host.xaxis.set_major_locator(MultipleLocator(5))
+host.xaxis.set_minor_locator(MultipleLocator(1))
 
 #myl = [p1] + [p2] + [p3]
-#myl = [p1] + [p2]
-myl = [p1]
+myl = [p1] + [p3]
+#myl = [p1]
 host.legend(myl, [l.get_label() for l in myl], loc='upper left')
 
+
+'''
 i = 0
 for rect in p2:
     text = df_affected_regions['Count'][i]
@@ -119,13 +132,9 @@ for rect in p2:
     #par1.add_patch(circle)
     par1.text(rect.get_x(), height, f'{text:.0f}', ha='center')
     i += 1
-
-
-plt.savefig('Megaplot.png',bbox_inches='tight')
-
-
-
-
-
-
 '''
+
+plt.savefig('Cachiplot.png',bbox_inches='tight')
+
+
+
