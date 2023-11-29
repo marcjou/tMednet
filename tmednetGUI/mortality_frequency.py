@@ -543,7 +543,13 @@ class MME_Plot:
         # Assesment tip: 0 means No, 1 Low, 2 Moderate, 3 Severe
         df_assesment_depthly = df.groupby('Depth range')['Assesment ' + ass].value_counts(normalize=True).unstack(
             'Assesment ' + ass).fillna(0).sort_values('Depth range')
-
+        # Check if the columns correspond to all the assesment categories, if not, add them
+        ass_columns = [0, 1, 2, 3]
+        if list(df_assesment_depthly.columns) != ass_columns:
+            for i in ass_columns:
+                if i not in list(df_assesment_depthly.columns):
+                    df_assesment_depthly[i] = 0.0
+            df_assesment_depthly = df_assesment_depthly[ass_columns]
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
         ax = fig.add_subplot(1, 1, 1)
         category_colors = ['#3faa59', '#fbfcd0', '#ffcf3d', '#ff6a6c']
@@ -671,9 +677,9 @@ class MME_Plot:
             self.plot_yearly_mortality_assesment_zoom(species=specie)
 
     def create_full_census_plots(self):
-        df_census = pd.read_excel('../src/CensandPop.xlsx', 'Census')
-        df_pop_all = pd.read_excel('../src/CensandPop.xlsx', 'Population % Affected all')
-        df_pop_rec = pd.read_excel('../src/CensandPop.xlsx', 'Population % Affected recent')
+        df_census = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Census')
+        df_pop_all = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected all')
+        df_pop_rec = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected recent')
 
         df_census, cmap_census = self.mortality_assesment_modified(df_census, ['% Affected all', '% Affected recent'])
         df_pop_all, bad = self.mortality_assesment_modified(df_pop_all, ['% Affected all'])
@@ -686,11 +692,11 @@ class MME_Plot:
                         typer = 'All'
                     else:
                         typer = 'Recent'
-                    #self.plot_mortality_assesment_zoom_modified(df_census, cmap_census, 'census', aff, type=typer, specie=specie, coords=site_dict[key], place=key)
-                    #self.census_horizontal_mortality(df_census, 'census', aff, typer, specie=specie, site=key)
-                    #self.create_histogram(df_census, aff, 'Hisogram census ' + typer + ' ' + specie + ' ' + key, site=key, species=specie, show_title=False)
-                    #self.census_horizontal_assesment_total(df_census, 'census', site=key, ass=aff, specie=specie)
-                '''self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
+                    self.plot_mortality_assesment_zoom_modified(df_census, cmap_census, 'census', aff, type=typer, specie=specie, coords=site_dict[key], place=key)
+                    self.census_horizontal_mortality(df_census, 'census', aff, typer, specie=specie, site=key)
+                    self.create_histogram(df_census, aff, 'Hisogram census ' + typer + ' ' + specie + ' ' + key, site=key, species=specie, show_title=False)
+                    self.census_horizontal_assesment_total(df_census, 'census', site=key, ass=aff, specie=specie)
+                self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
                                                             specie=specie, coords=site_dict[key],
                                                             place=key)
                 self.census_horizontal_mortality(df_pop_all, 'population', '% Affected all', type='All', specie=specie, site=key)
@@ -706,8 +712,8 @@ class MME_Plot:
                                       'Histogram population Recent ' + ' ' + specie + ' ' + key, site=key,
                                       species=specie, show_title=False, errbar=True)
                 self.census_horizontal_assesment_total(df_pop_rec, 'population', site=key, ass='% Affected recent',
-                                                       specie=specie)'''
-            '''# All costa brava, All affected, different species
+                                                       specie=specie)
+            # All costa brava, All affected, different species
             self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all',
                                                         type='All',
                                                         specie=specie)
@@ -723,7 +729,7 @@ class MME_Plot:
             self.census_horizontal_mortality(df_pop_rec, 'population', '% Affected recent', type='Rec', specie=specie)
             self.create_histogram(df_pop_rec, '% Affected recent', 'Histogram population Recent ' + ' ' + specie + ' General',
                                   species=specie, show_title=False, errbar=True)
-            self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent', specie=specie)'''
+            self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent', specie=specie)
         # All costa brava, All affected, all species
         self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all',
                                                     type='All')
@@ -792,56 +798,62 @@ class MME_Plot:
         df_master = pd.DataFrame()
         cens_number = 100
         for site in df_census['Site'].unique():
-            depth_dict = {'site': site, 'depth': [], 'species':str(df_census.loc[df_census['Site'] == site]['Species'].unique()[0]) ,  'Main site' : str(df_census.loc[df_census['Site'] == site]['Main site'].unique()[0]), 'LAT' : float(df_census.loc[df_census['Site'] == site]['LAT'].unique()), 'LONG': float(df_census.loc[df_census['Site'] == site]['LONG'].unique()), 'entries': [], 'census': [], 'total colonies': [], 'total affected': [], 'affected old': [], 'affected recent': [], '% Affected all':[], '% Affected old':[], '% Affected recent':[]}
-            depth_dict['depth'] = df_census.loc[df_census['Site'] == site]['Depth'].unique()
-            for depth in depth_dict['depth']:
-                counted = df_census.loc[(df_census['Site'] == site) & (df_census['Depth'] == depth), 'Depth'].count()
-                depth_dict['entries'].append(counted)
-                col_ordered = df_census.loc[(df_census['Site'] == site) & (df_census['Depth'] == depth)].drop(['Site', 'Depth'], axis=1).sort_values(by='Total colonies', ascending=False).reset_index(drop=True)
-                col_sum = col_ordered.cumsum()
-                totcol_cens = []
-                totaff_cens = []
-                affrec = []
-                affold = []
-                affperc_all = []
-                affperc_old = []
-                affperc_rec = []
-                idx = 0
-                #TODO falla cova fumada en depth 15
-                while idx < counted:
-                    if col_sum[(col_sum['Total colonies'] < 120) & (col_sum['Total colonies'] > 80)].empty:
-                        idx = col_sum.index[0]
-                        totcol_cens.append(col_sum['Total colonies'][idx])
-                        totaff_cens.append(col_sum['Total affected'][idx])
-                        affold.append(col_sum['Affected old'][idx])
-                        affrec.append(col_sum['Affected recent'][idx])
-                        affperc_all.append(round((col_sum['Total affected'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
-                        affperc_old.append(round((col_sum['Affected old'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
-                        affperc_rec.append(round((col_sum['Affected recent'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
-                    else:
-                        idx = col_sum[(col_sum['Total colonies'] < 120) & (col_sum['Total colonies'] > 80)].index[0]
-                        totcol_cens.append(col_sum['Total colonies'][idx])
-                        totaff_cens.append(col_sum['Total affected'][idx])
-                        affold.append(col_sum['Affected old'][idx])
-                        affrec.append(col_sum['Affected recent'][idx])
-                        affperc_all.append(round((col_sum['Total affected'][idx]/col_sum['Total colonies'][idx])*100, 2))
-                        affperc_old.append(
-                            round((col_sum['Affected old'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
-                        affperc_rec.append(
-                            round((col_sum['Affected recent'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
-                    if idx < counted - 1:
-                        col_sum = col_ordered.iloc[idx + 1:].cumsum()
-                    else:
-                        idx = counted
-                depth_dict['total colonies'].append(totcol_cens)
-                depth_dict['total affected'].append(totaff_cens)
-                depth_dict['affected old'].append(affold)
-                depth_dict['affected recent'].append(affrec)
-                depth_dict['census'].append(len(totaff_cens))
-                depth_dict['% Affected all'].append(affperc_all)
-                depth_dict['% Affected old'].append(affperc_old)
-                depth_dict['% Affected recent'].append(affperc_rec)
-            df_master = pd.concat([df_master, pd.DataFrame.from_dict(depth_dict)])
+            if site == 'Pta. 3 Frares':
+                print('hey')
+            for specie in df_census.loc[df_census['Site'] == site]['Species'].unique():
+                depth_dict = {'site': site, 'depth': [], 'species':specie ,  'Main site' : str(df_census.loc[df_census['Site'] == site]['Main site'].unique()[0]), 'LAT' : float(df_census.loc[df_census['Site'] == site]['LAT'].unique()), 'LONG': float(df_census.loc[df_census['Site'] == site]['LONG'].unique()), 'entries': [], 'census': [], 'total colonies': [], 'total affected': [], 'affected old': [], 'affected recent': [], '% Affected all':[], '% Affected old':[], '% Affected recent':[]}
+                depth_dict['depth'] = df_census.loc[(df_census['Site'] == site) & (df_census['Species'] == specie)]['Depth'].unique()
+                for depth in depth_dict['depth']:
+                    counted = df_census.loc[(df_census['Site'] == site) & (df_census['Depth'] == depth) & (df_census['Species'] == specie), 'Depth'].count()
+                    depth_dict['entries'].append(counted)
+                    col_ordered = df_census.loc[(df_census['Site'] == site) & (df_census['Depth'] == depth) & (df_census['Species'] == specie)].drop(['Site', 'Depth', 'Species'], axis=1).sort_values(by='Total colonies', ascending=False).reset_index(drop=True)
+                    col_sum = col_ordered.cumsum()
+                    totcol_cens = []
+                    totaff_cens = []
+                    affrec = []
+                    affold = []
+                    affperc_all = []
+                    affperc_old = []
+                    affperc_rec = []
+                    idx = 0
+                    #TODO falla cova fumada en depth 15
+                    while idx < counted:
+                        if col_sum[(col_sum['Total colonies'] < 120) & (col_sum['Total colonies'] > 80)].empty:
+                            if col_sum[(col_sum['Total colonies']) > 120].empty: # Check if the value is bigger or smaller
+                                idx = col_sum.index[-1]
+                            else:
+                                idx = col_sum.index[0]
+                            totcol_cens.append(col_sum['Total colonies'][idx])
+                            totaff_cens.append(col_sum['Total affected'][idx])
+                            affold.append(col_sum['Affected old'][idx])
+                            affrec.append(col_sum['Affected recent'][idx])
+                            affperc_all.append(round((col_sum['Total affected'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
+                            affperc_old.append(round((col_sum['Affected old'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
+                            affperc_rec.append(round((col_sum['Affected recent'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
+                        else:
+                            idx = col_sum[(col_sum['Total colonies'] < 120) & (col_sum['Total colonies'] > 80)].index[0]
+                            totcol_cens.append(col_sum['Total colonies'][idx])
+                            totaff_cens.append(col_sum['Total affected'][idx])
+                            affold.append(col_sum['Affected old'][idx])
+                            affrec.append(col_sum['Affected recent'][idx])
+                            affperc_all.append(round((col_sum['Total affected'][idx]/col_sum['Total colonies'][idx])*100, 2))
+                            affperc_old.append(
+                                round((col_sum['Affected old'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
+                            affperc_rec.append(
+                                round((col_sum['Affected recent'][idx] / col_sum['Total colonies'][idx]) * 100, 2))
+                        if idx < counted - 1:
+                            col_sum = col_ordered.iloc[idx + 1:].cumsum()
+                        else:
+                            idx = counted
+                    depth_dict['total colonies'].append(totcol_cens)
+                    depth_dict['total affected'].append(totaff_cens)
+                    depth_dict['affected old'].append(affold)
+                    depth_dict['affected recent'].append(affrec)
+                    depth_dict['census'].append(len(totaff_cens))
+                    depth_dict['% Affected all'].append(affperc_all)
+                    depth_dict['% Affected old'].append(affperc_old)
+                    depth_dict['% Affected recent'].append(affperc_rec)
+                df_master = pd.concat([df_master, pd.DataFrame.from_dict(depth_dict)])
         df_master = df_master.explode(['total colonies', 'total affected', 'affected old', 'affected recent', '% Affected all', '% Affected old', '% Affected recent'])
 
         affection = ['% Affected all', '% Affected old', '% Affected recent']
@@ -856,7 +868,7 @@ class MME_Plot:
             df_pop = df_pop.sort_values(affected, ascending=False).reset_index(drop=True)
             self.create_histogram(df_pop, affected, 'Histogram Population ' + affected, errbar=True)
 
-        with pd.ExcelWriter('CensandPop.xlsx') as writer:
+        with pd.ExcelWriter('CensandPop_New.xlsx') as writer:
 
             df_master.to_excel(writer, sheet_name='Census')
 

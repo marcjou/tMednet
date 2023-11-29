@@ -16,9 +16,9 @@ import surface_temperature as st
 achi = mf.MME_Plot('../src/MME.xlsx')
 ochi = mf.MME_Plot('../src/MME.xlsx')
 
-achi.affected_by_ecoregion()
+#achi.affected_by_ecoregion()
 
-#achi.create_full_census_plots()
+achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.mortality_assesment_census()
