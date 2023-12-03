@@ -147,6 +147,10 @@ class MME_Plot:
         ax_scatter_years.add_artist(leg)
         plt.legend(loc=[0.8, 0.5])
         ax_scatter_years.set(ylabel='Return Years')
+        from matplotlib.ticker import AutoMinorLocator, MultipleLocator
+        ax_scatter_years.set_xlim([1978.5, 2020.5])
+        ax_scatter_years.xaxis.set_major_locator(MultipleLocator(5))
+        ax_scatter_years.xaxis.set_minor_locator(MultipleLocator(1))
         self.save_image('Returning Time_Mediterranean')
         
     def plot_map_regional(self, reg):

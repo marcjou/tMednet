@@ -16,9 +16,10 @@ import surface_temperature as st
 achi = mf.MME_Plot('../src/MME.xlsx')
 ochi = mf.MME_Plot('../src/MME.xlsx')
 
+achi.plot_return_time()
 #achi.affected_by_ecoregion()
 
-achi.create_full_census_plots()
+#achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.mortality_assesment_census()
@@ -92,7 +93,7 @@ par2 = host.twinx()
 # Second, show the right spine.
 par2.spines["right"].set_visible(True)
 
-w = 0.5
+w = 0.9
 
 p1 = host.bar(df_third['Year'].astype(int), df_third['Count'], width=w, color='tab:blue', align='center', label='Hexagons')
 #p2 = par1.bar(df_records['Year'].astype(int), df_records['Count'], width=w, color='tab:orange', align='center', label='Records')
