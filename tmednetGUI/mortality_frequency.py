@@ -543,15 +543,21 @@ class MME_Plot:
         # Assesment tip: 0 means No, 1 Low, 2 Moderate, 3 Severe
         df_assesment_depthly = df.groupby('Depth range')['Assesment ' + ass].value_counts(normalize=True).unstack(
             'Assesment ' + ass).fillna(0).sort_values('Depth range')
-
+        # Check if the columns correspond to all the assesment categories, if not, add them
+        ass_columns = [0, 1, 2, 3]
+        if list(df_assesment_depthly.columns) != ass_columns:
+            for i in ass_columns:
+                if i not in list(df_assesment_depthly.columns):
+                    df_assesment_depthly[i] = 0.0
+            df_assesment_depthly = df_assesment_depthly[ass_columns]
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
         ax = fig.add_subplot(1, 1, 1)
         category_colors = ['#3faa59', '#fbfcd0', '#ffcf3d', '#ff6a6c']
-        df = df_assesment_depthly.iloc[::-1]
-        df = df[df.columns[::-1]]
+        dfh = df_assesment_depthly.iloc[::-1]
+        dfh = dfh[dfh.columns[::-1]]
         if df.empty:
             return
-        df.plot.barh(ax=ax, stacked=True, color=category_colors[::-1])
+        dfh.plot.barh(ax=ax, stacked=True, color=category_colors[::-1])
         category_names = ['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact']
 
         ax.legend(ncol=len(category_names), labels=category_names[::-1], bbox_to_anchor=(0, 1),
@@ -671,9 +677,9 @@ class MME_Plot:
             self.plot_yearly_mortality_assesment_zoom(species=specie)
 
     def create_full_census_plots(self):
-        df_census = pd.read_excel('../src/CensandPop.xlsx', 'Census')
-        df_pop_all = pd.read_excel('../src/CensandPop.xlsx', 'Population % Affected all')
-        df_pop_rec = pd.read_excel('../src/CensandPop.xlsx', 'Population % Affected recent')
+        df_census = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Census')
+        df_pop_all = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected all')
+        df_pop_rec = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected recent')
 
         df_census, cmap_census = self.mortality_assesment_modified(df_census, ['% Affected all', '% Affected recent'])
         df_pop_all, bad = self.mortality_assesment_modified(df_pop_all, ['% Affected all'])
@@ -686,17 +692,17 @@ class MME_Plot:
                         typer = 'All'
                     else:
                         typer = 'Recent'
-                    #self.plot_mortality_assesment_zoom_modified(df_census, cmap_census, 'census', aff, type=typer, specie=specie, coords=site_dict[key], place=key)
-                    #self.census_horizontal_mortality(df_census, 'census', aff, typer, specie=specie, site=key)
-                    #self.create_histogram(df_census, aff, 'Hisogram census ' + typer + ' ' + specie + ' ' + key, site=key, species=specie, show_title=False)
-                    #self.census_horizontal_assesment_total(df_census, 'census', site=key, ass=aff, specie=specie)
-                '''self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
-                                                            specie=specie, coords=site_dict[key],
-                                                            place=key)
-                self.census_horizontal_mortality(df_pop_all, 'population', '% Affected all', type='All', specie=specie, site=key)
-                self.create_histogram(df_pop_all, '% Affected all', 'Histogram population All ' + ' ' + specie + ' ' + key, site=key,
-                                      species=specie, show_title=False, errbar=True)
-                self.census_horizontal_assesment_total(df_pop_all, 'population', site=key, ass='% Affected all', specie=specie)
+                    self.plot_mortality_assesment_zoom_modified(df_census, cmap_census, 'census', aff, type=typer, specie=specie, coords=site_dict[key], place=key)
+                    self.census_horizontal_mortality(df_census, 'census', aff, typer, specie=specie, site=key)
+                    self.create_histogram(df_census, aff, 'Hisogram census ' + typer + ' ' + specie + ' ' + key, site=key, species=specie, show_title=False)
+                    self.census_horizontal_assesment_total(df_census, 'census', site=key, ass=aff, specie=specie)
+                #self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
+                #                                            specie=specie, coords=site_dict[key],
+                #                                            place=key)
+                #self.census_horizontal_mortality(df_pop_all, 'population', '% Affected all', type='All', specie=specie, site=key)
+                #self.create_histogram(df_pop_all, '% Affected all', 'Histogram population All ' + ' ' + specie + ' ' + key, site=key,
+                #                      species=specie, show_title=False, errbar=True)
+                #self.census_horizontal_assesment_total(df_pop_all, 'population', site=key, ass='% Affected all', specie=specie)
                 self.plot_mortality_assesment_zoom_modified(df_pop_rec, cmap_census, 'population', '% Affected recent', type='Recent',
                                                             specie=specie, coords=site_dict[key],
                                                             place=key)
@@ -706,7 +712,7 @@ class MME_Plot:
                                       'Histogram population Recent ' + ' ' + specie + ' ' + key, site=key,
                                       species=specie, show_title=False, errbar=True)
                 self.census_horizontal_assesment_total(df_pop_rec, 'population', site=key, ass='% Affected recent',
-                                                       specie=specie)'''
+                                                       specie=specie)
             '''# All costa brava, All affected, different species
             self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all',
                                                         type='All',
@@ -723,7 +729,7 @@ class MME_Plot:
             self.census_horizontal_mortality(df_pop_rec, 'population', '% Affected recent', type='Rec', specie=specie)
             self.create_histogram(df_pop_rec, '% Affected recent', 'Histogram population Recent ' + ' ' + specie + ' General',
                                   species=specie, show_title=False, errbar=True)
-            self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent', specie=specie)'''
+            self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent', specie=specie)
         # All costa brava, All affected, all species
         self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all',
                                                     type='All')
@@ -737,7 +743,7 @@ class MME_Plot:
         self.census_horizontal_mortality(df_pop_rec, 'population', '% Affected recent', type='Rec')
         self.create_histogram(df_pop_rec, '% Affected recent',
                               'Histogram population Recent ' + ' all ' + ' General', show_title=False, errbar=True)
-        self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent')
+        self.census_horizontal_assesment_total(df_pop_rec, 'population', ass='% Affected recent')'''
         print('hello')
 
     def plot_mortality_assesment_zoom_modified(self, df, cmap, kind, aff, type='All', coords = [3.00, 3.43, 41.74, 42.42], place='', specie='All'):
@@ -749,7 +755,7 @@ class MME_Plot:
         asses = ax.scatter(x=df['LONG'], y=df['LAT'], c=df['Assesment ' + aff],
                            transform=ccrs.PlateCarree(), s=df['Size']*5, cmap=cmap, edgecolor='blue', linewidth=0.2, vmin=0,
                            vmax=3, zorder=10, alpha=0.7)
-        cb = plt.colorbar(asses, ticks=range(0, 5), shrink=0.5, label='Assesment ' + aff)
+        cb = plt.colorbar(asses, ticks=range(0, 4), shrink=0.5, label='Assesment ' + aff) # Changed range from 0,5 to 0,4
         cb.set_ticklabels(['No Impact', 'Low Impact', 'Moderate Impact', 'High Impact'])
         plt.title('Mortality assesment ' + kind + ' ' + type + ' ' + specie)
         self.save_image('Mortality Assesment Zoom ' + kind + ' ' + type + ' ' + place + ' ' + specie)
@@ -807,7 +813,6 @@ class MME_Plot:
                 affperc_old = []
                 affperc_rec = []
                 idx = 0
-                #TODO falla cova fumada en depth 15
                 while idx < counted:
                     if col_sum[(col_sum['Total colonies'] < 120) & (col_sum['Total colonies'] > 80)].empty:
                         idx = col_sum.index[0]
@@ -892,13 +897,14 @@ class MME_Plot:
                zorder=2)
         if errbar:
             # Errorbar
-            ax.errorbar(df.index[mask_no], df[affected][mask_no], yerr=df['std'][mask_no], fmt='none',
+            # TODO REPLACE THE FILLNA IT WORKS AT HOME LAPTOP
+            ax.errorbar(df.index[mask_no], df[affected][mask_no], yerr=df['std'][mask_no].fillna(0), fmt='none',
                         capsize=3, color='dimgray', zorder=3)
-            ax.errorbar(df.index[mask_lo], df[affected][mask_lo], yerr=df['std'][mask_lo], fmt='none',
+            ax.errorbar(df.index[mask_lo], df[affected][mask_lo], yerr=df['std'][mask_lo].fillna(0), fmt='none',
                         capsize=3, color='dimgray', zorder=3)
-            ax.errorbar(df.index[mask_mod], df[affected][mask_mod], yerr=df['std'][mask_mod], fmt='none',
+            ax.errorbar(df.index[mask_mod], df[affected][mask_mod], yerr=df['std'][mask_mod].fillna(0), fmt='none',
                         capsize=3, color='dimgray', zorder=3)
-            ax.errorbar(df.index[mask_hi], df[affected][mask_hi], yerr=df['std'][mask_hi], fmt='none',
+            ax.errorbar(df.index[mask_hi], df[affected][mask_hi], yerr=df['std'][mask_hi].fillna(0), fmt='none',
                         capsize=3, color='dimgray', zorder=3)
 
         ax.set_xticks([])
@@ -940,12 +946,12 @@ class MME_Plot:
         df_plot_ready.sort_values(by='sum', ascending=False, inplace=True)
         df_plot_ready.drop('sum', axis=1, inplace=True)
         # Plot order west to east
-        #newCmap = sns.color_palette("ch:start=.2,rot=-.3", as_cmap=True)
-        newCmap = sns.color_palette("crest", as_cmap=True)
-        '''seas = ['Alboran Sea', 'Northwestern Mediterranean', 'Southwestern Mediterranean', 'Tunisian Plateau-Gulf of Sidra', 'Adriatic Sea', 'Ionian Sea', 'Aegean Sea', 'Levantine Sea']
+        newCmap = sns.color_palette("ch:start=.2,rot=-.3", as_cmap=True)
+        #newCmap = sns.color_palette("crest", as_cmap=True)
+        seas = ['Alboran Sea', 'Northwestern Mediterranean', 'Southwestern Mediterranean', 'Tunisian Plateau-Gulf of Sidra', 'Adriatic Sea', 'Ionian Sea', 'Aegean Sea', 'Levantine Sea']
         mapping = {sea: i for i, sea in enumerate(seas)}
         key = df_plot_ready.index.map(mapping)
-        df_plot_ready = df_plot_ready.iloc[key.argsort()]'''
+        df_plot_ready = df_plot_ready.iloc[key.argsort()]
         df_plot_ready.plot.bar(ax=ax, stacked=True, cmap=newCmap)
         ax.legend(title='# Affected Years', bbox_to_anchor=(1, 0.5), loc='center left', fontsize='small') #, ncol=len(range(1, max_years_with_MME + 1)),
         ax.set_ylabel('# Affected Hexagons')

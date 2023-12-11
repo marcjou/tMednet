@@ -6,7 +6,7 @@ import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
 import cartopy.crs as ccrs
-from hexalattice.hexalattice import *
+#from hexalattice.hexalattice import *
 import surface_temperature as st
 
 
@@ -18,7 +18,7 @@ ochi = mf.MME_Plot('../src/MME.xlsx')
 
 achi.affected_by_ecoregion()
 
-#achi.create_full_census_plots()
+# achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.mortality_assesment_census()
