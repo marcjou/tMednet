@@ -31,7 +31,7 @@ def main(argv):
     #end_date = '2023-11-30'
     if datetime.today().day == 1:
         last_day = True
-    df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
+    df_map = mp.MHWMapper('/mnt/MHW/2024_MHW.nc', start_period=start_date, end_period=end_date)
     if mode == 'all':
         for i in MODES:
             if i == 'temperature':

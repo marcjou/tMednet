@@ -700,7 +700,7 @@ class MME_Plot:
                     self.census_horizontal_mortality(df_census, 'census', aff, typer, specie=specie, site=key)
                     self.create_histogram(df_census, aff, 'Hisogram census ' + typer + ' ' + specie + ' ' + key, site=key, species=specie, show_title=False)
                     self.census_horizontal_assesment_total(df_census, 'census', site=key, ass=aff, specie=specie)
-<<<<<<< HEAD
+
                 #self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
                 #                                            specie=specie, coords=site_dict[key],
                 #                                            place=key)
@@ -708,7 +708,6 @@ class MME_Plot:
                 #self.create_histogram(df_pop_all, '% Affected all', 'Histogram population All ' + ' ' + specie + ' ' + key, site=key,
                 #                      species=specie, show_title=False, errbar=True)
                 #self.census_horizontal_assesment_total(df_pop_all, 'population', site=key, ass='% Affected all', specie=specie)
-=======
                 self.plot_mortality_assesment_zoom_modified(df_pop_all, cmap_census, 'population', '% Affected all', type='All',
                                                             specie=specie, coords=site_dict[key],
                                                             place=key)
@@ -716,7 +715,6 @@ class MME_Plot:
                 self.create_histogram(df_pop_all, '% Affected all', 'Histogram population All ' + ' ' + specie + ' ' + key, site=key,
                                       species=specie, show_title=False, errbar=True)
                 self.census_horizontal_assesment_total(df_pop_all, 'population', site=key, ass='% Affected all', specie=specie)
->>>>>>> 803a17bc15851ec12a7c30f2840a552b0edb7346
                 self.plot_mortality_assesment_zoom_modified(df_pop_rec, cmap_census, 'population', '% Affected recent', type='Recent',
                                                             specie=specie, coords=site_dict[key],
                                                             place=key)
@@ -727,7 +725,6 @@ class MME_Plot:
                                       species=specie, show_title=False, errbar=True)
                 self.census_horizontal_assesment_total(df_pop_rec, 'population', site=key, ass='% Affected recent',
                                                        specie=specie)
-<<<<<<< HEAD
             '''# All costa brava, All affected, different species
 =======
             # All costa brava, All affected, different species
@@ -816,7 +813,6 @@ class MME_Plot:
         df_master = pd.DataFrame()
         cens_number = 100
         for site in df_census['Site'].unique():
-<<<<<<< HEAD
             depth_dict = {'site': site, 'depth': [], 'species':str(df_census.loc[df_census['Site'] == site]['Species'].unique()[0]) ,  'Main site' : str(df_census.loc[df_census['Site'] == site]['Main site'].unique()[0]), 'LAT' : float(df_census.loc[df_census['Site'] == site]['LAT'].unique()), 'LONG': float(df_census.loc[df_census['Site'] == site]['LONG'].unique()), 'entries': [], 'census': [], 'total colonies': [], 'total affected': [], 'affected old': [], 'affected recent': [], '% Affected all':[], '% Affected old':[], '% Affected recent':[]}
             depth_dict['depth'] = df_census.loc[df_census['Site'] == site]['Depth'].unique()
             for depth in depth_dict['depth']:
@@ -866,7 +862,6 @@ class MME_Plot:
                 depth_dict['% Affected old'].append(affperc_old)
                 depth_dict['% Affected recent'].append(affperc_rec)
             df_master = pd.concat([df_master, pd.DataFrame.from_dict(depth_dict)])
-=======
             if site == 'Pta. 3 Frares':
                 print('hey')
             for specie in df_census.loc[df_census['Site'] == site]['Species'].unique():
@@ -923,7 +918,6 @@ class MME_Plot:
                     depth_dict['% Affected old'].append(affperc_old)
                     depth_dict['% Affected recent'].append(affperc_rec)
                 df_master = pd.concat([df_master, pd.DataFrame.from_dict(depth_dict)])
->>>>>>> 803a17bc15851ec12a7c30f2840a552b0edb7346
         df_master = df_master.explode(['total colonies', 'total affected', 'affected old', 'affected recent', '% Affected all', '% Affected old', '% Affected recent'])
 
         affection = ['% Affected all', '% Affected old', '% Affected recent']
