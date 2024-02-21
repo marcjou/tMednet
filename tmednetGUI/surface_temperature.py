@@ -397,11 +397,18 @@ class HistoricData:
         self.__anomaly_zoom_setter(concated, prop, target_year, depth, last_years_legend, this_year_legend, percentile)
 
     def __multidepth_anomaly_plot_setter(self, data_dict, prop_dict, target_year, depths, last_years_legend,
-                                       this_year_legend):
+                                       this_year_legend, zoom=False):
         ax = plt.axes()
         cycler = plt.cycler(linestyle=['-', '-'], color=['black', 'grey'],
                             alpha=[1., 0.7], linewidth=[0.7, 0.7])
         ax.set_prop_cycle(cycler)
+        xlabel=200
+        if zoom == True:
+            # Makes the plot zoomed for the summer
+            prop_zoom = prop_dict.to_list()
+            prop_dict = pd.Index(prop_zoom[prop_zoom.index('Jun'):prop_zoom.index('Oct')])
+            data_dict = data_dict.loc['06-01':'10-01'][:-1]
+            xlabel = 30
 
         data_dict.plot(ax=ax)
         # labelLines(plt.gca().get_lines(), zorder=2.5)
@@ -409,7 +416,7 @@ class HistoricData:
         i = 0
         for depth in depths:
 
-            labelLine(lines[i], 200, label=depth)
+            labelLine(lines[i], xlabel + int(depth), label=depth)
             i = i + 2
         for depth in depths:
             plt.fill_between(data_dict.index, data_dict[last_years_legend[depth]], data_dict[this_year_legend[depth]],
@@ -420,9 +427,13 @@ class HistoricData:
                              color='#5aaaff')
 
         plt.xlabel('')
-        plt.xticks(
-            ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01',
-             '12-01'])
+        if zoom==True:
+            plt.xticks(
+                ['06-01', '07-01', '08-01', '09-01'])
+        else:
+            plt.xticks(
+                ['01-01', '02-01', '03-01', '04-01', '05-01', '06-01', '07-01', '08-01', '09-01', '10-01', '11-01',
+                 '12-01'])
         plt.xlim((data_dict.index[0], data_dict.index[-1]))
         ax.set_xticklabels(prop_dict.unique())
 
@@ -435,7 +446,7 @@ class HistoricData:
         ax.remove()
 
 
-    def multidepth_anomaly_plotter(self, target_year, depths=['10', '25', '40']):
+    def multidepth_anomaly_plotter(self, target_year, depths=['10', '25', '40'], zoom=False):
         """
         Calculates and plots the anomalies of multiple given depths on the same
          figure for a given year
@@ -479,7 +490,7 @@ class HistoricData:
         concated.index = concated.index.strftime('%m-%d')
 
         self.__multidepth_anomaly_plot_setter(concated, prop, target_year, depths, last_legend_dict,
-                                       this_legend_dict)
+                                       this_legend_dict, zoom)
 
     def browse_heat_spikes(self, year):
         """

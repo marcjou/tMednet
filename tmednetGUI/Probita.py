@@ -14,10 +14,10 @@ import surface_temperature as st
 
 
 achi = mf.MME_Plot('../src/MME.xlsx')
-ochi = mf.MME_Plot('../src/MME.xlsx')
+#ochi = mf.MME_Plot('../src/MME.xlsx')
 
-achi.plot_return_time()
-#achi.affected_by_ecoregion()
+#achi.plot_return_time()
+achi.affected_by_ecoregion()
 
 #achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
@@ -104,17 +104,17 @@ host.set_ylabel("# of affected hexagons")
 #par1.set_ylabel("# of records")
 par2.set_ylabel("Cumulative % of affected hexagons")
 
-host.yaxis.label.set_color('tab:blue')
+host.yaxis.label.set_color('black')
 #par1.yaxis.label.set_color('tab:orange')
 par2.yaxis.label.set_color('black')
 
 tkw = dict(size=4, width=1.5)
-host.tick_params(axis='y', colors='tab:blue', **tkw)
+host.tick_params(axis='y', colors='black', **tkw)
 #par1.tick_params(axis='y', colors='tab:orange', **tkw)
 par2.tick_params(axis='y', colors='black', **tkw)
 host.tick_params(axis='x', **tkw)
 from matplotlib.ticker import AutoMinorLocator, MultipleLocator
-host.set_xlim([1978.5, 2020.5])
+host.set_xlim([1978, 2021])
 host.xaxis.set_major_locator(MultipleLocator(5))
 host.xaxis.set_minor_locator(MultipleLocator(1))
 
@@ -135,7 +135,7 @@ for rect in p2:
     i += 1
 '''
 
-plt.savefig('Cachiplot.png',bbox_inches='tight')
+plt.savefig('Cachiplot2.png',bbox_inches='tight')
 
 
 

@@ -92,6 +92,7 @@ class ExcelReport:
                          'Ndays>=25', 'Ndays>=26', 'Ndays>=27', 'Ndays>=28'])
             temp = df.groupby('Date')[str(depth)]
             tempmonth = df.groupby(['year', 'month'])[str(depth)]
+            #TODO consider include June (month 6)
             tempseason = df.loc[(df['month'] >= 7) & (df['month'] <= 9)].groupby(['year'])[str(depth)]
             last_year = df['year'][len(df) - 1]
             # temphist = df.loc[(df['month'] >= 7) & (df['month'] <= 9) & (df['year'] < last_year)][str(depth)]
@@ -160,7 +161,8 @@ class ExcelReport:
             {'Date': mhws['date_start'], 'Depth (m)': depths[0], 'Duration (Days)': mhws['duration'],
              'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
              'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']],
-             'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']]})
+             'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']],
+             'Mean Temperature (ºC)': [round(sst5[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])]})
         for depth in depths:
             if depth == depths[0]:
                 pass
@@ -171,7 +173,8 @@ class ExcelReport:
                     {'Date': mhws['date_start'], 'Depth (m)': depth, 'Duration (Days)': mhws['duration'],
                      'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
                      'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']],
-                     'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']]})
+                     'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']],
+                     'Mean Temperature (ºC)': [round(sst[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])]})
                 diff = diff.append(dfi, ignore_index=True)
 
         return diff

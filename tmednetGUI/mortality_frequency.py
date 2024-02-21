@@ -101,35 +101,54 @@ class MME_Plot:
 
         return df_scatter
 
-    def create_dict_df(self, df_scatter):
-        dict_for_yearly = {'Year': '', 'Return years': 0, 'Count': 0}
-
+    def create_dict_df(self, df_scatter, region=False):
         dict_list_yearly = []
-        for i in range(1, 41):
-            for year in df_scatter['Year'].unique():
-                dict_for_yearly['Year'] = year
-                dict_for_yearly['Return years'] = i
-                dict_for_yearly['Count'] = df_scatter['Return time'].loc[
-                    (df_scatter['Year'] == year) & (df_scatter['Return time'] == i)].count()
-                dict_list_yearly.append(dict_for_yearly.copy())
+        if region==True:
+            dict_for_yearly = {'Region': '', 'Year': '', 'Return years': 0, 'Count': 0}
+            for reg in df_scatter['sub-ecoregion'].unique():
+                print('region change')
+                i = 1
+                while i <= 40:
+                    print('number change')
+                    for year in df_scatter['Year'].unique():
+                        dict_for_yearly['Region'] = reg
+                        dict_for_yearly['Year'] = year
+                        dict_for_yearly['Return years'] = f'{i:02d}' + '-' + f'{i+4:02d}'
+                        dict_for_yearly['Count'] = df_scatter['Return time'].loc[
+                            (df_scatter['sub-ecoregion'] == reg) & (df_scatter['Year'] == year) & (df_scatter['Return time'] >= i) & (df_scatter['Return time'] <= i + 4)].count()
+                        dict_list_yearly.append(dict_for_yearly.copy())
+                    i = i+5
+        else:
+            dict_for_yearly = {'Year': '', 'Return years': 0, 'Count': 0}
+            for i in range(1, 41):
+                for year in df_scatter['Year'].unique():
+                    dict_for_yearly['Year'] = year
+                    dict_for_yearly['Return years'] = i
+                    dict_for_yearly['Count'] = df_scatter['Return time'].loc[
+                        (df_scatter['Year'] == year) & (df_scatter['Return time'] == i)].count()
+                    dict_list_yearly.append(dict_for_yearly.copy())
 
         df = pd.DataFrame.from_records(dict_list_yearly)
 
         return df
 
-    def create_dataframe_sorted(self, df):
-        df_sorted_yearly = df.sort_values(['Year', 'Return years']).reset_index()
+    def create_dataframe_sorted(self, df, region=False):
+        if region == False:
+            df_sorted_yearly = df.sort_values(['Year', 'Return years']).reset_index()
+        else:
+            df_sorted_yearly = df.sort_values(['Region', 'Year', 'Return years']).reset_index()
         df_sorted_yearly.loc[df_sorted_yearly['Count'] > 0, 'Return tax'] = df_sorted_yearly.loc[
             df_sorted_yearly['Count'] > 0, 'Return years']
         df_sorted_yearly.loc[df_sorted_yearly['Count'] == 0, 'Count'] = np.nan
-        df_sorted_yearly['Max Return'] = df_sorted_yearly['Year'].max() - df_sorted_yearly['Year']
-        df_sorted_yearly['Cum years'] = df_sorted_yearly['Return years'] * df_sorted_yearly['Count']
-        df_sorted_yearly['Mean'] = np.nan
-        df_sorted_yearly['Mean'] = round(
-            df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
-                'Cum years'].transform('sum') /
-            df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
-                'Count'].transform('sum'), 2)
+        if region==False:
+            df_sorted_yearly['Max Return'] = df_sorted_yearly['Year'].max() - df_sorted_yearly['Year']
+            df_sorted_yearly['Cum years'] = df_sorted_yearly['Return years'] * df_sorted_yearly['Count']
+            df_sorted_yearly['Mean'] = np.nan
+            df_sorted_yearly['Mean'] = round(
+                df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
+                    'Cum years'].transform('sum') /
+                df_sorted_yearly.loc[df_sorted_yearly['Return tax'] > 0].groupby(df_sorted_yearly['Year'])[
+                    'Count'].transform('sum'), 2)
         return df_sorted_yearly
 
     def plot_return_time(self):
@@ -139,10 +158,18 @@ class MME_Plot:
         df_sorted_yearly = self.create_dataframe_sorted(df)
         min_size = np.min(df_sorted_yearly['Count']) * 10
         max_size = np.max(df_sorted_yearly['Count']) * 10
-        ax_scatter_years = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', sizes=(min_size, max_size),
-                                           alpha=.5, legend='brief')
+        #sns.set_style(rc={'axes.facecolor': '#C4FFDD'})
+        #custom_colors_1 = ['#dddd71', '#ded269', '#dfbc5a', '#dea148', '#da772d', '#d4541a', '#cd2e08', '#c90701']
+        #custom_palette_1 = sns.set_palette(sns.color_palette(custom_colors_1))
+        cust = sns.dark_palette("#ff5151", as_cmap=True)
+        cust2 = sns.light_palette('#b80900', as_cmap=True, reverse=True)
+        lvTmp = np.linspace(0.25, 0.7, len(df_sorted_yearly['Return tax']) - 1)
+        cmTmp = matplotlib.cm.hot(lvTmp)
+        newCmap = mcol.ListedColormap(cmTmp)
+        ax_scatter_years = sns.scatterplot(df_sorted_yearly, x='Year', y='Return tax', size='Count', hue='Return tax', palette=newCmap, sizes=(min_size, max_size),
+                                           alpha=.75, legend=False) #legend='brief'
         ax_scatter_years = sns.lineplot(df_sorted_yearly, x='Year', y='Max Return', color='k')
-        ax_scatter_years = sns.regplot(df_sorted_yearly, x='Year', y='Mean', color='tab:orange')
+        ax_scatter_years = sns.regplot(df_sorted_yearly, x='Year', y='Mean', color='tab:gray', order=2, marker='d', scatter_kws={'s':8})
         leg = plt.legend(loc='upper right', labels=['Max return years', 'Regression', 'Nº of Events'])
         ax_scatter_years.add_artist(leg)
         plt.legend(loc=[0.8, 0.5])
@@ -542,11 +569,14 @@ class MME_Plot:
             df = dfin.loc[(dfin['species'] == specie)].copy()
         else:
             df = dfin.copy()
-        df['Depth range'] = df['depth'].apply(
-            lambda y: '05-10' if y <= 10 else ('10-15' if y <= 15 else ('15-20' if y <= 20 else '20-25' if y <= 25 else '25-30' if y <= 30 else '30-35')))
+        #TODO Comentado solo para usar en grafico de semaforos, descomentar
+        #df['Depth range (m)'] = df['depth'].apply(
+         #   lambda y: '05-10' if y <= 10 else ('10-15' if y <= 15 else ('15-20' if y <= 20 else '20-25' if y <= 25 else '25-30' if y <= 30 else '30-35')))ç
+        df['Depth range (m)'] = df['depth'].apply(
+           lambda y: '05-10' if y <= 10 else ('10-15' if y <= 15 else ('15-20' if y <= 20 else '20-25' if y <= 25 else '>25')))
         # Assesment tip: 0 means No, 1 Low, 2 Moderate, 3 Severe
-        df_assesment_depthly = df.groupby('Depth range')['Assesment ' + ass].value_counts(normalize=True).unstack(
-            'Assesment ' + ass).fillna(0).sort_values('Depth range')
+        df_assesment_depthly = df.groupby('Depth range (m)')['Assesment ' + ass].value_counts(normalize=True).unstack(
+            'Assesment ' + ass).fillna(0).sort_values('Depth range (m)')
         # Check if the columns correspond to all the assesment categories, if not, add them
         ass_columns = [0, 1, 2, 3]
         if list(df_assesment_depthly.columns) != ass_columns:
@@ -592,8 +622,8 @@ class MME_Plot:
                       loc='lower left', fontsize='small')
         else:
             # Assesment tip: 0 means No, 1 Low, 2 Moderate, 3 Severe
-            df_assesment_depthly = df.groupby('Depth range')['Assesment'].value_counts(normalize=True).unstack(
-                'Assesment').fillna(0).sort_values('Depth range')
+            df_assesment_depthly = df.groupby('Depth range (m)')['Assesment'].value_counts(normalize=True).unstack(
+                'Assesment').fillna(0).sort_values('Depth range (m)')
 
             fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
             ax = fig.add_subplot(1, 1, 1)
@@ -681,6 +711,7 @@ class MME_Plot:
             self.plot_yearly_mortality_assesment_zoom(species=specie)
 
     def create_full_census_plots(self):
+        plt.rcParams.update({'font.size': 22})
         df_census = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Census')
         df_pop_all = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected all')
         df_pop_rec = pd.read_excel('../src/AtencioCoralls_CensusPopulation.xlsx', 'Population % Affected recent')
@@ -941,10 +972,14 @@ class MME_Plot:
         df_aff = pd.DataFrame(regions, columns=['region']).sort_values('region').reset_index(drop=True)
         df_aff['#Years'] = list(range(1, 13)) * len(df_aff['region'].unique())
         df_aff['#Hexagons'] = 0
+        # For creating the graph with return tax per hexagon
+        df_scatter = self.create_scatter_dataframe()
+        df = self.create_dict_df(df_scatter, region=True)
         for reg in self.df_events['sub-ecoregion'].unique():
             df_aff['#Hexagons'].loc[df_aff['region'] == reg] = [self.df_events['#Years with MME'].loc[(self.df_events['sub-ecoregion'] == reg) & (self.df_events['#Years with MME'] == i)].count()
                                                                            for i in range(1, max_years_with_MME + 1)]
         df_plot_ready = df_aff.groupby(['region','#Years'])['#Hexagons'].aggregate('first').unstack()
+        df_plot_ready_RT = df.groupby(['Region','Return years'])['Count'].sum().unstack()
         df_plot_ready_percentage = df_plot_ready.div(df_plot_ready.sum(axis=1), axis=0)*100
         fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
         ax = fig.add_subplot(1, 1, 1)
@@ -958,10 +993,12 @@ class MME_Plot:
         # Plot order west to east
         #newCmap = sns.color_palette("ch:start=.2,rot=-.3", as_cmap=True)
         newCmap = sns.color_palette("crest", as_cmap=True)
-        '''seas = ['Alboran Sea', 'Northwestern Mediterranean', 'Southwestern Mediterranean', 'Tunisian Plateau-Gulf of Sidra', 'Adriatic Sea', 'Ionian Sea', 'Aegean Sea', 'Levantine Sea']
+        seas = ['Alboran Sea', 'Northwestern Mediterranean', 'Southwestern Mediterranean', 'Tunisian Plateau-Gulf of Sidra', 'Adriatic Sea', 'Ionian Sea', 'Aegean Sea', 'Levantine Sea']
         mapping = {sea: i for i, sea in enumerate(seas)}
         key = df_plot_ready.index.map(mapping)
-        df_plot_ready = df_plot_ready.iloc[key.argsort()]'''
+        key_RT = df_plot_ready_RT.index.map(mapping)
+        df_plot_ready = df_plot_ready.iloc[key.argsort()]
+        df_plot_ready_RT = df_plot_ready_RT.iloc[key_RT.argsort()]
         df_plot_ready.plot.bar(ax=ax, stacked=True, cmap=newCmap)
         ax.legend(title='# Affected Years', bbox_to_anchor=(1, 0.5), loc='center left', fontsize='small') #, ncol=len(range(1, max_years_with_MME + 1)),
         ax.set_ylabel('# Affected Hexagons')
@@ -980,7 +1017,21 @@ class MME_Plot:
         plt.xticks(rotation=30, ha='right')
         plt.setp(ax.set_xticklabels(labels))
         self.save_image('# of affected years per percentage of hexagons per eco region')
+        # Plot return years
         plt.clf()
+        lvTmp = np.linspace(0.25, 0.7, len(df['Return years'].unique()) - 1)
+        cmTmp = matplotlib.cm.hot(lvTmp)
+        newCmap2 = mcol.ListedColormap(cmTmp)
+        fig = plt.figure(figsize=(20 / 2.54, 15 / 2.54))
+        ax = fig.add_subplot(1, 1, 1)
+        df_plot_ready_RT.plot.bar(ax=ax, stacked=True, cmap=newCmap2)
+        ax.legend(title='Return Years', ncol=len(range(1, len(df['Return years'].unique()) + 1)), bbox_to_anchor=(0, 1),
+                  loc='lower left', fontsize='small')
+        ax.set_ylabel('# Affected Hexagons')
+        plt.xticks(rotation=30, ha='right')
+        plt.setp(ax.set_xticklabels(labels))
+        self.save_image('Return years per # of hexagons per eco region')
+
         print('proba')
 
     @staticmethod
