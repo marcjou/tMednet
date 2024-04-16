@@ -238,6 +238,9 @@ class HistoricData:
             ['06-01', '07-01', '08-01', '09-01'])
         plt.xlim((concated_zoom.index[0], concated_zoom.index[-1]))
         ax.set_xticklabels(prop_zoom.unique())
+        # Only for Sandra's Case
+        #ax.set_ylim((16, 25))
+        ax.set_ylim(12, self.max_temperature)
         # Sets the legend in order to include the fill_between value
         fill_patch = mpatches.Patch(color='#f8e959', label='Moderate')
         spike2_patch = mpatches.Patch(color='#f66000', label='Strong')

@@ -28,12 +28,18 @@ class ExcelReport:
         self.dfseasonal['depth(m)'] = self.dfseasonal['depth(m)'].astype(int)
         self.dfseasonal = self.dfseasonal.sort_values(by=['year', 'depth(m)'])
         self.dfexcel['year'] = pd.DatetimeIndex(self.dfexcel['date']).year
+        self.dfexcel['month'] = pd.DatetimeIndex(self.dfexcel['date']).month
         self.dfexcel['date'] = self.dfexcel['date'].dt.date
         dfmaxes = self.dfexcel.loc[self.dfexcel.groupby(['year'])['max'].idxmax()][['year', 'date', 'max']]
         dfmaxes.sort_values('max', ascending=False, inplace=True)
         dfmaxesdepth = self.dfexcel.loc[self.dfexcel.groupby(['year', 'depth(m)'])['max'].idxmax().dropna()][
             ['year', 'depth(m)', 'date', 'max']]
         dfmaxesdepth.sort_values(['depth(m)', 'max'], ascending=False, inplace=True)
+        dfmaxes_month = self.dfexcel.loc[self.dfexcel.groupby(['year', 'month'])['max'].idxmax()][['year', 'month', 'date', 'max']]
+        dfmaxes_month.sort_values('max', ascending=False, inplace=True)
+        dfmaxesdepth_month = self.dfexcel.loc[self.dfexcel.groupby(['year', 'month', 'depth(m)'])['max'].idxmax().dropna()][
+            ['year', 'month', 'depth(m)', 'date', 'max']]
+        dfmaxesdepth_month.sort_values(['depth(m)', 'max'], ascending=False, inplace=True)
         # Write the Excel file with the given DataFrames as sheets
         filein_split = self.filein.split('_')
         fileout_name = filein_split[3] + '_Stat_Report_' + filein_split[4] + '_' + filein_split[5][:-4]
@@ -43,6 +49,8 @@ class ExcelReport:
         self.dfseasonal.to_excel(writer, 'Seasonal', index=False)
         dfmaxes.to_excel(writer, 'Maxes', index=False)
         dfmaxesdepth.to_excel(writer, 'Maxes depth', index=False)
+        dfmaxes_month.to_excel(writer, 'Maxes month', index=False)
+        dfmaxesdepth_month.to_excel(writer, 'Maxes depth month', index=False)
         write_mhw = self.__check_year_difference()
         if write_mhw:
             mhw_sheet = self.create_mhw()

@@ -1,25 +1,47 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import mhw_mapper as mp
+
 from matplotlib import patches
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 import mortality_frequency as mf
 import cartopy.crs as ccrs
-from hexalattice.hexalattice import *
+#from hexalattice.hexalattice import *
 import surface_temperature as st
 
+MODES = ['intensity', 'duration', 'temperature']
+
+start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
+#start_date = '2023-11-01'
+end_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')
+#end_date = '2023-11-30'
+if datetime.today().day == 1:
+    last_day = True
+df_map = mp.MHWMapper('/mnt/MHW/2023_MHW.nc', start_period=start_date, end_period=end_date)
+for i in MODES:
+    if i == 'temperature':
+        df_map = mp.MHWMapper('/mnt/MHW/lastTemp.nc', start_period=start_date, end_period=end_date)
+    df_map.map_temperature(i)
 
 
+#achi = mf.MME_Plot('../src/MME.xlsx')
+#ochi = mf.MME_Plot('../src/MME.xlsx')
 
-
+<<<<<<< HEAD
 achi = mf.MME_Plot('../src/MME.xlsx')
 #ochi = mf.MME_Plot('../src/MME.xlsx')
 
 #achi.plot_return_time()
 achi.affected_by_ecoregion()
+=======
+#achi.plot_return_time()
+#achi.affected_by_ecoregion()
+>>>>>>> 070045bec84979509ff4ac3e3ac48c09a9f0a96c
 
-#achi.create_full_census_plots()
+# achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
 #achi.plot_yearly_fish_assesment_zoom()
 #achi.mortality_assesment_census()
@@ -41,7 +63,7 @@ achi.affected_by_ecoregion()
 #achi.plot_data_map()
 
 # Proba de nou grafic de Quim el MegaGraph
-
+'''
 total_numbers = achi.df_events # Number of total hexagons affected per year dataset
 total_records = achi.df_numbers # Number of total records per year dataset
 
@@ -124,7 +146,7 @@ myl = [p1] + [p3]
 host.legend(myl, [l.get_label() for l in myl], loc='upper left')
 
 
-'''
+
 i = 0
 for rect in p2:
     text = df_affected_regions['Count'][i]
@@ -133,9 +155,13 @@ for rect in p2:
     #par1.add_patch(circle)
     par1.text(rect.get_x(), height, f'{text:.0f}', ha='center')
     i += 1
-'''
 
+<<<<<<< HEAD
 plt.savefig('Cachiplot2.png',bbox_inches='tight')
+=======
+>>>>>>> 070045bec84979509ff4ac3e3ac48c09a9f0a96c
 
+plt.savefig('Cachiplot.png',bbox_inches='tight')
+'''
 
 
