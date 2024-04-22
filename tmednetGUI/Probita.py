@@ -11,7 +11,7 @@ import mortality_frequency as mf
 import cartopy.crs as ccrs
 #from hexalattice.hexalattice import *
 import surface_temperature as st
-
+'''
 MODES = ['intensity', 'duration', 'temperature']
 
 start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
@@ -25,21 +25,19 @@ for i in MODES:
     if i == 'temperature':
         df_map = mp.MHWMapper('/mnt/MHW/lastTemp.nc', start_period=start_date, end_period=end_date)
     df_map.map_temperature(i)
-
+'''
 
 #achi = mf.MME_Plot('../src/MME.xlsx')
 #ochi = mf.MME_Plot('../src/MME.xlsx')
 
-<<<<<<< HEAD
 achi = mf.MME_Plot('../src/MME.xlsx')
 #ochi = mf.MME_Plot('../src/MME.xlsx')
 
 #achi.plot_return_time()
 achi.affected_by_ecoregion()
-=======
+
 #achi.plot_return_time()
 #achi.affected_by_ecoregion()
->>>>>>> 070045bec84979509ff4ac3e3ac48c09a9f0a96c
 
 # achi.create_full_census_plots()
 #achi.plot_fish_assesment_zoom()
