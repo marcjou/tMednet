@@ -601,7 +601,7 @@ class tmednet(tk.Frame):
         self.newwindow.destroy()
         historic = st.HistoricData(filename)
         for i in range(int(year), historic.last_year):
-            historic.multidepth_anomaly_plotter(i, zoom=True)
+            historic.multidepth_anomaly_plotter(i)
         self.console_writer('Plots saved at output_images', 'action')
 
     def __create_quadradepth_anomalies(self):

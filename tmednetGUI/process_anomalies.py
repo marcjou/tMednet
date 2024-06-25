@@ -34,7 +34,7 @@ def main(argv):
         historic = st.HistoricData(path + '/'  + filename)
         depths = ['10', '25', '40']
         for i in range(int(year), historic.last_year):
-            historic.multidepth_anomaly_plotter(i, depths)
+            historic.multidepth_anomaly_plotter(i, depths, False)
         print('Plots saved at output_images', 'action')
 
 
