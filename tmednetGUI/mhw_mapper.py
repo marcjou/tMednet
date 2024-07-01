@@ -361,7 +361,7 @@ class MHWMapper:
             the type of map that needs to be plotted. The current options are: 'intensity' and 'duration'
         """
          #TODO Add code when robert sends it
-        
+
 
     def __get_SST_files(self):
         # Read all files from a directory, and read your input argument
