@@ -42,16 +42,23 @@ class SensorData():
         start_round_time = self.data['date'][0].floor('15min')
         end_round_time = self.data['date'][len(self.data) - 1].ceil('15min')
         ticks = pd.date_range(start_round_time, end_round_time, freq='15min')
+
+        # Starts the figures and axes
         fig, ax1 = plt.subplots()
         ax1.set_ylabel('Temperature (ºC)', color='tab:blue')
         ax2 = ax1.twinx()
         ax2.set_ylabel('Depth (m)', color='tab:red')
+
+        # Plots the temperature and depth
         self.data.plot(x='date', y='temperature(ºC)', ax=ax1)
         self.data.plot(x='date', y='depth(m.)', color='tab:red', ax=ax2)
         ax1.xaxis.set_ticks(ticks)
         plt.xticks(ticks)
         plt.xlabel('Time')
         ax1.set_xlabel('Time')
+        
+        # Sets a grid showing the depths levels
+        plt.grid(color='gray', linestyle='--', linewidth=0.3)
 
 
 
