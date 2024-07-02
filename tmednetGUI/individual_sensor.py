@@ -43,11 +43,16 @@ class SensorData():
         end_round_time = self.data['date'][len(self.data) - 1].ceil('15min')
         ticks = pd.date_range(start_round_time, end_round_time, freq='15min')
         fig, ax1 = plt.subplots()
-
+        ax1.set_ylabel('Temperature (ºC)', color='tab:blue')
         ax2 = ax1.twinx()
+        ax2.set_ylabel('Depth (m)', color='tab:red')
         self.data.plot(x='date', y='temperature(ºC)', ax=ax1)
-        self.data.plot(x='date', y='depth(m.)', color='red', secondary_y=True, ax=ax2)
+        self.data.plot(x='date', y='depth(m.)', color='tab:red', ax=ax2)
         ax1.xaxis.set_ticks(ticks)
         plt.xticks(ticks)
+        plt.xlabel('Time')
+        ax1.set_xlabel('Time')
+
+
 
         plt.show()
