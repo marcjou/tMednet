@@ -66,3 +66,14 @@ class SensorData():
     @staticmethod
     def __save_image(savefile):
         plt.savefig(savefile)
+
+    @staticmethod
+    def __custom_round(x, base=0.25):
+        return base * round(float(x) / base)
+
+    def __transform_to_columns(self):
+        data_copy = self.data.copy()
+        data_copy['depth(m.)'] = data_copy['depth(m.)'].apply(lambda x: self.__class__.__custom_round(x))
+
+    def stratification_plot(self):
+        # Open all the files to use on the stratification plot
