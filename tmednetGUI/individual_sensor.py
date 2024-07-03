@@ -56,10 +56,13 @@ class SensorData():
         plt.xticks(ticks)
         plt.xlabel('Time')
         ax1.set_xlabel('Time')
-        
+
         # Sets a grid showing the depths levels
         plt.grid(color='gray', linestyle='--', linewidth=0.3)
 
+        self.__class__.__save_image('../src/output_images/Temperature+Depth_' + self.dive + '_' +
+                                    self.data['date'][0].strftime('%d-%m-%Y') + '.png')
 
-
-        plt.show()
+    @staticmethod
+    def __save_image(savefile):
+        plt.savefig(savefile)
