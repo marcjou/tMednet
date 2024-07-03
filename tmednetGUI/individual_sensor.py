@@ -72,8 +72,13 @@ class SensorData():
         return base * round(float(x) / base)
 
     def __transform_to_columns(self):
+        # Pivots table to convert date, temp, depth df to date index and depths columns rounded default=0.25
         data_copy = self.data.copy()
         data_copy['depth(m.)'] = data_copy['depth(m.)'].apply(lambda x: self.__class__.__custom_round(x))
+        data_copy = data_copy.pivot('date', 'depth(m.)')
+        data_copy.columns = data_copy.columns.droplevel(0)
+        return data_copy
 
     def stratification_plot(self):
         # Open all the files to use on the stratification plot
+        print('placeholder')
