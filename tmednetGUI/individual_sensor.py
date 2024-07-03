@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import os
+import glob
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
@@ -71,14 +73,28 @@ class SensorData():
     def __custom_round(x, base=0.25):
         return base * round(float(x) / base)
 
-    def __transform_to_columns(self):
+    def __transform_to_columns(self, new_df=False):
         # Pivots table to convert date, temp, depth df to date index and depths columns rounded default=0.25
-        data_copy = self.data.copy()
+        if new_df:
+            data_copy = new_df
+        else:
+            data_copy = self.data.copy()
         data_copy['depth(m.)'] = data_copy['depth(m.)'].apply(lambda x: self.__class__.__custom_round(x))
         data_copy = data_copy.pivot('date', 'depth(m.)')
         data_copy.columns = data_copy.columns.droplevel(0)
         return data_copy
 
+    def __concat_files(self, path):
+        diff = ''
+        csv_files = glob.glob(os.path.join(path, "*.csv"))
+        for file in csv_files:
+            df = pd.read_csv(file, sep=',', header=9)
+            if diff == '':
+                diff = self.__transform_to_columns(df)
+            else:
+                duf2 = self.__transform_to_columns(df)
+                diff = pd.concat([diff, duf2], axis=0, keys=['diff', 'duf2'], join='inner')
     def stratification_plot(self):
         # Open all the files to use on the stratification plot
+        self.__concat_files()
         print('placeholder')
