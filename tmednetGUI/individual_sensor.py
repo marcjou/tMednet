@@ -94,7 +94,16 @@ class SensorData():
             else:
                 duf2 = self.__transform_to_columns(df)
                 diff = pd.concat([diff, duf2], axis=0, keys=['diff', 'duf2'], join='inner')
+        return diff
+
     def stratification_plot(self):
         # Open all the files to use on the stratification plot
-        self.__concat_files()
+        df = self.__concat_files()
+        fig, ax1 = plt.subplots()
+        levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
+        levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
+        cf = ax1.contourf(df.index, df.columns, df.values.T, 256, extend='both', cmap='RdYlBu_r',
+                                  levels=levels2)
+
+        cb = plt.colorbar(cf, ax=ax1, label='Temperature (ºC)', ticks=levels)
         print('placeholder')
