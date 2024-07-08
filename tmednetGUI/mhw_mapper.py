@@ -216,7 +216,7 @@ class MHWMapper:
             print('Time for looping over a single lat: ' + str(timu))
         return proc_duration
 
-    def __create_image_by_type(self, lons, lats, mode, filenames):
+    def __create_image_by_type(self, lons, lats, mode, filenames, whole_year=False):
         # Plots the given map and returns the filenames of the temporary images
         # created to be used for the gif
         start = time.time()
@@ -229,8 +229,13 @@ class MHWMapper:
         elif mode == 'duration':
             midi = xr.where(self.ds_MHW_days_sliced >= 1, 1, self.ds_MHW_days_sliced)
             ds = midi.rolling(time=midi.shape[0], min_periods=1).sum()
-            ticks = np.arange(0, 32, 5)
-            levels = np.arange(0, 32, 1)
+            #Check if we want to plot a whole year operation, in which case select acordingly the levels and ticks
+            if whole_year:
+                ticks = np.arange(0, 366, 60)
+                levels = np.arange(0, 366, 1)
+            else:
+                ticks = np.arange(0, 32, 5)
+                levels = np.arange(0, 32, 1)
             cmap = 'plasma'
             ylabel = 'Duration (Nº days)'
         elif mode == 'intensity':
@@ -293,7 +298,7 @@ class MHWMapper:
                 logger.error('Found error on day ' + str(date))
         return filenames
 
-    def map_temperature(self, mode):
+    def map_temperature(self, mode, whole_year=False):
         """
         Given the kind of map that wants to be plotted starts the methods to plot them and creates and saves
         a gif containing the given period of operation.
@@ -306,7 +311,7 @@ class MHWMapper:
         self.__enforce_literals(self.map_temperature)
         lons, lats = self.lon, self.lat
         filenames = []
-        filenames = self.__create_image_by_type(lons, lats, mode, filenames)
+        filenames = self.__create_image_by_type(lons, lats, mode, filenames, whole_year)
         if mode == 'temperature':
             dt = pd.to_datetime(str(self.ds_dtime[0].values))
         else:
