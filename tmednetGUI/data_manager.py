@@ -150,6 +150,9 @@ class DataManager:
                 df = pd.read_csv(filein, sep='\t', skiprows=1, header=None, index_col=0)
                 col = df.columns
                 df.drop(col[3:], axis=1, inplace=True)
+                # Only if the date column is index
+                if df.columns.size != 3:
+                    df = df.reset_index()
                 df.columns = ['Date', 'Time', 'Temp']
                 df.dropna(inplace=True)
                 print("file", filein)

@@ -664,7 +664,7 @@ class GUIPlot:
         self.__plot.text(0.1, 0.1, "multi-year mean", backgroundcolor='grey')
         self.canvas.draw()
 
-    def plot_thresholds(self, historical, toolbar, consolescreen):
+    def plot_thresholds(self, historical, toolbar, consolescreen, special=False):
         """
         Creates the thresholds plot of a given dataset
 
@@ -700,6 +700,15 @@ class GUIPlot:
         # Check if any depth is all nan which means there are no data for said depth
         depths = df['depth(m)'].unique()
 
+        # We get all the years on the dataset
+        years = df['year'].unique()
+        years = years[years != 0]
+
+        # Special case for Sandra's Paper - Delete after use
+        if special == True:
+            depths = ['10', '15', '20', '25']
+            years = years[[13, 14, 15, 20]]
+            df = df[(df['depth(m)'] != '5') & (df['depth(m)'] != '30') & (df['depth(m)'] != '35') & (df['depth(m)'] != '40')]
         for depth in depths:
             depth = str(depth)
             for year in df['year'].unique():
@@ -725,9 +734,7 @@ class GUIPlot:
 
         # Loop to decide each year which style has
         # TODO check code in 2030 to change this method
-        # We get all the years on the dataset
-        years = df['year'].unique()
-        years = years[years != 0]
+
 
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis

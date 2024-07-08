@@ -356,6 +356,18 @@ class MHWMapper:
             for filename in set(filenames):
                 os.remove(filename)
 
+    def create_histogram(self):
+        """
+        Starts the methods to plot a histogram showing the MHW category evolution over a period.
+
+        Parameters
+        ----------
+        mode : str
+            the type of map that needs to be plotted. The current options are: 'intensity' and 'duration'
+        """
+         #TODO Add code when robert sends it
+
+
     def __get_SST_files(self):
         # Read all files from a directory, and read your input argument
         files = os.listdir("/home/marcjou/Escritorio/Projects/tMednet/src/output_images/SST_img")
