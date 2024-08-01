@@ -100,8 +100,9 @@ class SensorData():
         # Open all the files to use on the stratification plot
         df = self.__concat_files()
         fig, ax1 = plt.subplots()
-        levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
-        levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
+        # Create the different levels to show on the plot (2) and on the colorbar (1)
+        levels = np.arange(np.floor(df.min()), df.max(), 1)
+        levels2 = np.arange(np.floor(df.min()), df.max(), 0.1)
         cf = ax1.contourf(df.index, df.columns, df.values.T, 256, extend='both', cmap='RdYlBu_r',
                                   levels=levels2)
 
