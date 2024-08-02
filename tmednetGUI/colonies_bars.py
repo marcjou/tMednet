@@ -31,14 +31,31 @@ df_markers = df.mask(df == str)
 columns = df.columns
 df_single = df.copy()
 df_single = df_single.drop(columns=columns)
+df_marked = df_single.copy()
+df_markers = df_markers.fillna(0)
 df_single['End Year'] = 1
+df_marked['N'] = 1
+df_marked['O'] = 1
+df_marked['B'] = 1
+df_marked['X'] = 1
 df_zero = df.fillna('na')
 for ind in df_single.index:
     u = df_zero.loc[df_zero.index == ind].squeeze()
     df_single['End Year'].loc[df_single.index == ind] = [int(u.index[u.str.contains('M')].values)
                                                          if len(u.index[u.str.contains('M')]) > 0 else columns[-1]]
     print(ind)
+
+for ind in df_marked.index:
+    #TODO can't mask with nan values, why?? I could above
+    u = df_markers.loc[df_markers.index == ind].squeeze()
+    df_marked['N'].loc[df_marked.index == ind] = [int(u.index[u.str.contains('N')].values)
+                                                         if len(u.index[u.str.contains('N')]) > 0 else np.nan]
+    print(ind)
 ax = df_single.plot.bar(figsize=(30,10))
 ax.set_ylim([2000, 2025])
+
+
+ax.scatter(x - width *1.5,np.array(df2["A"]),c="black",marker="_",zorder=2)
+
 plt.savefig('/home/marc/proba.png')
 print('hi')
