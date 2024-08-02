@@ -1,6 +1,7 @@
 import sys
 import time
 import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import pandas as pd
 import tkinter as tk
@@ -17,6 +18,7 @@ import file_manipulation as fm
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
+from mpl_toolkits.axisartist.axislines import Subplot
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
 from tkinter import messagebox, Button
@@ -36,6 +38,7 @@ for ind in df_single.index:
     df_single['End Year'].loc[df_single.index == ind] = [int(u.index[u.str.contains('M')].values)
                                                          if len(u.index[u.str.contains('M')]) > 0 else columns[-1]]
     print(ind)
-
-
+ax = df_single.plot.bar(figsize=(30,10))
+ax.set_ylim([2000, 2025])
+plt.savefig('/home/marc/proba.png')
 print('hi')
