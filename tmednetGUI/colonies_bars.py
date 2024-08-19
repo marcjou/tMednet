@@ -32,12 +32,16 @@ columns = df.columns
 df_single = df.copy()
 df_single = df_single.drop(columns=columns)
 df_marked = df_single.copy()
-df_markers = df_markers.fillna(0)
+df_markers = df_markers.fillna('na')
 df_single['End Year'] = 1
 df_marked['N'] = 1
+df_marked['N'] = df_marked['N'].astype('object')
 df_marked['O'] = 1
+df_marked['O'] = df_marked['O'].astype('object')
 df_marked['B'] = 1
+df_marked['B'] = df_marked['B'].astype('object')
 df_marked['X'] = 1
+df_marked['X'] = df_marked['X'].astype('object')
 df_zero = df.fillna('na')
 for ind in df_single.index:
     u = df_zero.loc[df_zero.index == ind].squeeze()
@@ -46,16 +50,22 @@ for ind in df_single.index:
     print(ind)
 
 for ind in df_marked.index:
-    #TODO can't mask with nan values, why?? I could above
+    #TODO implement the markers into the graph...
     u = df_markers.loc[df_markers.index == ind].squeeze()
-    df_marked['N'].loc[df_marked.index == ind] = [int(u.index[u.str.contains('N')].values)
+    df_marked.at[ind, 'N'] = [list(u.index[u.str.contains('N')].values)
                                                          if len(u.index[u.str.contains('N')]) > 0 else np.nan]
+    df_marked.at[ind, 'O'] = [list(u.index[u.str.contains('O')].values)
+                                                  if len(u.index[u.str.contains('O')]) > 0 else np.nan]
+    df_marked.at[ind, 'B'] = [list(u.index[u.str.contains('B')].values)
+                                                  if len(u.index[u.str.contains('B')]) > 0 else np.nan]
+    df_marked.at[ind, 'X'] = [list(u.index[u.str.contains('X')].values)
+                                                  if len(u.index[u.str.contains('X')]) > 0 else np.nan]
     print(ind)
 ax = df_single.plot.bar(figsize=(30,10))
 ax.set_ylim([2000, 2025])
 
 
-ax.scatter(x - width *1.5,np.array(df2["A"]),c="black",marker="_",zorder=2)
+# ax.scatter(x - width *1.5,np.array(df2["A"]),c="black",marker="_",zorder=2)
 
 plt.savefig('/home/marc/proba.png')
 print('hi')
