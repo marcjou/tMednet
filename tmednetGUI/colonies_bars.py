@@ -50,22 +50,32 @@ for ind in df_single.index:
     print(ind)
 
 for ind in df_marked.index:
-    #TODO implement the markers into the graph...
     u = df_markers.loc[df_markers.index == ind].squeeze()
-    df_marked.at[ind, 'N'] = [list(u.index[u.str.contains('N')].values)
-                                                         if len(u.index[u.str.contains('N')]) > 0 else np.nan]
-    df_marked.at[ind, 'O'] = [list(u.index[u.str.contains('O')].values)
-                                                  if len(u.index[u.str.contains('O')]) > 0 else np.nan]
-    df_marked.at[ind, 'B'] = [list(u.index[u.str.contains('B')].values)
-                                                  if len(u.index[u.str.contains('B')]) > 0 else np.nan]
-    df_marked.at[ind, 'X'] = [list(u.index[u.str.contains('X')].values)
-                                                  if len(u.index[u.str.contains('X')]) > 0 else np.nan]
+    df_marked.at[ind, 'N'] = list(u.index[u.str.contains('N')].values) if len(u.index[u.str.contains('N')]) > 0 else []
+    df_marked.at[ind, 'O'] = list(u.index[u.str.contains('O')].values) if len(u.index[u.str.contains('O')]) > 0 else []
+    df_marked.at[ind, 'B'] = list(u.index[u.str.contains('B')].values) if len(u.index[u.str.contains('B')]) > 0 else []
+    df_marked.at[ind, 'X'] = list(u.index[u.str.contains('X')].values) if len(u.index[u.str.contains('X')]) > 0 else []
     print(ind)
 ax = df_single.plot.bar(figsize=(30,10))
-ax.set_ylim([2000, 2025])
+ax.set_ylim([2003, 2025])
+
+# Checks marker by marker and plots them in their given position on the bars
+for ind in df_marked.index:
+    u = df_marked.loc[df_marked.index == ind].squeeze()
+    if len(u['N']) > 0:
+        for i in range(0, len(u['N'])):
+            ax.plot(ind, u['N'][i], marker='o', color='red', markersize=10, label='N')
+    if len(u['O']) > 0:
+        for i in range(0, len(u['O'])):
+            ax.plot(ind, u['O'][i], marker='^', color='green', markersize=10, label='O')
+    if len(u['B']) > 0:
+        for i in range(0, len(u['B'])):
+            ax.plot(ind, u['B'][i], marker='s', color='blue', markersize=10, label='B')
+    if len(u['X']) > 0:
+        for i in range(0, len(u['X'])):
+            ax.plot(ind, u['X'][i], marker='d', color='orange', markersize=10, label='X')
 
 
-# ax.scatter(x - width *1.5,np.array(df2["A"]),c="black",marker="_",zorder=2)
-
+# TODO markers appear moved for some reason, check it out
 plt.savefig('/home/marc/proba.png')
 print('hi')
