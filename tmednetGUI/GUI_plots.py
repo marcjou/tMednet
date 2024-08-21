@@ -470,6 +470,7 @@ class GUIPlot:
             levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
             levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
 
+            # Checks when there is a day change
             df_datetime = pd.to_datetime(df.index)
             old = df_datetime[0]
             index_cut = None
