@@ -25,7 +25,8 @@ from tkinter import messagebox, Button
 from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-df = pd.read_excel('/home/marc/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1)
+# df = pd.read_excel('/home/marc/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1)
+df = pd.read_excel('/home/marcjou/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
 df = df.drop(columns=['Unnamed: 0','Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3'])
 df_markers = df.mask(df == str)
 columns = df.columns
@@ -56,10 +57,15 @@ for ind in df_marked.index:
     df_marked.at[ind, 'B'] = list(u.index[u.str.contains('B')].values) if len(u.index[u.str.contains('B')]) > 0 else []
     df_marked.at[ind, 'X'] = list(u.index[u.str.contains('X')].values) if len(u.index[u.str.contains('X')]) > 0 else []
     print(ind)
-ax = df_single.plot.bar(figsize=(30,10))
-ax.set_ylim([2003, 2025])
+#ax = df_single.plot.bar(figsize=(30,10))
+#ax.set_ylim([2003, 2025])
+#ax.set_yticks(range(2003, 2026, 2))
+ax = df_single.plot.barh(figsize=(10,30))
+ax.set_xlim([2003, 2025])
+ax.set_xticks(range(2003, 2026, 2))
 
 # Checks marker by marker and plots them in their given position on the bars
+# Eliminate T2_BOTTOM2B and T2-BOTTOM16
 for ind in df_marked.index:
     u = df_marked.loc[df_marked.index == ind].squeeze()
     if len(u['N']) > 0:
@@ -76,6 +82,26 @@ for ind in df_marked.index:
             ax.plot(ind, u['X'][i], marker='d', color='orange', markersize=10, label='X')
 
 
-# TODO markers appear moved for some reason, check it out
-plt.savefig('/home/marc/proba.png')
+# plt.savefig('/home/marc/proba.png')
+'''
+# Checks marker by marker and plots them in their given position on the bars
+# Eliminate T2_BOTTOM2B and T2-BOTTOM16
+for ind in df_marked.index:
+    u = df_marked.loc[df_marked.index == ind].squeeze()
+    if len(u['N']) > 0:
+        for i in range(0, len(u['N'])):
+            # ax.scatter(ind, u['N'][i], marker='o', c='red', s=10, label='N')
+            ax.plot(u['N'][i], ind, marker='o', color='red', markersize=10, label='N')
+    if len(u['O']) > 0:
+        for i in range(0, len(u['O'])):
+            ax.plot(u['O'][i], ind, marker='^', color='green', markersize=10, label='O')
+    if len(u['B']) > 0:
+        for i in range(0, len(u['B'])):
+            ax.plot(u['B'][i], ind, marker='s', color='blue', markersize=10, label='B')
+    if len(u['X']) > 0:
+        for i in range(0, len(u['X'])):
+            ax.plot(u['X'][i], ind, marker='d', color='orange', markersize=10, label='X')
+
+'''
+plt.savefig('/home/marcjou/proba.png')
 print('hi')
