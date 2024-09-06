@@ -1,6 +1,7 @@
 import sys
 import time
 import matplotlib
+import seaborn as sns
 
 matplotlib.use('Agg')
 import numpy as np
@@ -27,6 +28,7 @@ from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilen
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 df = pd.read_excel('/home/marc/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
+df_heat = pd.read_excel('/home/marc/Documentos/CSIC/PalazzuPlot.xlsx', index_col=0, header=0, sheet_name='HeatMap')
 # df = pd.read_excel('/home/marcjou/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
 df = df.drop(columns=['Unnamed: 0', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3'])
 df_markers = df.mask(df == str)
@@ -47,7 +49,7 @@ df_marked['X'] = df_marked['X'].astype('object')
 df_zero = df.fillna('na')
 
 
-def plot_hbars():
+def plot_hbars(df_single):
     for ind in df_single.index:
         u = df_zero.loc[df_zero.index == ind].squeeze()
         df_single['End Year'].loc[df_single.index == ind] = [int(u.index[u.str.contains('M')].values)
@@ -65,14 +67,15 @@ def plot_hbars():
         df_marked.at[ind, 'X'] = list(u.index[u.str.contains('X')].values) if len(
             u.index[u.str.contains('X')]) > 0 else []
         print(ind)
-
+    df_single = df_single.sort_values(by='End Year')
     ax = df_single.plot.barh(figsize=(10, 30))
     ax.set_xlim([2003, 2025])
     ax.set_xticks(range(2003, 2026, 2))
+    ax.get_yaxis().set_visible(False)
     return ax
 
 
-def plot_markers(ax):
+def plot_markers(ax, df_marked):
     # Checks marker by marker and plots them in their given position on the bars
     # Eliminate T2_BOTTOM2B and T2-BOTTOM16
     n = 0
@@ -97,8 +100,12 @@ def plot_markers(ax):
 def savefigure():
     plt.savefig('/home/marc/proba.png')
 
+df_heat = df_heat.fillna(100)
+fig2, ax2 = plt.subplots(figsize=(20, 20))
+sns.heatmap(df_heat, ax=ax2, cmap='RdYlGn_r', linewidths=1, linecolor='black')
+fig2.savefig("/home/marc/heatmap_blankis red.png")
 
-ax = plot_hbars()
-plot_markers(ax)
+ax = plot_hbars(df_single)
+plot_markers(ax, df_marked)
 savefigure()
 print('hi')
