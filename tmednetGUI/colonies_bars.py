@@ -28,8 +28,8 @@ from tkinter import messagebox, Button
 from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-df = pd.read_excel('/home/marcjou/Escritorio/Projects/tMednet/src/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
-df_heat = pd.read_excel('/home/marcjou/Escritorio/Projects/tMednet/src/PalazzuPlot.xlsx', index_col=0, header=0, sheet_name='HeatMap')
+df = pd.read_excel('/home/marc/Projects/Mednet/tMednet/src/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
+df_heat = pd.read_excel('/home/marc/Projects/Mednet/tMednet/src/PalazzuPlot.xlsx', index_col=0, header=0, sheet_name='HeatMap')
 # df = pd.read_excel('/home/marcjou/Documentos/CSIC/PalazzuPlot.xlsx', index_col=4, header=1, sheet_name='Gràfic Barres')
 df = df.drop(columns=['Unnamed: 0', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3'])
 df_markers = df.mask(df == str)
@@ -77,7 +77,11 @@ def plot_hbars(df_single):
     xticks[-4].label1.set_visible(False)
     xticks[-5].label1.set_visible(False)
     xticks[-7].label1.set_visible(False)
-    ax.get_yaxis().set_visible(False)
+    #ax.get_yaxis().set_visible(False)
+    yticks_positions = [0, len(df_single.index) // 4, len(df_single.index) // 2, (len(df_single.index) // 4)*3, len(df_single.index) - 1]
+    ax.set_yticks(yticks_positions)
+    ax.set_yticklabels(['0%', '25%', '50%', '75%', '100%'])
+
     return ax, df_single
 
 
@@ -112,21 +116,39 @@ def plot_markers(ax, df_marked, df_single):
     ax.legend(handles=legend_elements)
 
 
-def savefigure():
-    plt.savefig('/home/marcjou/palazzu_bars.png')
+def savefigure(title):
+    plt.savefig('/home/marc/Projects/Mednet/tMednet/src/'+ title + '.png')
 
+def plot_curve_death(df_single):
+    plt.clf()
+    plt.plot(df_single['End Year'].values, df_single.index)
+    plt.xlim([2003, 2025])
+    plt.xticks(range(2003, 2026, 1))
+    plt.tick_params(axis='x', labelrotation=45)
+    xticks = plt.gca().xaxis.get_major_ticks()
+    xticks[-4].label1.set_visible(False)
+    xticks[-5].label1.set_visible(False)
+    xticks[-7].label1.set_visible(False)
+    # ax.get_yaxis().set_visible(False)
+    yticks_positions = [0, len(df_single.index) // 4, len(df_single.index) // 2, (len(df_single.index) // 4) * 3,
+                        len(df_single.index) - 1]
+    plt.yticks(yticks_positions, ['0%', '25%', '50%', '75%', '100%'])
 
 
 ax, df_single = plot_hbars(df_single)
 plot_markers(ax, df_marked, df_single)
-savefigure()
+savefigure('palazzu_bars')
+plot_curve_death(df_single)
+savefigure('palazzu_curve')
 
 
 df_heat = df_heat.fillna(100)
 df_heat = df_heat.reindex(df_single.sort_values(by='End Year').index)
 fig2, ax2 = plt.subplots(figsize=(20, 20))
-sns.heatmap(df_heat, ax=ax2, cmap='RdYlGn_r', linewidths=1, linecolor='black')
+cmap = matplotlib.cm.get_cmap('YlOrBr', 256)
+new_cmap = matplotlib.cm.colors.ListedColormap(cmap(np.linspace(0.1, 0.9, 256)))
+sns.heatmap(df_heat, ax=ax2, cmap=new_cmap, linewidths=1, linecolor='black')
 ax2.get_yaxis().set_visible(False)
-fig2.savefig("/home/marcjou/heatmap_blankis red.png")
+fig2.savefig("/home/marc/Projects/Mednet/tMednet/src/palazzu_heatmap YlOrBr.png")
 
 print('hi')
