@@ -147,7 +147,8 @@ class DataManager:
                          "datafin": datetime.strptime(ifile.split("_")[2], '%Y%m%d-%H'), 'images': []}
 
                 # Loads the data on a dataframe
-                df = pd.read_csv(filein, sep='\t', skiprows=1, header=None, index_col=0)
+                # TODO se quito index_col de read_csv, tal vez deba añadirse?
+                df = pd.read_csv(filein, sep='\t', skiprows=1, header=None)
                 col = df.columns
                 df.drop(col[3:], axis=1, inplace=True)
                 # Only if the date column is index

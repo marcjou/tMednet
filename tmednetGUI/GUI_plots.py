@@ -144,17 +144,17 @@ class GUIPlot:
         if self.__plot.axes:
             # self.__plot = self.fig.add_subplot(111)
             self.__plot.plot(mdata[index]['df'].index, masked_ending_temperatures,
-                           '-', label=str(mdata[index]['depth']))
+                             '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
-                          title='Multiple depths Site: ' + str(mdata[index]['region_name']))
+                            title='Multiple depths Site: ' + str(mdata[index]['region_name']))
         else:
             self.__plot = self.fig.add_subplot(111)
             self.__plot.plot(mdata[index]['df'].index, masked_ending_temperatures,
-                           '-', label=str(mdata[index]['depth']))
+                             '-', label=str(mdata[index]['depth']))
             self.__plot.set(ylabel='Temperature (DEG C)',
-                          title=files[index] + "\n" + 'Depth:' + str(
-                              mdata[index]['depth']) + " - Site: " + str(
-                              mdata[index]['region_name']))
+                            title=files[index] + "\n" + 'Depth:' + str(
+                                mdata[index]['depth']) + " - Site: " + str(
+                                mdata[index]['region_name']))
 
         self.__plot.legend(title='Depth (m)')
         # fig.set_size_inches(14.5, 10.5, forward=True)
@@ -193,43 +193,45 @@ class GUIPlot:
         masked_temperatures = np.ma.masked_where(np.array(mdata[index]['df']['Temp']) == 999,
                                                  np.array(mdata[index]['df']['Temp']))
 
-        self.__plot1.plot(time_series[0][int(start_index):], masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
-                        '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+        self.__plot1.plot(time_series[0][int(start_index):],
+                          masked_temperatures[int(start_index) + int(valid_start):len(time_series[0]) + valid_start],
+                          '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
         self.__plot1.legend()
-        self.__plot1.plot(time_series[0][:int(start_index) + 1], masked_temperatures[valid_start:int(start_index) + 1 + int(valid_start)],
-                        '-', color='red', marker='o', label=str(mdata[index]['depth']))
+        self.__plot1.plot(time_series[0][:int(start_index) + 1],
+                          masked_temperatures[valid_start:int(start_index) + 1 + int(valid_start)],
+                          '-', color='red', marker='o', label=str(mdata[index]['depth']))
 
         self.__plot1.set(ylabel='Temperature (DEG C)',
-                       title=files[index] + "\n" + 'Depth:' + str(
-                           mdata[index]['depth']) + " - Region: " + str(
-                           mdata[index]['region']))
+                         title=files[index] + "\n" + 'Depth:' + str(
+                             mdata[index]['depth']) + " - Region: " + str(
+                             mdata[index]['region']))
         if indexes.size != 0:
             if indexes[0] + 1 == len(time_series[0]):
                 self.__plot2.plot(time_series[1][:int(indexes[0])],
-                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
-                                '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+                                  masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]))],
+                                  '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
             else:
                 self.__plot2.plot(time_series[1][:int(indexes[0] + 1)],
-                                masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
-                                '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+                                  masked_temperatures[-len(time_series[1]):(int(indexes[0]) - len(time_series[1]) + 1)],
+                                  '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
             self.__plot2.legend()
             # Plots in the same graph the last part which represents the errors in the data from removing the sensors
             self.__plot2.plot(time_series[1][int(indexes[0]):],
-                            masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
-                            '-', color='red', marker='o', label=str(mdata[index]['depth']))
+                              masked_temperatures[(int(indexes[0]) - len(time_series[1])):],
+                              '-', color='red', marker='o', label=str(mdata[index]['depth']))
             self.__plot2.set(ylabel='Temperature (DEG C)',
-                           title=files[index] + "\n" + 'Depth:' + str(
-                               mdata[index]['depth']) + " - Region: " + str(
-                               mdata[index]['region']))
+                             title=files[index] + "\n" + 'Depth:' + str(
+                                 mdata[index]['depth']) + " - Region: " + str(
+                                 mdata[index]['region']))
         else:
             self.__plot2.plot(time_series[1],
-                            masked_temperatures[-len(time_series[1]):],
-                            '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
+                              masked_temperatures[-len(time_series[1]):],
+                              '-', color='steelblue', marker='o', label=str(mdata[index]['depth']))
             self.__plot2.legend()
             self.__plot2.set(ylabel='Temperature (DEG C)',
-                           title=files[index] + "\n" + 'Depth:' + str(
-                               mdata[index]['depth']) + " - Region: " + str(
-                               mdata[index]['region']))
+                             title=files[index] + "\n" + 'Depth:' + str(
+                                 mdata[index]['depth']) + " - Region: " + str(
+                                 mdata[index]['region']))
         # fig.set_size_inches(14.5, 10.5, forward=True)
         # Controls if we are accesing the event handler through a real click or it loops.
         if not controller:
@@ -275,17 +277,17 @@ class GUIPlot:
             masked_ending_temperatures = np.ma.masked_where(np.array(temperatures[1]) == 999,
                                                             np.array(temperatures[1]))
             self.__plot1.plot(time_series[0], masked_temperatures[:len(time_series[0])],
-                            '-', label=str(mdata[i]['depth']))
+                              '-', label=str(mdata[i]['depth']))
             self.__plot1.set(ylabel='Temperature (DEG C)',
-                           title='Temperature at depths:' + depths + " - Region: " + str(
-                               mdata[i]['region']))
+                             title='Temperature at depths:' + depths + " - Region: " + str(
+                                 mdata[i]['region']))
             self.__plot1.legend()
 
             self.__plot2.plot(time_series[1], masked_temperatures[-len(time_series[1]):],
-                            '-', label=str(mdata[i]['depth']))
+                              '-', label=str(mdata[i]['depth']))
             self.__plot2.set(ylabel='Temperature (DEG C)',
-                           title='Temperature at depths:' + depths + " - Region: " + str(
-                               mdata[i]['region']))
+                             title='Temperature at depths:' + depths + " - Region: " + str(
+                                 mdata[i]['region']))
             self.__plot2.legend()
 
             # fig.set_size_inches(14.5, 10.5, forward=True)
@@ -317,7 +319,7 @@ class GUIPlot:
             self.__plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.__plot)
             self.__plot.set(ylabel='Temperature (DEG C)',
-                          title='Temperature differences')
+                            title='Temperature differences')
 
             self.__plot.legend()
 
@@ -361,7 +363,7 @@ class GUIPlot:
             self.__plot = self.fig.add_subplot(111)
             dfdelta.plot(ax=self.__plot)
             self.__plot.set(ylabel='Temperature (DEG C)',
-                          title='Temperature differences filtered')
+                            title='Temperature differences filtered')
 
             self.__plot.legend()
 
@@ -396,12 +398,13 @@ class GUIPlot:
             # df.resample(##) if we want to filter the results in a direct way
             # Draws a contourn line. Right now looks messy
             # ct = self.__plot.contour(df.index.to_pydatetime(), -depths, df.values.T, colors='black', linewidths=0.5)
-            cf = self.__plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r')
+            cf = self.__plot.contourf(df.index.to_pydatetime(), -depths, df.values.T, 256, extend='both',
+                                      cmap='RdYlBu_r')
 
             self.__cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             self.__cbexists = True
             self.__plot.set(ylabel='Depth (m)',
-                          title='Stratification Site: ' + mdata[0]['region_name'])
+                            title='Stratification Site: ' + mdata[0]['region_name'])
 
             # Sets the X axis as the initials of the months
             locator = mdates.MonthLocator()
@@ -449,14 +452,14 @@ class GUIPlot:
                 self.__plot.set_yticks(-np.insert(depths, 0, 0))
 
             self.__plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
-                               datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
+                                 datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
             # self.__plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
 
             # self.__plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
             self.__plot.invert_yaxis()
             # levels = np.arange(np.floor(np.nanmin(df.values)), np.ceil(np.nanmax(df.values)), 1)
-            #levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
-            #levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
+            # levels = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 1)
+            # levels2 = np.arange(np.floor(hismintemp), np.ceil(hismaxtemp), 0.1)
 
             # Checks the historic min and max values to use in the colourbar, if they are too outlandish
             # over 5 degrees of difference, it uses its own max and min for this year.
@@ -496,8 +499,8 @@ class GUIPlot:
                 cf = []
                 for i in range(0, len(df_cuts)):
                     cf.append(self.__plot.contourf(pd.to_datetime(df_cuts[i].index), -depths, df_cuts[i].values.T, 256,
-                                                 extend='both',
-                                                 cmap='RdYlBu_r', levels=levels2))
+                                                   extend='both',
+                                                   cmap='RdYlBu_r', levels=levels2))
                 self.__cb = plt.colorbar(cf[0], ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             else:
                 # Checks if there is a vertical gap bigger than 5 meters and if so instead of interpolating
@@ -513,22 +516,23 @@ class GUIPlot:
                     old_index = 0
                     for i in vertical_split:
                         cf = self.__plot.contourf(df_datetime, -depths[old_index: i + 1],
-                                                df.filter(items=str_depths[old_index:i + 1]).values.T, 256, extend='both',
-                                                cmap='RdYlBu_r',
-                                                levels=levels2)
+                                                  df.filter(items=str_depths[old_index:i + 1]).values.T, 256,
+                                                  extend='both',
+                                                  cmap='RdYlBu_r',
+                                                  levels=levels2)
                         old_index = i + 1
                     cf = self.__plot.contourf(df_datetime, -depths[old_index:],
-                                            df.filter(items=str_depths[old_index:]).values.T, 256, extend='both',
-                                            cmap='RdYlBu_r',
-                                            levels=levels2)
+                                              df.filter(items=str_depths[old_index:]).values.T, 256, extend='both',
+                                              cmap='RdYlBu_r',
+                                              levels=levels2)
                 else:
                     cf = self.__plot.contourf(df_datetime, -depths, df.values.T, 256, extend='both', cmap='RdYlBu_r',
-                                            levels=levels2)
+                                              levels=levels2)
 
                 self.__cb = plt.colorbar(cf, ax=self.__plot, label='Temperature (ºC)', ticks=levels)
             self.__cbexists = True
             self.__plot.set(ylabel='Depth (m)',
-                          title=historical.split('_')[4] + ' year ' + year)
+                            title=historical.split('_')[4] + ' year ' + year)
             self.savefilename = historical.split('_')[3] + '_1_' + year + '_' + historical.split('_')[4]
             # Sets the X axis as the initials of the months
             locator = mdates.MonthLocator()
@@ -582,7 +586,8 @@ class GUIPlot:
         orderedhist_df = histdf.groupby('day_month')[depths].mean()
         orderedhist_df.sort_index(inplace=True)
 
-        year_df, hismintemp, hismaxtemp, minyear = self.dm.historic_to_df(historical, year, start_month='01', end_month='01')
+        year_df, hismintemp, hismaxtemp, minyear = self.dm.historic_to_df(historical, year, start_month='01',
+                                                                          end_month='01')
         year_df.index = year_df.index.strftime('%Y-%m-%d %H:%M:%S')
         if '0' in year_df.columns:
             year_df.drop('0', axis=1, inplace=True)
@@ -641,13 +646,13 @@ class GUIPlot:
             for depth in orderedhist_df.columns:
                 if oldepth != 0:
                     self.__plot.fill_between(np.unique(orderedhist_df.index), orderedhist_df[oldepth],
-                                           orderedhist_df[depth], facecolor='lightgrey', zorder=0)
+                                             orderedhist_df[depth], facecolor='lightgrey', zorder=0)
                 oldepth = depth
                 orderedhist_df.plot(kind='line', ax=self.__plot, color='#e9e8e8', label='_nolegend_', legend=False,
                                     zorder=5)
 
         self.__plot.set(ylabel='Temperature (ºC) smoothed',
-                      title=historical.split('_')[4] + ' year ' + year)
+                        title=historical.split('_')[4] + ' year ' + year)
         self.__plot.set_yticks(np.arange(10, hismaxtemp, 2))  # Sets the limits for the Y axis
         self.__plot.set_xlim([year + '-01-01' + ' 00:00:00', str(int(year) + 1) + '-01-01' + ' 00:00:00'])
 
@@ -696,7 +701,7 @@ class GUIPlot:
         dfhist_control['month'] = pd.DatetimeIndex(dfhist_control['Date'], dayfirst=True).month
         dfhist_summer = dfhist_control.loc[
             (dfhist_control['month'] == 7) | (dfhist_control['month'] == 8) | (
-                        dfhist_control['month'] == 9)]
+                    dfhist_control['month'] == 9)]
 
         # Check if any depth is all nan which means there are no data for said depth
         depths = df['depth(m)'].unique()
@@ -709,11 +714,13 @@ class GUIPlot:
         if special == True:
             depths = ['10', '15', '20', '25']
             years = years[[13, 14, 15, 20]]
-            df = df[(df['depth(m)'] != '5') & (df['depth(m)'] != '30') & (df['depth(m)'] != '35') & (df['depth(m)'] != '40')]
+            df = df[(df['depth(m)'] != '5') & (df['depth(m)'] != '30') & (df['depth(m)'] != '35') & (
+                        df['depth(m)'] != '40')]
         for depth in depths:
             depth = str(depth)
             for year in df['year'].unique():
-                if (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].isnull().all()) | (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].count() / 24 < 30):
+                if (dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].isnull().all()) | (
+                        dfhist_summer.loc[dfhist_summer['year'] == int(year)][depth].count() / 24 < 30):
                     for i in range(23, 29):
                         df.loc[(df['year'] == str(year)) & (df['depth(m)'] == depth), 'Ndays>=' + str(i)] = np.nan
                 else:
@@ -736,7 +743,6 @@ class GUIPlot:
         # Loop to decide each year which style has
         # TODO check code in 2030 to change this method
 
-
         # Iterates through all the years and temperatures to create a dictionary storing the needed data to plot
         maxdepth = 0  # Used to set the lowest depth as the lowest point in the Y axis
         maxdays = 0  # Used to set the maximum number of days to point in the X axis
@@ -747,6 +753,22 @@ class GUIPlot:
         # Whole records is 2208
         # Overriding the above criteria, now established that the records cannot be different than 240 from the max one
         legend_years = years.copy()
+        # TODO THIS SECTION FOR WHEN DOING SCANDOLA LIKE
+        '''
+        legend_years = np.array(['Climatology', '2009', '2010', '2014', '2016', '2018', '2020', '2022'])
+        #Creating a dict only for scandola to put a sort of climatology
+        clim_dict = {}
+        temps = {23: [], 24: [], 25: [], 26: [], 28: []}
+        for i in range(23,29):
+            clim_temp = []
+            for depth in depths:
+                clim_temp.append(df.loc[df['depth(m)'] == depth]['Ndays>=' + str(i)].sum() / len(years))
+            temps[i] = np.column_stack((pd.DataFrame(clim_temp), pd.DataFrame(depths.astype(int))))
+        clim_dict = temps
+        self.__plot.plot(clim_dict[23][:, 0], clim_dict[23][:, 1],
+                         marker='o',
+                         color='k', linestyle='dotted')
+        '''
         for year in years:
             maxndays = np.nanmax(df.loc[df['year'] == year]['N'])
             check = False
@@ -767,7 +789,7 @@ class GUIPlot:
             for i in range(23, 29):
                 yearly_plot = np.column_stack(
                     (df.loc[df['year'] == year, 'Ndays>=' + str(i)], df.loc[df['year'] == year, 'depth(m)']))
-                #if yearly_plot != np.nan:
+                # if yearly_plot != np.nan:
                 yearly_plot[pd.isnull(yearly_plot)] = -999
                 yearly_plot = yearly_plot.astype(int)
                 if yearly_plot[-1, -1] > maxdepth:
@@ -779,7 +801,7 @@ class GUIPlot:
             self.__plot.set(ylim=(0, maxdepth + 2))
             if maxdays >= 30:
                 ticks = 10
-            elif maxdays >=20:
+            elif maxdays >= 20:
                 ticks = 5
             else:
                 ticks = 2
@@ -787,47 +809,81 @@ class GUIPlot:
             # Remove asterisks (if any) on years
             seq_type = type(year)
             int_year = int(seq_type().join(filter(seq_type.isdigit, year)))
+            # TODO AÑADIENDO COSAS PARA PALAZZU IMPORTANTISIMO QUITAR LUEGO AÑADIDO LO DE EL GROSOR DE LINEAS
             if int_year < 2000:
                 color = colors[0]
                 if year == years[-1]:
                     color = 'tab:orange'
                 self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 1990]
-                               , color=color, linestyle=lines[0])
+                                 , color=color, linestyle=lines[0])
             elif int_year >= 2000 and int_year < 2010:
                 color = colors[1]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2000],
-                               color=color, linestyle=lines[1])
+                '''if int_year == 2003:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2000],
+                                     color='tab:red', linestyle='solid', linewidth=1.5)
+                elif int_year == 2009:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2000],
+                                     color='tab:orange', linestyle='dotted', linewidth=0.5)
+                else:'''
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2000],
+                                     color=color, linestyle=lines[1])
             elif int_year >= 2010 and int_year < 2020:
                 color = colors[2]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2010],
-                               color=color, linestyle=lines[2])
+                '''if int_year == 2016 or int_year == 2018:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2010],
+                                     color='tab:red', linestyle='solid', linewidth=1.5)
+                elif int_year == 2010 or int_year == 2014:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2010],
+                                     color='tab:orange', linestyle='dotted', linewidth=0.5)
+                else:'''
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2010],
+                                     color=color, linestyle=lines[2])
             elif int_year >= 2020 and int_year < 2030:
                 color = colors[3]
                 if year == years[-1]:
                     color = 'tab:orange'
-                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1], marker=markers[int_year - 2020],
-                               color=color, linestyle=lines[3])
+                '''if int_year == 2022:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2020],
+                                     color='tab:red', linestyle='solid', linewidth=1.5)
+                elif int_year== 2020:
+                    self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker='x',
+                                     color='tab:orange', linestyle='dotted', linewidth=0.5)
+                else:'''
+                self.__plot.plot(year_dict[year][23][:, 0], year_dict[year][23][:, 1],
+                                     marker=markers[int_year - 2020],
+                                     color=color, linestyle=lines[3])
+
 
             self.__plot.invert_yaxis()
             self.__plot.xaxis.tick_top()
             self.canvas.draw()
+
         # Shrink the axis a bit to fit the legend outside of it
         box = self.__plot.get_position()
         self.__plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         # Draws the legend for the different years
         legend = self.__plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
         self.__plot.set(ylabel='Depth (m)',
-                      title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
+                        title=historical.split('_')[4] + ' Summer (JAS) days ≥ 23ºC')
         self.__plot.xaxis.grid(True, linestyle='dashed')
 
         p = self.__plot.get_window_extent()
-        self.__plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0), textcoords="offset points",
-                  va="center", ha="left",
-                  bbox=dict(boxstyle="round", fc="w"))
+        self.__plot.annotate('*Recorded period not complete', xy=(0.68, 0.03), xycoords=p, xytext=(0.1, 0),
+                             textcoords="offset points",
+                             va="center", ha="left",
+                             bbox=dict(boxstyle="round", fc="w"))
 
         self.canvas.draw()
         # Adds tabs for the temperatures being buttons to call raiseTab and plot the Thresholds
@@ -835,9 +891,11 @@ class GUIPlot:
             tab = {}
             btn = tk.Button(toolbar, text=i,
                             command=lambda i=i, maxdepth=maxdepth, maxdays=maxdays: self.__raiseTab(i, maxdepth,
-                                                                                                  year_dict, markers,
-                                                                                                  colors, lines, years,
-                                                                                                  maxdays, historical, legend_years))
+                                                                                                    year_dict, markers,
+                                                                                                    colors, lines,
+                                                                                                    years,
+                                                                                                    maxdays, historical,
+                                                                                                    legend_years))
             btn.pack(side=tk.LEFT, fill=tk.BOTH, expand=0)
             tab['id'] = i
             tab['btn'] = btn
@@ -863,6 +921,9 @@ class GUIPlot:
                 ticks = 2
             self.__plot.set(ylim=(0, maxdepth + 2))
             self.__plot.set(xlim=(-2, maxdays + 2), xticks=np.arange(0, maxdays + 2, ticks))
+            '''self.__plot.plot(clim_dict[i][:, 0], clim_dict[i][:, 1],
+                             marker='o',
+                             color='k', linestyle='dotted')'''
             for year in years:
                 # Remove asterisks (if any) on years
                 seq_type = type(year)
@@ -872,25 +933,55 @@ class GUIPlot:
                     if year == years[-1]:
                         color = 'tab:orange'
                     self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 1990]
-                                   , color=color, linestyle=lines[0])
+                                     , color=color, linestyle=lines[0])
                 elif int_year >= 2000 and int_year < 2010:
                     color = colors[1]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2000],
-                                   color=color, linestyle=lines[1])
+                    '''if int_year == 2003:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2000],
+                                         color='tab:red', linestyle='solid', linewidth=1.5)
+                    elif int_year == 2009:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2000],
+                                         color='tab:orange', linestyle='dotted', linewidth=0.5)
+                    else:'''
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2000],
+                                         color=color, linestyle=lines[1])
                 elif int_year >= 2010 and int_year < 2020:
                     color = colors[2]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2010],
-                                   color=color, linestyle=lines[2])
+                    '''if int_year == 2016 or int_year == 2018:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2010],
+                                         color='tab:red', linestyle='solid', linewidth=1.5)
+                    elif int_year == 2010 or int_year == 2014:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2010],
+                                         color='tab:orange', linestyle='dotted', linewidth=0.5)
+                    else:'''
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2010],
+                                         color=color, linestyle=lines[2])
                 elif int_year >= 2020 and int_year < 2030:
                     color = colors[3]
                     if year == years[-1]:
                         color = 'tab:orange'
-                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1], marker=markers[int_year - 2020],
-                                   color=color, linestyle=lines[3])
+                    '''if int_year == 2022:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2020],
+                                         color='tab:red', linestyle='solid', linewidth=1.5)
+                    elif int_year == 2020:
+                        self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker='x',
+                                         color='tab:orange', linestyle='dotted', linewidth=0.5)
+                    else:'''
+                    self.__plot.plot(year_dict[year][i][:, 0], year_dict[year][i][:, 1],
+                                         marker=markers[int_year - 2020],
+                                         color=color, linestyle=lines[3])
 
             self.__plot.invert_yaxis()
             self.__plot.xaxis.tick_top()
@@ -899,14 +990,14 @@ class GUIPlot:
             self.__plot.set_position([box.x0, box.y0, box.width * 0.8, box.height])
             legend = self.__plot.legend(legend_years, title='Year', loc='center left', bbox_to_anchor=(1, 0.5))
             self.__plot.set(ylabel='Depth (m)',
-                          title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
+                            title=historical.split('_')[4] + ' Summer(JAS) days ≥ ' + str(i) + 'ºC')
             self.savefilename = historical.split('_')[3] + '_3_' + str(i) + '_' + year + '_' + historical.split('_')[4]
 
             p = self.__plot.get_window_extent()
             self.__plot.annotate('*Recorded period not complete', xy=(0.61, 0.03), xycoords=p, xytext=(0.1, 0),
-                               textcoords="offset points",
-                               va="center", ha="left",
-                               bbox=dict(boxstyle="round", fc="w"))
+                                 textcoords="offset points",
+                                 va="center", ha="left",
+                                 bbox=dict(boxstyle="round", fc="w"))
             self.__plot.xaxis.grid(True, linestyle='dashed')
             self.canvas.draw()
 

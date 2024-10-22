@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_b438104e9d38116a8562c4a70263a652 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_b438104e9d38116a8562c4a70263a652" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_b438104e9d38116a8562c4a70263a652 = L.map(
+                "map_b438104e9d38116a8562c4a70263a652",
+                {
+                    center: [38.0, -2.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 6,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_a5011b25368b3d6ca0b0004f834ba16d = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+        
+    
+            tile_layer_a5011b25368b3d6ca0b0004f834ba16d.addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+            var marker_cbf02a70fecda2d4d6183bfed2bc6906 = L.marker(
+                [41.69201, 2.94031],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_1955b65733b5c4291f292c93dbbd804c = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_62286b0e0b17b1c06d36855da6903b42 = $(`<div id="html_62286b0e0b17b1c06d36855da6903b42" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> SuperDive Tossa<br>                     <b>Ubicación:</b> Tossa<br>                     <b>Coordenadas:</b> 41.69201, 2.94031<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_1955b65733b5c4291f292c93dbbd804c.setContent(html_62286b0e0b17b1c06d36855da6903b42);
+            
+        
+
+        marker_cbf02a70fecda2d4d6183bfed2bc6906.bindPopup(popup_1955b65733b5c4291f292c93dbbd804c)
+        ;
+
+        
+    
+    
+            marker_cbf02a70fecda2d4d6183bfed2bc6906.bindTooltip(
+                `<div>
+                     SuperDive Tossa
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_df8fa957775efc18ee3693a36251ee2d = L.marker(
+                [41.79046, 3.10997],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_52e63af63f95343f7934e3fbcd856393 = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_e90751108adb9bd908b87829101cf6b1 = $(`<div id="html_e90751108adb9bd908b87829101cf6b1" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> H2O Diving Center<br>                     <b>Ubicación:</b> Diving Center<br>                     <b>Coordenadas:</b> 41.79046, 3.10997<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_52e63af63f95343f7934e3fbcd856393.setContent(html_e90751108adb9bd908b87829101cf6b1);
+            
+        
+
+        marker_df8fa957775efc18ee3693a36251ee2d.bindPopup(popup_52e63af63f95343f7934e3fbcd856393)
+        ;
+
+        
+    
+    
+            marker_df8fa957775efc18ee3693a36251ee2d.bindTooltip(
+                `<div>
+                     H2O Diving Center
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_88887944719dd15a36086e205bce8904 = L.marker(
+                [41.91559, 3.22664],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_fadc064df1b61397301813c823a32522 = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_603458380e14201e283608912be93ac2 = $(`<div id="html_603458380e14201e283608912be93ac2" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> Triton Diving Llafranc<br>                     <b>Ubicación:</b> Diving Llafranc<br>                     <b>Coordenadas:</b> 41.91559, 3.22664<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_fadc064df1b61397301813c823a32522.setContent(html_603458380e14201e283608912be93ac2);
+            
+        
+
+        marker_88887944719dd15a36086e205bce8904.bindPopup(popup_fadc064df1b61397301813c823a32522)
+        ;
+
+        
+    
+    
+            marker_88887944719dd15a36086e205bce8904.bindTooltip(
+                `<div>
+                     Triton Diving Llafranc
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_10cda9d89d720a726ae4957e1d522c98 = L.marker(
+                [39.95619, 3.76483],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_a9fd6937dfb3d7a2a4c61ecaaaae2011 = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_8ea34734621668e7eb608c9876cec6b8 = $(`<div id="html_8ea34734621668e7eb608c9876cec6b8" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> Diving Menorca<br>                     <b>Ubicación:</b> Menorca<br>                     <b>Coordenadas:</b> 39.95619, 3.76483<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_a9fd6937dfb3d7a2a4c61ecaaaae2011.setContent(html_8ea34734621668e7eb608c9876cec6b8);
+            
+        
+
+        marker_10cda9d89d720a726ae4957e1d522c98.bindPopup(popup_a9fd6937dfb3d7a2a4c61ecaaaae2011)
+        ;
+
+        
+    
+    
+            marker_10cda9d89d720a726ae4957e1d522c98.bindTooltip(
+                `<div>
+                     Diving Menorca
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_cbd60a032dc19490c4412f2eee5cf2a4 = L.marker(
+                [36.80105, -2.56239],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_addd3cd7e0d00874586646f26308a45f = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_5b09cc1802b5dfaf5593a799e62dab25 = $(`<div id="html_5b09cc1802b5dfaf5593a799e62dab25" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> Aquatours<br>                     <b>Ubicación:</b> Almeria<br>                     <b>Coordenadas:</b> 36.80105, -2.56239<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_addd3cd7e0d00874586646f26308a45f.setContent(html_5b09cc1802b5dfaf5593a799e62dab25);
+            
+        
+
+        marker_cbd60a032dc19490c4412f2eee5cf2a4.bindPopup(popup_addd3cd7e0d00874586646f26308a45f)
+        ;
+
+        
+    
+    
+            marker_cbd60a032dc19490c4412f2eee5cf2a4.bindTooltip(
+                `<div>
+                     Aquatours
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_0a298b3cb2c41c629bd6ad7d81ff8860 = L.marker(
+                [36.72029, -3.7509],
+                {}
+            ).addTo(map_b438104e9d38116a8562c4a70263a652);
+        
+    
+        var popup_0afaa992ef74ea1bafc1ec3acbce9486 = L.popup({"maxWidth": 300, "minWidth": 150});
+
+        
+            
+                var html_b4aaeb4f181e197d989ebdee8c2f589f = $(`<div id="html_b4aaeb4f181e197d989ebdee8c2f589f" style="width: 100.0%; height: 100.0%;"><b>Centro:</b> BuceoNatura<br>                     <b>Ubicación:</b> La Herradura<br>                     <b>Coordenadas:</b> 36.72029, -3.7509<br>                     <b>Número de registros: </b>                                 </div>`)[0];
+                popup_0afaa992ef74ea1bafc1ec3acbce9486.setContent(html_b4aaeb4f181e197d989ebdee8c2f589f);
+            
+        
+
+        marker_0a298b3cb2c41c629bd6ad7d81ff8860.bindPopup(popup_0afaa992ef74ea1bafc1ec3acbce9486)
+        ;
+
+        
+    
+    
+            marker_0a298b3cb2c41c629bd6ad7d81ff8860.bindTooltip(
+                `<div>
+                     BuceoNatura
+                 </div>`,
+                {"sticky": true}
+            );
+        
+</script>
+</html>

@@ -741,6 +741,30 @@
             "start_year": "2021",
             "end_year": "2023",
             "institution": ""
+        },
+        "205": {
+            "lat": "40.5610",
+            "long": "8.1612",
+            "site_number": "",
+            "site_name": "Capo Caccia_(Il Nereo)",
+            "site_code": "205",
+            "eco_region": "Sardinia",
+            "sub_basin": "Sardinia",
+            "start_year": "2024",
+            "end_year": "2024",
+            "institution": ""
+        },
+        "151": {
+            "lat": "42.3648",
+            "long": "10.9207",
+            "site_number": "",
+            "site_name": "Isola del Giglio_(Punta Gabbianara)",
+            "site_code": "151",
+            "eco_region": "N-Thyrrenian",
+            "sub_basin": "N-Thyrrenian",
+            "start_year": "2021",
+            "end_year": "2024",
+            "institution": ""
         }
     },
     "regions": {
