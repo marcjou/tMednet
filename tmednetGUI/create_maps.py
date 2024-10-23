@@ -26,9 +26,9 @@ def main(argv):
         print(opts)
     print('Selected map is ', mode)
     start_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')[:-2] + '01'
-    #start_date = '2024-06-01'
+    #start_date = '2024-09-01'
     end_date = datetime.strftime(datetime.today() - timedelta(days=1), '%Y-%m-%d')
-    #end_date = '2024-06-30'
+    #end_date = '2024-09-30'
     if datetime.today().day == 1:
         last_day = True
     df_map = mp.MHWMapper('/mnt/MHW/2024_MHW.nc', start_period=start_date, end_period=end_date)
