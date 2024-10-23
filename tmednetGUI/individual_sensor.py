@@ -1,9 +1,14 @@
 import numpy as np
 import pandas as pd
 import os
+import folium
 import glob
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+import cartopy.feature as cfeature
+
+
+import cartopy.crs as ccrs
 import matplotlib.dates as dates
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
@@ -11,32 +16,59 @@ from matplotlib.figure import Figure
 
 class SensorData():
 
-    def __init__(self, filename):
+    def __init__(self, filename, type):
         # For test "/home/marc/Projects/Mednet/tMednet/src/input_files/prueba_seascale.csv"
-        # Load csv as DataFrame directly with its header
-        self.data = pd.read_csv(filename, sep=',', header=9)
-        # Reads the file and stores the metadata
-        with open(filename) as f:
-            content = f.readlines()
-            self.utc = content[7][-8:-2]
-            self.sensor = content[4][7:-1]
-            self.dive = content[6][5:-1]
-            self.duration = datetime.strptime(content[10][10:-4], '%H:%M:%S').time()
-            self.duration_seconds = (self.duration.hour*60 + self.duration.minute)*60 + self.duration.second
-        self.__convert_to_utc()
 
+        if type == 'site':
+            # Load csv as DataFrame directly with its header
+            self.data = [pd.read_csv(filename, sep=',', header=9)]
+            # Reads the file and stores the metadata
+            with open(filename) as f:
+                content = f.readlines()
+                self.utc = [content[7][-8:-2]]
+                self.sensor = [content[4][7:-1]]
+                self.dive = [content[6][5:-1]]
+                self.duration = [datetime.strptime(content[10][10:-4], '%H:%M:%S').time()]
+                self.duration_seconds = [(self.duration.hour*60 + self.duration.minute)*60 + self.duration.second]
+            self.__convert_to_utc()
+        elif type == 'multi_center':
+            # Load csv as DataFrame directly with its header
+            self.data = [pd.read_excel(filename, skiprows=2, usecols='B:E')]
+            self.place_coordinates()
+        elif type == 'multi_site':
+            # Loads multiple csv as they have been uploaded
+            self.__read_mutiple_csv(filename)
+
+    def __read_mutiple_csv(self, filenames):
+        self.data = []
+        self.utc = []
+        self.sensor = []
+        self.dive = []
+        self.duration = []
+        self.duration_seconds = []
+        for filename in filenames:
+            self.data.append(pd.read_csv(filename, sep=',', header=9))
+            # Reads the file and stores the metadata
+            with open(filename) as f:
+                content = f.readlines()
+                self.utc.append(content[7][-8:-2])
+                self.sensor.append(content[4][7:-1])
+                self.dive.append(content[6][5:-1])
+                self.duration.append(datetime.strptime(content[10][10:-4], '%H:%M:%S').time())
+                self.duration_seconds.append((self.duration.hour * 60 + self.duration.minute) * 60 + self.duration.second)
+        self.__convert_to_utc()
     def __convert_to_utc(self):
         #TODO se deberia mostrar todo siempre en UTC 0??
-
-        # Converts date column to datetime object and transforms it to UTC 00:00
-        if self.utc[0] == '+':
-            self.data['date'] = pd.to_datetime(self.data['date'],
-                                               format="%Y-%m-%d %H:%M:%S") - timedelta(hours=float(self.utc[1:3]),
-                                                                                       minutes=float(self.utc[4:6]))
-        else:
-            self.data['date'] = pd.to_datetime(self.data['date'],
-                                               format="%Y-%m-%d %H:%M:%S") + timedelta(hours=float(self.utc[1:3]),
-                                                                                       minutes=float(self.utc[4:6]))
+        for i in len(self.data):
+            # Converts date column to datetime object and transforms it to UTC 00:00
+            if self.utc[i][0] == '+':
+                self.data[i]['date'] = pd.to_datetime(self.data[i]['date'],
+                                                   format="%Y-%m-%d %H:%M:%S") - timedelta(hours=float(self.utc[i][1:3]),
+                                                                                           minutes=float(self.utc[i][4:6]))
+            else:
+                self.data[i]['date'] = pd.to_datetime(self.data[i]['date'],
+                                                   format="%Y-%m-%d %H:%M:%S") + timedelta(hours=float(self.utc[i][1:3]),
+                                                                                           minutes=float(self.utc[i][4:6]))
 
     def plot_temperature_depth(self):
 
@@ -62,12 +94,37 @@ class SensorData():
         # Sets a grid showing the depths levels
         plt.grid(color='gray', linestyle='--', linewidth=0.3)
 
-        self.__class__.__save_image('../src/output_images/Temperature+Depth_' + self.dive + '_' +
-                                    self.data['date'][0].strftime('%d-%m-%Y') + '.png')
+        self.__class__.__save_image(self.dive + '_' +
+                                    self.data['date'][0].strftime('%d-%m-%Y'))
+
+    def create_map(self):
+        # Coordenadas del centro del mapa (aproximadamente el centro entre Gibraltar y la frontera francesa)
+        map_center = [38, -2]
+
+        # Crear el mapa usando Folium, centrado en la región y con un zoom adecuado
+        m = folium.Map(location=map_center, zoom_start=6, tiles='OpenStreetMap')
+
+        return m
+
+    def place_coordinates(self):
+        m = self.create_map()
+
+        # Itera en la lista y crea el mapa con sus contenidos
+        for index, row in self.data.iterrows():
+            popup_content = """<b>Centro:</b> """ + row['Centro'] + """<br>
+                    <b>Ubicación:</b> """ + row['Localidad'] + """<br>
+                    <b>Coordenadas:</b> """ + str(row['Lat']) + """, """ + str(row['Lon']) + """<br>
+                    <b>Número de registros: </b>
+                                """
+            coords = tuple([row['Lat'], row['Lon']])
+            folium.Marker(coords, popup=folium.Popup(popup_content, max_width=300, min_width=150), tooltip=row['Centro']).add_to(m)
+
+        # Guardar el mapa en un archivo HTML
+        m.save('../mapa_centros_seascale.html')
 
     @staticmethod
     def __save_image(savefile):
-        plt.savefig(savefile)
+        plt.savefig('/home/marc/Projects/Mednet/tMednet/src/' + savefile + '.png')
 
     @staticmethod
     def __custom_round(x, base=0.25):
