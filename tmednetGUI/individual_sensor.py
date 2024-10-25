@@ -106,18 +106,22 @@ class SensorData():
 
         return m
 
-    def place_coordinates(self):
+    def place_coordinates(self, points=False):
         m = self.create_map()
 
-        # Itera en la lista y crea el mapa con sus contenidos
-        for index, row in self.data.iterrows():
-            popup_content = """<b>Centro:</b> """ + row['Centro'] + """<br>
-                    <b>Ubicación:</b> """ + row['Localidad'] + """<br>
-                    <b>Coordenadas:</b> """ + str(row['Lat']) + """, """ + str(row['Lon']) + """<br>
-                    <b>Número de registros: </b>
-                                """
-            coords = tuple([row['Lat'], row['Lon']])
-            folium.Marker(coords, popup=folium.Popup(popup_content, max_width=300, min_width=150), tooltip=row['Centro']).add_to(m)
+        if points:
+            for name, coords in points:
+                folium.Marker(coords).add_to(m)
+        else:
+            # Itera en la lista y crea el mapa con sus contenidos
+            for index, row in self.data.iterrows():
+                popup_content = """<b>Centro:</b> """ + row['Centro'] + """<br>
+                        <b>Ubicación:</b> """ + row['Localidad'] + """<br>
+                        <b>Coordenadas:</b> """ + str(row['Lat']) + """, """ + str(row['Lon']) + """<br>
+                        <b>Número de registros: </b>
+                                    """
+                coords = tuple([row['Lat'], row['Lon']])
+                folium.Marker(coords, popup=folium.Popup(popup_content, max_width=300, min_width=150), tooltip=row['Centro']).add_to(m)
 
         # Guardar el mapa en un archivo HTML
         m.save('../mapa_centros_seascale.html')

@@ -51,6 +51,8 @@ class ExcelReport:
         dfmaxesdepth.to_excel(writer, 'Maxes depth', index=False)
         dfmaxes_month.to_excel(writer, 'Maxes month', index=False)
         dfmaxesdepth_month.to_excel(writer, 'Maxes depth month', index=False)
+        df30tmax = self.set_30tmax()
+        df30tmax.to_excel(writer, '30Tmax', index=False)
         write_mhw = self.__check_year_difference()
         if write_mhw:
             mhw_sheet = self.create_mhw()
@@ -64,6 +66,14 @@ class ExcelReport:
         end = time.time()
         print(end - start)
 
+    def set_30tmax(self):
+        df = self.dfexcel.copy()
+        df_30tmax = pd.DataFrame(columns=['year', '30tmax'])
+        for year, group in df.groupby(['year']):
+            tmean = group.sort_values(by='mean', ascending=False)['mean'].values[:30].mean().round(2)
+            dict = {'year': int(year), '30tmax': tmean}
+            df_30tmax = df_30tmax.append(dict, ignore_index=True)
+        return df_30tmax
     def read_and_setup(self):
         df = pd.read_csv(self.filein, sep='\t')
         self.mhwdf = df.copy()
