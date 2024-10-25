@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import data_manager as dm
 import matplotlib.pyplot as plt
 from datetime import datetime
 import matplotlib.dates as mdates
@@ -73,4 +74,66 @@ ax.bar(df_means['Year'], df_means['MeanT'])
 ax.set_ylim([12, 21])
 ax.set_xticks(range(df_means['Year'][0], df_means['Year'][len(df_means['Year'])-1] + 1, 1))
 plt.savefig('history.png')
+
+
+# Ejemplo de datos
+dm = dm.DataManager('hey', 'yo')
+df_thresholds = dm.thresholds_df('../src/input_files/Database_T_06_Medes_200207-202409.txt')
+depth = df.columns[2:-2].values
+thresholds = ['25°C', '26°C', '27°C', '28°C']
+
+values_old_25 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=25'].max()
+values_old_26 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=26'].max()
+values_old_27 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=27'].max()
+values_old_28 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=28'].max()
+
+values_25 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=25'].max()
+values_26 = df_thresholds.loc[df_thresholds['year'] ==2024].groupby('depth(m)')['Ndays>=26'].max()
+values_27 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=27'].max()
+values_28 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=28'].max()
+# Crear la figura
+fig, ax = plt.subplots(figsize=(6, 6))
+
+# Crear las barras apiladas simétricas
+
+ax.barh(depth, values_25, color='#fdcb5c')
+ax.barh(depth, values_26, left=values_25, color='#fd8d3c')
+ax.barh(depth, values_27, left=values_25 + values_26, color='#e63523')
+ax.barh(depth, values_28, left=values_25 + values_26 + values_27, color='#bd0026')
+
+ax.barh(depth, -values_old_25, color='#fdcb5c')
+ax.barh(depth, -values_old_26, left=-values_old_25, color='#fd8d3c')
+ax.barh(depth, -values_old_27, left=-values_old_25 - values_old_26, color='#e63523')
+ax.barh(depth, -values_old_28, left=-values_old_25 - values_old_26 - values_old_27, color='#bd0026')
+
+
+# Etiquetas y estilo
+ax.set_xlabel('Exposure days')
+ax.set_ylabel('Depth (m)')
+ax.set_title('Exposure days by depth and temperature thresholds')
+
+# Leyenda y límites
+ax.legend()
+ax.set_xlim(-30, 30)
+ax.set_xticks(np.arange(-30, 31, 10))
+ax.set_xticklabels([str(abs(x)) for x in np.arange(-30, 31, 10)])
+ax.set_yticks(depth)
+ax.invert_yaxis()
+ax.xaxis.set_ticks_position('top')
+ax.axvline(0, color='gray', linewidth=0.8)  # Línea divisoria en el centro
+
+# Mostrar gráfico
+plt.tight_layout()
+
+# Personalizar la leyenda
+legend_labels = thresholds
+legend_colors = ['#fdcb5c', '#fd8d3c', '#e63523', '#bd0026']
+
+# Crear las entradas de la leyenda con colores específicos
+legend_handles = [plt.Line2D([0], [0], color=color, lw=2) for color in legend_colors]
+
+# Agregar la leyenda al gráfico
+plt.legend(legend_handles, legend_labels, title='Thresholds')
+plt.savefig('../chatprueba.png')
+
 print('hi')
