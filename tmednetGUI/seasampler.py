@@ -12,11 +12,22 @@ class SeaSampler():
                        'Tmax', 'Depth']
             df = pd.DataFrame(columns=columns)
             # path = '../src/input_files/SeaSampler'
-            df = self.dir_reader(df, path)
+            df, bad_list = self.dir_reader(df, path, self.dict_creator)
             df.to_excel('../src/output_files/' + output_file +  '.xlsx')
+            self.save_txt('bad_entries_' + output_file, bad_list)
 
-        print('yes')
-    def dms_to_decimal(self, coordenada):
+        if type == 'control depth':
+
+            print('yes')
+
+    @staticmethod
+    def save_txt(filename, my_list):
+        with open('../src/output_files/' + filename + ".txt", "w") as file:
+            for item in my_list:
+                file.write(item + "\n")
+
+    @staticmethod
+    def dms_to_decimal(coordenada):
         # Usar expresiones regulares para extraer los grados, minutos y segundos
         match = re.match(r"(-?\d+)º(-?\d+)'(-?[\d.]+)\"([NSEW])", coordenada)
 
@@ -38,7 +49,7 @@ class SeaSampler():
         else:
             raise ValueError("El formato de la coordenada no es válido.")
 
-    def dict_creator(self, file_path, file_name, df):
+    def dict_creator(self, file_path, file_name, df, bad_list):
         with open(file_path, newline='') as csvfile:
             # Crear el lector de CSV
             csvreader = csv.reader(csvfile)
@@ -59,7 +70,8 @@ class SeaSampler():
             years = [date.split('-')[0], date.split('-')[3]]
             if (years[0].lstrip() != years[1].lstrip()) | (years[0].lstrip() == '1970') | (years[1].lstrip() == '1970'):
                 print('Discrepancy in years in file: ' + file_name)
-                return df
+                bad_list.append(file_name)
+                return df, bad_list
             bad_lat = primeras_lineas[5].split(':', 1)[1][1:].split(',')[0]
             if bool(re.match(r"^-?\d+º-?\d+'-?\d+(\.\d+)?\"[NSEW]$", bad_lat)):
                 lat = self.dms_to_decimal(bad_lat)
@@ -77,9 +89,10 @@ class SeaSampler():
             dict = {'User': user, 'Sensor': sensor, 'Dive': dive, 'Date Range': date, 'Latitude': lat, 'Longitude': lon,
                     'Duration': dur, 'Tmin': min_temp, 'Tmax': max_temp, 'Depth': depth}
             df = df.append(dict, ignore_index=True)
-            return df
+            return df, bad_list
 
-    def dir_reader(self, df, path):
+    def dir_reader(self, df, path, func):
+        bad_list = []
         for file in os.listdir(path):  # use the directory name here
             file_name, file_ext = os.path.splitext(file)
             print(file_name)
@@ -87,8 +100,8 @@ class SeaSampler():
                 print('ups')
             file_path = path +'/' + file
             if file_ext == '.csv':
-                df = self.dict_creator(file_path, file_name, df)
-        return df
+                df, bad_list = func(file_path, file_name, df, bad_list)
+        return df, bad_list
 
 
 
