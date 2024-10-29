@@ -28,13 +28,13 @@ def dms_to_decimal(coordenada):
 
 columns = ['User', 'Sensor', 'Dive', 'Date Range', 'Latitude', 'Longitude', 'Duration', 'Temp. Min.', 'Temp. Max.', 'Depth']
 df = pd.DataFrame(columns=columns)
-for file in os.listdir('../src/input_files/TODO'):  # use the directory name here
+for file in os.listdir('../src/input_files/SeaSampler'):  # use the directory name here
 
     file_name, file_ext = os.path.splitext(file)
     print(file_name)
     if file_name == "Diver1_SeaScale_2024-08-05T16_07_55_2024-09-05T12_53_55(1)":
         print('ups')
-    file_path = '../src/input_files/TODO/' + file
+    file_path = '../src/input_files/SeaSampler/' + file
     if file_ext == '.csv':
         with open(file_path, newline='') as csvfile:
             # Crear el lector de CSV
@@ -58,6 +58,10 @@ for file in os.listdir('../src/input_files/TODO'):  # use the directory name her
             sensor = primeras_lineas[2].split(':', 1)[1][1:]
             dive = primeras_lineas[3].split(':', 1)[1][1:]
             date = primeras_lineas[4].split(':', 1)[1][1:]
+            years = [date.split('-')[0], date.split('-')[3]]
+            if (years[0] != years[3]) | (years[0] == '1970') | (years[3] == '1970'):
+                print('Discrepancy in years in file: ' + file_name)
+                continue
             bad_lat = primeras_lineas[5].split(':', 1)[1][1:].split(',')[0]
             if bool(re.match(r"^-?\d+º-?\d+'-?\d+(\.\d+)?\"[NSEW]$", bad_lat)):
                 lat = dms_to_decimal(bad_lat)
