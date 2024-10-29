@@ -17,8 +17,7 @@ class SeaSampler():
             self.save_txt('bad_entries_' + output_file, bad_list)
 
         if type == 'control depth':
-
-            print('yes')
+            self.dir_reader(df='bad', path=path, func=self.check_depths)
 
     @staticmethod
     def save_txt(filename, my_list):
@@ -48,6 +47,14 @@ class SeaSampler():
             return decimal
         else:
             raise ValueError("El formato de la coordenada no es válido.")
+
+    #TODO work on using *args and **kwargs to make the functions more flexible
+    def check_depths(self, file_path, file_name, bad_list, *args):
+        df = pd.read_csv(file_path , skiprows=16)
+        df['depth(m)'] = - df['depth(m)']
+        # devuelve las entradas que estan por debajo de un metro de profundidad
+        df = df.loc[df['depth(m)'] >= 1]
+        print('he')
 
     def dict_creator(self, file_path, file_name, df, bad_list):
         with open(file_path, newline='') as csvfile:
@@ -96,8 +103,6 @@ class SeaSampler():
         for file in os.listdir(path):  # use the directory name here
             file_name, file_ext = os.path.splitext(file)
             print(file_name)
-            if file_name == "Diver1_SeaScale_2024-08-05T16_07_55_2024-09-05T12_53_55(1)":
-                print('ups')
             file_path = path +'/' + file
             if file_ext == '.csv':
                 df, bad_list = func(file_path, file_name, df, bad_list)
