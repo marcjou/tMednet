@@ -70,7 +70,7 @@ class SeaSampler():
             years = [date.split('-')[0], date.split('-')[3]]
             if (years[0].lstrip() != years[1].lstrip()) | (years[0].lstrip() == '1970') | (years[1].lstrip() == '1970'):
                 print('Discrepancy in years in file: ' + file_name)
-                bad_list.append(file_name)
+                bad_list.append('Discrepancy on years on: ' + file_name)
                 return df, bad_list
             bad_lat = primeras_lineas[5].split(':', 1)[1][1:].split(',')[0]
             if bool(re.match(r"^-?\d+º-?\d+'-?\d+(\.\d+)?\"[NSEW]$", bad_lat)):
