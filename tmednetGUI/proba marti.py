@@ -4,4 +4,5 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 import seasampler as samp
 
-object = samp.SeaSampler('../src/input_files/SeaSampler', 'control depth', 'probas2')
+#object = samp.SeaSampler('../src/input_files/SeaSampler', 'control depth', 'control_depth_V2')
+object = samp.SeaSampler('../src/input_files/SeaSampler', 'metadata', 'metadata_seasampler_V3')

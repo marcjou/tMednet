@@ -9,7 +9,7 @@ class SeaSampler():
     def __init__(self, path, type, output_file):
         if type == 'metadata':
             columns = ['User', 'Sensor', 'Dive', 'Date Range', 'Latitude', 'Longitude', 'Duration', 'Tmin',
-                       'Tmax', 'Depth']
+                       'Tmax', 'Tsurface', 'Depth']
             df = pd.DataFrame(columns=columns)
             # path = '../src/input_files/SeaSampler'
             df, bad_list = self.dir_reader(df, path, self.dict_creator)
@@ -17,7 +17,9 @@ class SeaSampler():
             self.save_txt('bad_entries_' + output_file, bad_list)
 
         if type == 'control depth':
-            self.dir_reader(df='bad', path=path, func=self.check_depths)
+            df, bad_list = self.dir_reader(df='bad', path=path, func=self.check_depths)
+            self.save_txt('bad_depth_entries', bad_list)
+
 
     @staticmethod
     def save_txt(filename, my_list):
@@ -49,14 +51,32 @@ class SeaSampler():
             raise ValueError("El formato de la coordenada no es válido.")
 
     #TODO work on using *args and **kwargs to make the functions more flexible
-    def check_depths(self, file_path, file_name, bad_list, *args):
+    def check_depths(self, file_path, file_name, df, bad_list, *args):
         df = pd.read_csv(file_path , skiprows=16)
         df['depth(m)'] = - df['depth(m)']
         # devuelve las entradas que estan por debajo de un metro de profundidad
-        df = df.loc[df['depth(m)'] >= 1]
+        if df.loc[df['depth(m)'] < 1].empty:
+            text = 'Depth ok in: ' + file_name
+            bad_list.append(text)
+            df.to_csv('../src/input_files/SeaSampler_corrected/' + file_name + '.csv', index=False, sep=',')
+            return df, bad_list
+        else:
+            df = df.loc[df['depth(m)'] >= 1]
+            df.to_csv('../src/input_files/SeaSampler_corrected/' + file_name + '.csv', index=False, sep=',')
+            text = 'ERROR DEPTH in: ' + file_name
+            bad_list.append(text)
+            return df, bad_list
         print('he')
+        return df, 'bad'
 
     def dict_creator(self, file_path, file_name, df, bad_list):
+        # Gets the first temperature record, estimated to be the surface record
+        df_quick = pd.read_csv('../src/input_files/SeaSampler_corrected/' + file_name + '.csv')
+        if df_quick.empty:
+            print('ha')
+            bad_list.append('Empty file: ' + file_name)
+            return df, bad_list
+        tsurface = df_quick['temperature(c)'][0]
         with open(file_path, newline='') as csvfile:
             # Crear el lector de CSV
             csvreader = csv.reader(csvfile)
@@ -94,7 +114,7 @@ class SeaSampler():
             max_temp = primeras_lineas[8].split(':', 1)[1][1:].split(')', 1)[1].split(' ', 1)[1].split(' ', 1)[0]
             depth = int(-float(primeras_lineas[9].split(':', 1)[1].split(' ')[1]))
             dict = {'User': user, 'Sensor': sensor, 'Dive': dive, 'Date Range': date, 'Latitude': lat, 'Longitude': lon,
-                    'Duration': dur, 'Tmin': min_temp, 'Tmax': max_temp, 'Depth': depth}
+                    'Duration': dur, 'Tmin': min_temp, 'Tmax': max_temp, 'Tsurface': tsurface, 'Depth': depth}
             df = df.append(dict, ignore_index=True)
             return df, bad_list
 
