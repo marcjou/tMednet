@@ -3,6 +3,7 @@ import numpy as np
 import os
 import csv
 import re
+import matplotlib.pyplot as plt
 
 class SeaSampler():
 
@@ -19,6 +20,10 @@ class SeaSampler():
         if type == 'control depth':
             df, bad_list = self.dir_reader(df='bad', path=path, func=self.check_depths)
             self.save_txt('bad_depth_entries', bad_list)
+        if type == 'plots':
+            df, bad_list = self.dir_reader(df=pd.DataFrame(), path=path, func=self.mega_dataframe)
+            self.temp_depth_data = df.sort_values(by='date')
+            print('he')
 
 
     @staticmethod
@@ -50,6 +55,23 @@ class SeaSampler():
         else:
             raise ValueError("El formato de la coordenada no es válido.")
 
+    def mega_dataframe(self, file_path, file_name, df, bad_list):
+        df = df.append(pd.read_csv(file_path))
+        return df, 'bad'
+
+    #TODO convertir date a timestamp o datetime y hacer caso a chatgpt
+    def plot_depthvstemp(self, filename):
+        self.temp_depth_data['date'] = pd.to_datetime(self.temp_depth_data['date'])
+        # Probamos un resample para suavizar las lineas
+        self.temp_depth_data = self.temp_depth_data.resample('T', on='date').mean().reset_index()
+        # Usar solo datos de ciertos dias self.temp_depth_data.loc[self.temp_depth_data['date'] <= '2024-09-20']
+        fig, ax = plt.subplots(figsize=(15, 10))
+        ax.plot(self.temp_depth_data['date'], self.temp_depth_data['temperature(c)'])
+        ax2 = ax.twinx()
+        ax2.plot(self.temp_depth_data['date'], self.temp_depth_data['depth(m)'], color='tab:orange')
+        ax2.invert_yaxis()
+        plt.savefig('../src/output_images/' + filename + '.png')
+        print('alo')
     #TODO work on using *args and **kwargs to make the functions more flexible
     def check_depths(self, file_path, file_name, df, bad_list, *args):
         df = pd.read_csv(file_path , skiprows=16)
