@@ -7,4 +7,4 @@ import seasampler as samp
 #object = samp.SeaSampler('../src/input_files/SeaSampler', 'control depth', 'control_depth_V2')
 #object = samp.SeaSampler('../src/input_files/SeaSampler', 'metadata', 'metadata_seasampler_V3')
 object = samp.SeaSampler('../src/input_files/SeaSampler Tossa', 'plots', 'plots')
-object.plot_depthvstemp('probatemp')
+object.radar_plot()

@@ -55,6 +55,40 @@ class SeaSampler():
         else:
             raise ValueError("El formato de la coordenada no es válido.")
 
+    def radar_plot(self):
+        # Prepare the data for the plot by rounding the depths to integers and  calculating the mean
+        data = self.temp_depth_data.copy()
+        data['depth(m)'] = data['depth(m)'].round()
+        data_mean = data.groupby(by='depth(m)', as_index=False)['temperature(c)'].mean()
+
+        # Prepare the labels
+        labels = data_mean['depth(m)'].unique()
+        num_vars = len(labels)
+
+        # Crear el gráfico de radar
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+
+        # Convertir etiquetas en ángulos para el gráfico de radar
+        angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
+        angles += angles[:1]
+
+
+        # Repetir el primer valor al final para cerrar el gráfico
+        data_mean = pd.concat([data_mean, pd.DataFrame([data_mean.iloc[0]])], ignore_index=True)
+
+
+
+        ax.plot(angles, data_mean['temperature(c)'], color='blue', linewidth=2, label='Average temperature - Tossa')
+
+        # Rellenar el área bajo la curva
+        ax.fill(angles, data_mean['temperature(c)'], color='blue', alpha=0.1)
+
+        # Configuración de etiquetas y leyenda
+        ax.set_yticklabels([])
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels, color='skyblue', fontsize=12)
+        ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))
+        plt.savefig('../src/output_images/radar_tossa.png')
     def mega_dataframe(self, file_path, file_name, df, bad_list):
         df = df.append(pd.read_csv(file_path))
         return df, 'bad'
