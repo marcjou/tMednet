@@ -3,6 +3,7 @@ import numpy as np
 import os
 import csv
 import re
+#TODO convertir depth en positiu
 
 def dms_to_decimal(coordenada):
     # Usar expresiones regulares para extraer los grados, minutos y segundos
@@ -26,7 +27,7 @@ def dms_to_decimal(coordenada):
     else:
         raise ValueError("El formato de la coordenada no es válido.")
 
-columns = ['User', 'Sensor', 'Dive', 'Date Range', 'Latitude', 'Longitude', 'Duration', 'Temp. Min.', 'Temp. Max.', 'Depth']
+columns = ['User', 'Sensor', 'Dive', 'Date Range', 'Latitude', 'Longitude', 'Duration', 'Tmin', 'Tmax', 'Depth']
 df = pd.DataFrame(columns=columns)
 for file in os.listdir('../src/input_files/TODO'):  # use the directory name here
 
