@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 map_center = [41.9000, 3.2000]
 
 # Crear el mapa usando Folium, centrado en la región y con un zoom adecuado
-m = folium.Map(location=map_center, zoom_start=9, tiles='OpenStreetMap')
+m = folium.Map(location=map_center, zoom_start=9, tiles='CartoDB positron')
 
 points = {
             "Cap de Creus Nord (Portaló)": (42.333460, 3.286557 ),
@@ -23,7 +23,7 @@ points = {
 for name, coords in points.items():
     folium.Marker(coords).add_to(m)
 
-m.save('../mapa_sites_catalunya.html')
+m.save('../mapa_sites_catalunya_V2.html')
 
 '''sensor = iss.SensorData('/home/marc/Projects/Mednet/tMednet/src/Centros de Buceo_V1.xlsx', 'site')
 sensor.place_coordinates(points)

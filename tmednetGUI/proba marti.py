@@ -10,4 +10,7 @@ object = samp.SeaSampler('../src/input_files/SeaSampler Tossa', 'plots', 'plots'
 object.add_data_list('../src/input_files/SeaSampler Boreas')
 object.add_data_list('../src/input_files/SeaSampler Medes')
 object.add_data_list('../src/input_files/SeaSampler Ullastres')
-object.radar_plot()
+#object.radar_plot()
+object.dir_reader('no', '../src/input_files/Copernicus September', object.open_netcdf)
+#object.plot_surface_mean()
+object.create_map()

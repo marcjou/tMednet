@@ -80,17 +80,17 @@ plt.savefig('history.png')
 dm = dm.DataManager('hey', 'yo')
 df_thresholds = dm.thresholds_df('../src/input_files/Database_T_06_Medes_200207-202409.txt')
 depth = df.columns[2:-2].values
-thresholds = ['25°C', '26°C', '27°C', '28°C']
+thresholds = ['23°C', '24°C', '25°C', '26°C']
 
-values_old_25 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=25'].max()
-values_old_26 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=26'].max()
-values_old_27 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=27'].max()
-values_old_28 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=28'].max()
+values_old_25 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=23'].max()
+values_old_26 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=24'].max()
+values_old_27 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=25'].max()
+values_old_28 = df_thresholds.loc[df_thresholds['year'] < 2024].groupby('depth(m)')['Ndays>=26'].max()
 
-values_25 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=25'].max()
-values_26 = df_thresholds.loc[df_thresholds['year'] ==2024].groupby('depth(m)')['Ndays>=26'].max()
-values_27 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=27'].max()
-values_28 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=28'].max()
+values_25 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=23'].max()
+values_26 = df_thresholds.loc[df_thresholds['year'] ==2024].groupby('depth(m)')['Ndays>=24'].max()
+values_27 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=25'].max()
+values_28 = df_thresholds.loc[df_thresholds['year'] == 2024].groupby('depth(m)')['Ndays>=26'].max()
 # Crear la figura
 fig, ax = plt.subplots(figsize=(6, 6))
 
@@ -114,9 +114,9 @@ ax.set_title('Exposure days by depth and temperature thresholds')
 
 # Leyenda y límites
 ax.legend()
-ax.set_xlim(-30, 30)
-ax.set_xticks(np.arange(-30, 31, 10))
-ax.set_xticklabels([str(abs(x)) for x in np.arange(-30, 31, 10)])
+ax.set_xlim(-90, 90)
+ax.set_xticks(np.arange(-90, 91, 10))
+ax.set_xticklabels([str(abs(x)) for x in np.arange(-90, 91, 10)])
 ax.set_yticks(depth)
 ax.invert_yaxis()
 ax.xaxis.set_ticks_position('top')
@@ -134,6 +134,6 @@ legend_handles = [plt.Line2D([0], [0], color=color, lw=2) for color in legend_co
 
 # Agregar la leyenda al gráfico
 plt.legend(legend_handles, legend_labels, title='Thresholds')
-plt.savefig('../chatprueba.png')
+plt.savefig('../thresholds_simmetry.png')
 
 print('hi')
