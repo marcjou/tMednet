@@ -434,9 +434,9 @@ class GUIPlot:
             else:
                 self.__plot.set_ylim(0, -depths[-1])
                 self.__plot.set_yticks(-np.insert(depths, 0, 0))
-
+            #TODO CANVIAR FECHA DESPUES DE INFORME
             self.__plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
-                                 datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
+                                 datetime.strptime('31/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
             # self.__plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
 
             # self.__plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
@@ -453,7 +453,9 @@ class GUIPlot:
             dfcopy = dfcopy.loc[(dfcopy.index.month >= 5) & (dfcopy.index.month < 12)]
             # Quantile changes with the amount of data available, with less data is possible to have a higher outlier
             # We only take into account the quantile for all the years to make it correct.
-
+            # USAR SOLO CON INFORME t-MEDNET
+            #hismintemp = 12
+            #hismaxtemp = 29
             levels = np.arange(np.floor(hismintemp), hismaxtemp, 1)
             levels2 = np.arange(np.floor(hismintemp), hismaxtemp, 0.1)
 
