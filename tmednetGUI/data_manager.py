@@ -148,9 +148,20 @@ class DataManager:
 
                 # Loads the data on a dataframe
                 # TODO se quito index_col de read_csv, tal vez deba añadirse?
+                # Check if the first line includes "Titulo de trazado" to ignore it
+                with open(filein, "r", encoding="utf-8") as f:
+                    primera_linea = f.readline().strip()  # .strip() elimina espacios o saltos de línea
+                    if "Título" in primera_linea:
+                        lineas = f.readlines()  # Leer todas las líneas excepto la primera
+                        with open(filein, "w", encoding="utf-8") as f:
+                            f.writelines(lineas)  # Sobreescribir el archivo sin la primera línea
+
+
                 df = pd.read_csv(filein, sep='\t', skiprows=1, header=None)
                 col = df.columns
-                df.drop(col[3:], axis=1, inplace=True)
+                # Drop the first column corresponding to number of series
+                df = df.iloc[:, 1:4]
+                #df.drop(col[3:], axis=1, inplace=True)
                 # Only if the date column is index
                 if df.columns.size != 3:
                     df = df.reset_index()

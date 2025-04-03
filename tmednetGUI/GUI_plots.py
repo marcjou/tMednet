@@ -90,6 +90,8 @@ class GUIPlot:
         self.__cbexists = False  # Control for the colorbar of the Hovmoller
         self.canvas = FigureCanvasTkAgg(self.fig, master=f2)
         self.canvas.draw()
+        #self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
         self.canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
     def plot_ts(self, mdata, files, index):
@@ -436,7 +438,7 @@ class GUIPlot:
                 self.__plot.set_yticks(-np.insert(depths, 0, 0))
             #TODO CANVIAR FECHA DESPUES DE INFORME
             self.__plot.set_xlim(datetime.strptime('01/05/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'),
-                                 datetime.strptime('31/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
+                                 datetime.strptime('01/12/' + year + ' 00:00:00', '%d/%m/%Y %H:%M:%S'))
             # self.__plot.set_xlim(pd.to_datetime(df.index[0]), pd.to_datetime(df.index[-1]))
 
             # self.__plot.set_yticks(-np.arange(0, depths[-1]+1, 5))
@@ -1014,7 +1016,10 @@ class GUIPlot:
             plt.Axes.remove(self.__plot1)
             plt.Axes.remove(self.__plot2)
         if self.__cbexists:
-            self.__cb.remove()
+            if self.__cb is not None:
+                self.__cb.remove()
+            else:
+                print("No colorbar to remove")
             self.__cbexists = False
         if clear_thresholds:
             for tab in self.__tabs:
