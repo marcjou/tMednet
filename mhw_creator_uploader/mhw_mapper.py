@@ -121,7 +121,10 @@ class MHWMapper:
         plt.figure(figsize=(20/2.54, 15/2.54))
 
         ax = plt.axes(projection=ccrs.Mercator())
+        # Mediterranean Extent
         ax.set_extent([-9.5, 37., 28., 50.], crs=ccrs.PlateCarree())
+        # Spanish litoral Extent
+        #ax.set_extent([-9.4, 10.9, 34.9, 43.4], crs=ccrs.PlateCarree())
         ax.add_feature(cf.OCEAN)
         ax.add_feature(cf.LAND)
         ax.coastlines(resolution='10m')
@@ -140,7 +143,7 @@ class MHWMapper:
         # gl.xlabel_style = {'color': 'red', 'weight': 'bold'}
         p = ax.get_window_extent()
         plt.annotate('Source: T-MEDNet MHW Tracker / Generated using E.U. Copernicus Marine Service information',
-                    xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0),
+                    xy=(-0.2, -0.3), xycoords=p, xytext=(0.1, 0), # TODO cambiar el -20 a 0
                     textcoords="offset points",
                     va="center", ha="left")
         plt.annotate('t-mednet.org', xy=(0.01, 0.03), xycoords=p, xytext=(0.1, 0),
@@ -234,7 +237,7 @@ class MHWMapper:
                 ticks = np.arange(0, 366, 60)
                 levels = np.arange(0, 366, 1)
             else:
-                ticks = np.arange(0, 32, 5)
+                ticks = np.arange(0, 32, 15)
                 levels = np.arange(0, 32, 1)
             cmap = 'plasma'
             ylabel = 'Duration (Nº days)'
