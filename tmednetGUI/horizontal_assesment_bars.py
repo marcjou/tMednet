@@ -52,16 +52,32 @@ project_colors = {
     'mortality' : 'ac1520',
     'posidonia': 'cfde35'
 }
+
+regions = ['all', 'Catalunya', 'Balear', 'Murcia', 'Alboran', 'Granada', 'Almería', 'Catalunya_Shook', 'Balear_Shook', 'Estrecho', 'Tarragona', 'Ibiza']
 def plot_horizontal_assessment(df, tipus, colors, region='all'):
     if region!= 'all':
         if region == 'Catalunya':
             df = df.loc[(df['Region'] == 'Costa Brava') | (df['Region'] == 'Tarragona') | (df['Region'] == 'Barcelona')]
+        elif region == 'Catalunya_Shook':
+            df = df.loc[(df['Region'] == 'Costa Brava') | (df['Region'] == 'Barcelona')]
         elif region == 'Balear':
             df = df.loc[(df['Region'] == 'Menorca') | (df['Region'] == 'Mallorca') | (df['Region'] == 'Ibiza-Formentera')]
+        elif region == 'Balear_Shook':
+            df = df.loc[(df['Region'] == 'Menorca') | (df['Region'] == 'Mallorca')]
         elif region == 'Murcia':
             df = df.loc[(df['Region'] == 'Murcia')]
         elif region == 'Alboran':
             df = df.loc[(df['Region'] == 'Almería') | (df['Region'] == 'Granada') | (df['Region'] == 'Estrecho')]
+        elif region == 'Almería':
+            df = df.loc[(df['Region'] == 'Almería')]
+        elif region == 'Granada':
+            df = df.loc[(df['Region'] == 'Granada')]
+        elif region == 'Estrecho':
+            df = df.loc[(df['Region'] == 'Estrecho')]
+        elif region == 'Tarragona':
+            df = df.loc[(df['Region'] == 'Tarragona')]
+        elif region == 'Ibiza':
+            df = df.loc[(df['Region'] == 'Ibiza-Formentera')]
     if tipus == 'posidonia':
         col = 'Type'
         type_counts = df[col].value_counts()
@@ -89,9 +105,12 @@ def plot_horizontal_assessment(df, tipus, colors, region='all'):
             2: "Moderate impact",
             3: "Severe impact"
         }
+        
+
         df[col] = df[col].map(num_to_text)
         type_counts = df[col].value_counts()
         ordered_categories = ["Absence", "No impact", "Moderate impact", "Severe impact"]
+
 
     elif tipus == 'mortality':
         col = '% Affected all'
@@ -105,9 +124,33 @@ def plot_horizontal_assessment(df, tipus, colors, region='all'):
         # Contar la cantidad de valores en cada rango
         type_counts = df["Range"].value_counts().sort_index()
         ordered_categories = ["No impact", "Low impact", "Moderate impact", "Severe impact"]
+        df_summary = df.groupby('Species').agg(
+            mitjana_afectacio=(col, 'mean'),
+            recompte=(col, 'count')
+        ).reset_index()
+
+        pivot_counts = df.pivot_table(
+            index='Species',
+            columns='Range',
+            values=col,
+            aggfunc='count',
+            fill_value=0
+        ).reset_index()
+
+        resulted = df_summary.merge(pivot_counts, on='Species')
+        df_summary["Range"] = pd.cut(df_summary['mitjana_afectacio'], bins=bins, labels=labels, right=False)
+        with pd.ExcelWriter(r'C:\Users\marcj\Documents\CSIC\OdM\Shook\species_count.xlsx', engine='openpyxl',
+                            mode='a', if_sheet_exists='replace') as writer:
+            resulted.to_excel(writer, sheet_name=region, index=True)
+        print('hey')
 
     type_counts = type_counts.reindex(ordered_categories)
     type_percent = type_counts / type_counts.sum() * 100
+    daff = pd.DataFrame({
+        'count': type_counts,
+        'percent': type_percent
+    })
+    daff.rename_axis(region)
     #type_percent = type_percent.dropna() # Convertir a porcentaje
     color_dict = colors[tipus]
     # Crear la barra horizontal acumulada
@@ -131,11 +174,18 @@ def plot_horizontal_assessment(df, tipus, colors, region='all'):
     plt.yticks([])
     plt.tight_layout()  # Ajustar márgenes
     plt.savefig(r'C:\Users\marcj\Documents\CSIC\OdM\Shook\Barras_'+tipus+ '_' + region +'.png', bbox_inches="tight")
-
+    return daff
 
 maptiler_url = f"https://api.maptiler.com/maps/basic-v2/256/{{z}}/{{x}}/{{y}}.png?key=acX4BQAXGb3u391t8fks"  # Tu URL de MapTiler
-plot_horizontal_assessment(df_mortality, 'mortality', colors, 'Alboran')
-plot_horizontal_assessment(df_posidonia, 'posidonia', colors, 'Alboran')
-plot_horizontal_assessment(df_medusas, 'medusas', colors, 'Alboran')
-plot_horizontal_assessment(df_visual, 'visual', colors, 'Alboran')
+with pd.ExcelWriter(r'C:\Users\marcj\Documents\CSIC\OdM\Shook\results.xlsx', engine='openpyxl', mode='w') as writer:
+
+    for region in regions:
+        daf1 = plot_horizontal_assessment(df_mortality.copy(), 'mortality', colors, region)
+        daf1.to_excel(writer, sheet_name='mortality ' + region, index=True)
+        daf2 = plot_horizontal_assessment(df_posidonia.copy(), 'posidonia', colors, region)
+        daf2.to_excel(writer, sheet_name='posidonia ' + region, index=True)
+        daf3 = plot_horizontal_assessment(df_medusas.copy(), 'medusas', colors, region)
+        daf3.to_excel(writer, sheet_name='medusas ' + region, index=True)
+        daf4 = plot_horizontal_assessment(df_visual.copy(), 'visual', colors, region)
+        daf4.to_excel(writer, sheet_name='visual census ' + region, index=True)
 print('hey')

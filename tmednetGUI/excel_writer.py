@@ -62,17 +62,18 @@ class ExcelReport:
             dfmaxesmhw.sort_values(['Date'], ascending=True, inplace=True)
             dfmaxesmhw.to_excel(writer, 'MHW_MAX I', index=False)
 
-        writer.save()
+        writer.close()
         end = time.time()
         print(end - start)
 
     def set_30tmax(self):
         df = self.dfexcel.copy()
         df_30tmax = pd.DataFrame(columns=['year', '30tmax'])
-        for year, group in df.groupby(['year']):
+        for year, group in df.groupby('year'):
             tmean = group.sort_values(by='mean', ascending=False)['mean'].values[:30].mean().round(2)
             dict = {'year': int(year), '30tmax': tmean}
-            df_30tmax = df_30tmax.append(dict, ignore_index=True)
+            print(year)
+            df_30tmax = pd.concat([df_30tmax, pd.DataFrame([dict])], ignore_index=True)
         return df_30tmax
     def read_and_setup(self):
         df = pd.read_csv(self.filein, sep='\t')
@@ -160,9 +161,9 @@ class ExcelReport:
             dfinterseason['Ndays>=27'] = np.round(tempseason.apply(lambda x: x[x >= 27].count()).values / 24)
             dfinterseason['Ndays>=28'] = np.round(tempseason.apply(lambda x: x[x >= 28].count()).values / 24)
 
-            self.dfexcel = self.dfexcel.append(dfinter, ignore_index=True)
-            self.dfmonthly = self.dfmonthly.append(dfintermonth, ignore_index=True)
-            self.dfseasonal = self.dfseasonal.append(dfinterseason, ignore_index=True)
+            self.dfexcel = pd.concat([self.dfexcel, dfinter], ignore_index=True)
+            self.dfmonthly = pd.concat([self.dfmonthly, dfintermonth], ignore_index=True)
+            self.dfseasonal = pd.concat([self.dfseasonal, dfinterseason], ignore_index=True)
 
     # This method uses the mhw library to return the mhw of a given historic file.
     def create_mhw(self):
@@ -180,7 +181,8 @@ class ExcelReport:
              'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
              'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']],
              'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']],
-             'Mean Temperature (ºC)': [round(sst5[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])]})
+             'Mean Temperature (ºC)': [round(sst5[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])],
+             'Category': mhws['category']})
         for depth in depths:
             if depth == depths[0]:
                 pass
@@ -192,8 +194,9 @@ class ExcelReport:
                      'Max Intensity (ºC)': [round(num, 2) for num in mhws['intensity_max']],
                      'Cumulative Intensity (ºC day)': [round(num, 2) for num in mhws['intensity_cumulative']],
                      'Mean Intensity (ºC)': [round(num, 2) for num in mhws['intensity_mean']],
-                     'Mean Temperature (ºC)': [round(sst[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])]})
-                diff = diff.append(dfi, ignore_index=True)
+                     'Mean Temperature (ºC)': [round(sst[item[0]:item[0]+item[1]].mean(), 2) for item in zip(mhws['index_start'], mhws['duration'])],
+                     'Category': mhws['category']})
+                diff = pd.concat([diff, dfi], ignore_index=True)
 
         return diff
 

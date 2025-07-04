@@ -240,6 +240,18 @@
             "end_year": "2018",
             "institution": "Office de l'Environnement de la Corse"
         },
+        "21": {
+            "lat": "38.161318",
+            "long": "-0.431749",
+            "site_number": "21",
+            "site_name": "Tabarca",
+            "site_code": "21",
+            "eco_region": "W-MED",
+            "sub_basin": "S-Catalan",
+            "start_year": "2009",
+            "end_year": "2024",
+            "institution": "Centro de Investigación Marina de Santa Pola (CIMAR)"
+        },
         "23": {
             "lat": "41.33333",
             "long": "9.23861",
